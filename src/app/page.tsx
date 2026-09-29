@@ -1,9 +1,9 @@
+import { SystemsTitleStraight } from "@/components/systems-title-straight";
+
 export default function Home() {
   return (
-    <main className="flex flex-1 items-center justify-center">
-      <h1 className="text-5xl font-bold text-primary">
-        Daniel &quot;Ludo&quot; DeAnda
-      </h1>
+    <main className="flex flex-1 flex-col items-center justify-center gap-48 overflow-hidden py-24">
+      <SystemsTitleStraight />
     </main>
   );
 }
