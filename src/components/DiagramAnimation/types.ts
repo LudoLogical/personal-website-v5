@@ -90,3 +90,42 @@ export type RasterizedArrowEnd = Point & {
    */
   depth: number;
 };
+
+/**
+ * Creates a new ArrowAnchor for a DiagramAnimation.
+ * @param side the side of the bounding box of the display text
+ *             in the DiagramAnimation relative to which the new
+ *             ArrowAnchor should be defined
+ * @param percent the percentage of the way along the specified side
+ *                at which the new ArrowAnchor should be located
+ * @param depth the number of ems away from the specified side at
+ *              which the new ArrowAnchor should be located
+ * @returns the new ArrowAnchor
+ */
+export const anchor = (
+  side: Side,
+  percent: number,
+  depth: number,
+): ArrowAnchor => ({
+  side,
+  percentageAlongSide: percent,
+  depth,
+});
+
+/**
+ * Creates a new ArrowFreeEnd for a DiagramAnimation.
+ * @param xPercentage the percentage of the way along the x-axis
+ *                    of the display text's bounding box at which
+ *                    the new ArrowFreeEnd should be located
+ * @param yPercentage the percentage of the way along the y-axis
+ *                    of the display text's bounding box at which
+ *                    the new ArrowFreeEnd should be located
+ * @returns the new ArrowFreeEnd
+ */
+export const free = (
+  xPercentage: number,
+  yPercentage: number,
+): ArrowFreeEnd => ({
+  xPercentage,
+  yPercentage,
+});

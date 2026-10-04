@@ -1,14 +1,7 @@
 import { orthogonalPathFinding } from "orthogonal-path-finding";
 import { roundCorners } from "svg-round-corners";
 import { type TextDimensions } from "@/utils/useTextDimensions";
-import {
-  CORNER_RADIUS,
-  HEAD_LENGTH,
-  HEAD_SPREAD,
-  OVERLAY_PADDING,
-  PATH_PRECISION,
-  SNAP_DISTANCE,
-} from "./config";
+import { type DiagramAnimationOptions } from "./DiagramAnimation";
 import {
   Side,
   type Arrow,
@@ -24,11 +17,14 @@ import {
  * @param end the ArrowEnd to be rasterized
  * @param textDimensions the TextDimensions of the display text against
  *                       which the specified ArrowEnd is to be rasterized
+ * @param padding the amount of padding, in ems, that should be applied to
+ *                the specified ArrowEnd if and only if it is an ArrowAnchor
  * @returns the RasterizedArrowEnd
  */
 const rasterizeArrowEnd = (
   end: ArrowEnd,
   textDimensions: TextDimensions,
+  padding: number,
 ): RasterizedArrowEnd => {
   if (!("side" in end)) {
     // i.e., if it's an ArrowFreeEnd
@@ -40,7 +36,7 @@ const rasterizeArrowEnd = (
     };
   }
 
-  const rasterizedPadding = OVERLAY_PADDING * textDimensions.em;
+  const rasterizedPadding = padding * textDimensions.em;
   return {
     x:
       end.side === Side.Left
@@ -139,21 +135,27 @@ const simplifyPath = (path: Point[]) => {
  * @param arrow the Arrow convert into a rasterized SVG patha
  * @param textDimensions the TextDimensions of the display text against
  *                       which the specified Arrow should be rasterized
+ * @param options the construction options for the associated DiagramAnimation
  * @returns the rasterized SVG path
  */
 export const arrowToPath = (
   arrow: Arrow,
   textDimensions: TextDimensions,
+  options: DiagramAnimationOptions["construction"],
 ): string => {
   // Resolve origin points
-  const fromArrowEnd = rasterizeArrowEnd(arrow.from, textDimensions);
+  const fromArrowEnd = rasterizeArrowEnd(
+    arrow.from,
+    textDimensions,
+    options.diagramPadding,
+  );
   const fromConnectionPoint = getConnectionPoint(fromArrowEnd);
 
   // Resolve destination points
   const toArrowEnd = alignIfClose(
-    rasterizeArrowEnd(arrow.to, textDimensions),
+    rasterizeArrowEnd(arrow.to, textDimensions, options.diagramPadding),
     fromConnectionPoint,
-    SNAP_DISTANCE * textDimensions.em,
+    options.snapDistance * textDimensions.em,
   );
   const toConnectionPoint = getConnectionPoint(toArrowEnd);
 
@@ -178,8 +180,8 @@ export const arrowToPath = (
   const pathArray = simplifyPath([fromArrowEnd, ...connection, toArrowEnd]);
   return roundCorners(
     pathArray.map(({ x, y }, i) => `${i ? "L" : "M"}${x} ${y}`).join(" "),
-    CORNER_RADIUS * textDimensions.em,
-    PATH_PRECISION,
+    options.cornerRadius * textDimensions.em,
+    options.pathPrecision,
   ).path;
 };
 
@@ -189,11 +191,15 @@ export const arrowToPath = (
  * The size of the arrowhead is based on the specified TextDimensions.
  * @param textDimensions the TextDimensions of the display text against
  *                       which the arrowhead should be rasterized
+ * @param options the appearance options for the associated DiagramAnimation
  * @returns the rasterized SVG path
  */
-export const getArrowheadPath = (textDimensions: TextDimensions): string => {
-  const rasterizedHeadLength = HEAD_LENGTH * textDimensions.em;
-  const rasterizedHeadSpread = HEAD_SPREAD * rasterizedHeadLength;
+export const getArrowheadPath = (
+  textDimensions: TextDimensions,
+  options: DiagramAnimationOptions["appearance"],
+): string => {
+  const rasterizedHeadLength = options.headLength * textDimensions.em;
+  const rasterizedHeadSpread = options.headSpread * rasterizedHeadLength;
   return [
     // Outer tip of one arm
     `M${-rasterizedHeadLength} ${-rasterizedHeadSpread}`,
