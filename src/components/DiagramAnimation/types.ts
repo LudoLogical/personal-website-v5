@@ -39,6 +39,8 @@ export type ArrowAnchor = {
 /**
  * A Point defined relative to the upper-left corner of the
  * bounding box of the display text in a DiagramAnimation.
+ * If the associated Arrow has a marker at this ArrowFreeEnd, this Point is
+ * the center of that marker. Otherwise, it is the end of the Arrow's body.
  */
 export type ArrowFreeEnd = {
   /**
@@ -58,6 +60,36 @@ export type ArrowFreeEnd = {
 export type ArrowEnd = ArrowAnchor | ArrowFreeEnd;
 
 /**
+ * One of the shapes that a marker in a DiagramAnimation can take.
+ */
+export enum MarkerShape {
+  FilledCircle = "filled-circle",
+  OutlinedCircle = "outlined-circle",
+  X = "x",
+}
+
+/**
+ * One of the MarkerShapes that a PathMarker can take.
+ */
+export type PathMarkerShape = MarkerShape.FilledCircle | MarkerShape.X;
+
+/**
+ * A marker that appears directly along the path of an Arrow.
+ */
+export type PathMarker = {
+  /**
+   * The shape of this PathMarker.
+   */
+  shape: PathMarkerShape;
+
+  /**
+   * The percentage of the way along the path of the Arrow
+   * to which this PathMarker belongs at which it is located.
+   */
+  percentageAlongPath: number;
+};
+
+/**
  * A single Arrow in an ArrowAnimation, defined by its two ArrowEnds.
  */
 export type Arrow = {
@@ -70,6 +102,29 @@ export type Arrow = {
    * The ArrowEnd at which this arrow terminates. Rendered with an arrowhead.
    */
   to: ArrowEnd;
+
+  /**
+   * The shape of the marker, if any, from which this Arrow originates.
+   * If the `from` ArrowEnd is an ArrowFreeEnd, the marker is centered on it.
+   * Otherwise, the marker is placed just inside the `from` ArrowAnchor such
+   * that its outer edge aligns with where the end of this Arrow would be
+   * without it.
+   */
+  fromMarker?: MarkerShape;
+
+  /**
+   * The shape of the marker, if any, to which this Arrow points.
+   * If the `to` ArrowEnd is an ArrowFreeEnd, the marker is centered on it.
+   * Otherwise, the marker is placed just inside the `to` ArrowAnchor such
+   * that its outer edge aligns with where the end of this Arrow would be
+   * without it.
+   */
+  toMarker?: MarkerShape;
+
+  /**
+   * The PathMarkers that appear directly along the path of this Arrow.
+   */
+  pathMarkers?: PathMarker[];
 };
 
 /**
@@ -89,6 +144,31 @@ export type RasterizedArrowEnd = Point & {
    * is located.
    */
   depth: number;
+};
+
+/**
+ * A marker for which the position of the center has been converted to pixels.
+ */
+export type RasterizedMarker = Point & {
+  /**
+   * The shape of this RasterizedMarker.
+   */
+  shape: MarkerShape;
+};
+
+/**
+ * An Arrow for which all values have been converted to pixels.
+ */
+export type RasterizedArrow = {
+  /**
+   * The rasterized SVG path for the body of this RasterizedArrow.
+   */
+  body: string;
+
+  /**
+   * The RasterizedMarkers that belong to this RasterizedArrow.
+   */
+  markers: RasterizedMarker[];
 };
 
 /**
@@ -128,4 +208,17 @@ export const free = (
 ): ArrowFreeEnd => ({
   xPercentage,
   yPercentage,
+});
+
+/**
+ * Creates a new PathMarker for a DiagramAnimation.
+ * @param shape the shape of the new PathMarker
+ * @param percent the percentage of the way along the path of the Arrow
+ *                to which the new PathMarker belongs at which the new
+ *                PathMarker should be located
+ * @returns the new PathMarker
+ */
+export const along = (shape: PathMarkerShape, percent: number): PathMarker => ({
+  shape,
+  percentageAlongPath: percent,
 });

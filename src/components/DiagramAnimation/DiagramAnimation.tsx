@@ -3,9 +3,9 @@
 import { useMemo, useRef, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
 import { useTextDimensions } from "@/utils/useTextDimensions";
-import { arrowToPath, getArrowheadPath } from "./paths";
+import { getArrowheadPath, getMarkerPaths, rasterizeArrow } from "./paths";
 import { useDiagramAnimationTimeline } from "./timeline";
-import { type Arrow } from "./types";
+import { MarkerShape, type Arrow } from "./types";
 
 export type DiagramAnimationProps = {
   /**
@@ -63,6 +63,12 @@ export type DiagramAnimationProps = {
        * should be approximated when applying rounded corners.
        */
       pathPrecision?: number;
+
+      /**
+       * The distance, in ems, between the edge of a marker at the end of an
+       * Arrow in a DiagramAnimation and the end of the body of that Arrow.
+       */
+      markerGap?: number;
     };
 
     /**
@@ -86,6 +92,12 @@ export type DiagramAnimationProps = {
        * expressed as a fraction of the headLength.
        */
       headSpread?: number;
+
+      /**
+       * The side length, in ems, of the square within which
+       * each marker in a DiagramAnimation fits.
+       */
+      markerSize?: number;
     };
 
     /**
@@ -144,11 +156,13 @@ export const DEFAULT_OPTIONS: DiagramAnimationOptions = {
     cornerRadius: 0.3,
     snapDistance: 0.05,
     pathPrecision: 2,
+    markerGap: 0.18,
   },
   appearance: {
     strokeWidth: 0.085,
     headLength: 0.22,
     headSpread: 0.7,
+    markerSize: 0.4,
   },
   animation: {
     forwardDuration: 0.5,
@@ -205,19 +219,36 @@ const DiagramAnimation = ({
       getArrowheadPath(textDimensions, resolvedOptions.appearance),
     [textDimensions, resolvedOptions.appearance],
   );
-  const arrowBodies = useMemo(
+  const markerPaths = useMemo(
+    () =>
+      textDimensions &&
+      getMarkerPaths(textDimensions, resolvedOptions.appearance),
+    [textDimensions, resolvedOptions.appearance],
+  );
+  const rasterizedArrows = useMemo(
     () =>
       textDimensions &&
       arrows.map((arrow) =>
-        arrowToPath(arrow, textDimensions, resolvedOptions.construction),
+        rasterizeArrow(
+          arrow,
+          textDimensions,
+          resolvedOptions.construction,
+          resolvedOptions.appearance,
+        ),
       ),
-    [textDimensions, arrows, resolvedOptions.construction],
+    [
+      textDimensions,
+      arrows,
+      resolvedOptions.construction,
+      resolvedOptions.appearance,
+    ],
   );
 
   const animation = useDiagramAnimationTimeline(
     svgRef,
     arrowhead,
-    arrowBodies,
+    markerPaths,
+    rasterizedArrows,
     resolvedOptions.animation,
   );
 
@@ -227,10 +258,10 @@ const DiagramAnimation = ({
 
   return (
     <div className={twMerge("relative", className)}>
-      {/* Tight leading brings bounding box closer to the letters */}
+      {/* Removing leading brings bounding box closer to the letters */}
       <h1
         ref={textRef}
-        className="leading-tight whitespace-nowrap"
+        className="leading-none whitespace-nowrap"
         onPointerEnter={(e) => {
           if (!isTouchEvent(e)) animation.setActive(true);
         }}
@@ -254,9 +285,23 @@ const DiagramAnimation = ({
         strokeLinejoin="round"
       >
         {arrowhead &&
-          arrowBodies?.map((body, i) => (
+          markerPaths &&
+          rasterizedArrows?.map(({ body, markers }, i) => (
             <g key={i} data-arrow opacity={0}>
               <path data-body d={body} />
+              {markers.map(({ x, y, shape }, j) => (
+                // Positioned by the outer group, scaled by the inner path
+                <g key={j} transform={`translate(${x} ${y})`}>
+                  <path
+                    data-marker
+                    d={markerPaths[shape]}
+                    {...(shape === MarkerShape.FilledCircle && {
+                      fill: "currentColor",
+                      stroke: "none",
+                    })}
+                  />
+                </g>
+              ))}
               <g data-tip>
                 <path data-head d={arrowhead} />
               </g>

@@ -3,11 +3,13 @@ import { gsap } from "gsap";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { type DiagramAnimationOptions } from "./DiagramAnimation";
+import { type MarkerShape, type RasterizedArrow } from "./types";
 
 gsap.registerPlugin(DrawSVGPlugin, MotionPathPlugin);
 
 /**
- * Adds the animations for the specified arrow to the specified Timeline.
+ * Adds the animations for the specified arrow (and its markers)
+ * to the specified Timeline.
  * @param arrow the Element containing the SVG for the arrow to be animated
  * @param timeline the GSAP Timeline to which the animations should be added
  * @param options the animation options for the associated DiagramAnimation
@@ -56,6 +58,17 @@ const animateArrow = (
       },
       0,
     );
+
+  // Scale each marker up from nothing over the whole timeline
+  for (const marker of arrow.querySelectorAll("[data-marker]")) {
+    timeline.fromTo(
+      marker,
+      // Origin set from the start so that GSAP doesn't offset it to compensate
+      { scale: 0, transformOrigin: "50% 50%" }, // grow out from center
+      { scale: 1 },
+      0,
+    );
+  }
 };
 
 export type DiagramAnimationTimelineControls = {
@@ -72,7 +85,9 @@ export type DiagramAnimationTimelineControls = {
  * @param svgRef a RefObject for the SVG Element to be animated
  * @param head the arrowhead path rendered in the SVG;
  *             passed to trigger a rebuild when changed
- * @param bodies the Arrow body paths rendered in the SVG;
+ * @param markerPaths the marker paths rendered in the SVG;
+ *                    passed to trigger a rebuild when changed
+ * @param arrows the RasterizedArrows rendered in the SVG;
  *               passed to trigger a rebuild when changed
  * @param options the animation options for the associated DiagramAnimation
  * @returns the DiagramAnimationTimelineControls for the animation
@@ -80,7 +95,8 @@ export type DiagramAnimationTimelineControls = {
 export const useDiagramAnimationTimeline = (
   svgRef: RefObject<Element | null>,
   head: string | null,
-  bodies: string[] | null,
+  markerPaths: Record<MarkerShape, string> | null,
+  arrows: RasterizedArrow[] | null,
   options: DiagramAnimationOptions["animation"],
 ): DiagramAnimationTimelineControls => {
   const timeline = useRef<gsap.core.Timeline | null>(null);
@@ -109,7 +125,7 @@ export const useDiagramAnimationTimeline = (
   const toggleActive = () => setActive(!active.current);
 
   useLayoutEffect(() => {
-    if (!bodies || !head) return; // wait until the SVG is renderable
+    if (!arrows || !head || !markerPaths) return; // wait until the SVG is renderable
 
     const gsapContext = gsap.context((self) => {
       // Create a new, empty timeline
@@ -137,7 +153,7 @@ export const useDiagramAnimationTimeline = (
       timeline.current = null;
       gsapContext.revert(); // reset the SVG to baseline
     };
-  }, [bodies, head, options, svgRef, setActive]);
+  }, [arrows, head, markerPaths, options, svgRef, setActive]);
 
   return { setActive, toggleActive };
 };
