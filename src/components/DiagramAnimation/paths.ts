@@ -8,6 +8,7 @@ import {
   Side,
   type Arrow,
   type ArrowEnd,
+  type PathMarker,
   type Point,
   type RasterizedArrow,
   type RasterizedArrowEnd,
@@ -20,7 +21,7 @@ import {
  * to the rasterized coordinates.
  * @param end the ArrowEnd to be rasterized
  * @param textDimensions the TextDimensions of the display text against
- *                       which the specified ArrowEnd is to be rasterized
+ *                       which the specified ArrowEnd should be rasterized
  * @param padding the amount of padding, in ems, that should be applied to
  *                the specified ArrowEnd if and only if it is an ArrowAnchor
  * @returns the RasterizedArrowEnd
@@ -135,13 +136,20 @@ const simplifyPath = (path: Point[]) => {
 };
 
 /**
- * Moves the specified Point toward the specified target Point by the
- * specified distance, without moving it past the target Point.
- * A negative distance moves the Point directly away from the target Point.
+ * Moves the specified Point toward the specified target Point
+ * by the specified distance.
+ *
+ * If the distance is large enough to cause the point to move past the target,
+ * it is snapped to the target instead.
+ *
+ * If the distance is negative,
+ * the point is moved directly *away* from the target Point instead.
+ *
  * @param point the Point to be moved
- * @param target the Point toward which the specified Point should be moved
- * @param distance the distance, in pixels, by which the Point should be moved
- * @returns the moved Point
+ * @param target the Point toward which the other Point should be moved
+ * @param distance the distance, in pixels, by which
+ *                 the first Point should be moved
+ * @returns a new Point representing the result of the movement
  */
 const moveToward = (point: Point, target: Point, distance: number): Point => {
   const dx = target.x - point.x;
@@ -153,34 +161,132 @@ const moveToward = (point: Point, target: Point, distance: number): Point => {
 };
 
 /**
+ * Places the end marker(s) (if any) of the specified Arrow at the appropriate
+ * end(s) of the specified path and then trims that path so that it does not
+ * overlap with the marker(s).
+ * @param arrow the Arrow whose end markers are to be placed
+ * @param pathArray the rasterized path of the specified Arrow
+ * @param emSize the size, in pixels, of a single em in the context
+ *               relative to which the end markers should be rasterized
+ * @param constructionOptions the construction options for
+ *                            the associated DiagramAnimation
+ * @param appearanceOptions the appearance options for
+ *                          the associated DiagramAnimation
+ * @returns the RasterizedMarkers and trimmed pathArray
+ */
+const placeEndMarkers = (
+  arrow: Arrow,
+  pathArray: Point[],
+  emSize: number,
+  constructionOptions: DiagramAnimationOptions["construction"],
+  appearanceOptions: DiagramAnimationOptions["appearance"],
+): { markers: RasterizedMarker[]; trimmedPathArray: Point[] } => {
+  const rasterizedMarkerSize = appearanceOptions.markerSize * emSize;
+  const rasterizedStroke = appearanceOptions.strokeWidth * emSize;
+  const rasterizedMarkerGap = constructionOptions.markerGap * emSize;
+
+  // How far a marker would need to be moved to
+  // align its outer edge with an anchor coordinate
+  const offset = rasterizedMarkerSize / 2 - rasterizedStroke / 2;
+  // How much a path would need to be trimmed to
+  // accomodate a marker being placed at one end
+  const clearance = rasterizedMarkerSize / 2 + rasterizedMarkerGap;
+
+  const markers: RasterizedMarker[] = [];
+  const trimmedPathArray = [...pathArray];
+
+  const placeEndMarker = (
+    endIndex: number,
+    neighborIndex: number,
+    arrowEnd: ArrowEnd,
+    shape: MarkerShape,
+  ) => {
+    // Reads from the original path only so that trimming one end of a path
+    // with only two points doesn't affect the trimming of the other end.
+    const end = pathArray[endIndex];
+    const neighbor = pathArray[neighborIndex];
+
+    // End markers are centered on ArrowFreeEnds, but shifted inward
+    // from ArrowAnchors to align their outer edges with the natural
+    // ends of their Arrow's body.
+    const center = "side" in arrowEnd ? moveToward(end, neighbor, offset) : end;
+    markers.push({ ...center, shape });
+
+    // Make way for the new marker
+    trimmedPathArray[endIndex] = moveToward(center, neighbor, clearance);
+  };
+
+  if (arrow.fromMarker) placeEndMarker(0, 1, arrow.from, arrow.fromMarker);
+  if (arrow.toMarker) {
+    placeEndMarker(
+      pathArray.length - 1,
+      pathArray.length - 2,
+      arrow.to,
+      arrow.toMarker,
+    );
+  }
+
+  return { markers, trimmedPathArray };
+};
+
+/**
+ * Computes the positions of the specified PathMarkers along the specified
+ * rasterized SVG path.
+ * @param body the rasterized SVG path along which
+ *             the PathMarkers should be placed
+ * @param pathMarkers the PathMarkers to be placed
+ * @returns the resulting RasterizedMarkers
+ */
+const placePathMarkers = (
+  body: string,
+  pathMarkers: PathMarker[] = [],
+): RasterizedMarker[] => {
+  if (pathMarkers.length === 0) return [];
+  const rawPath = MotionPathPlugin.stringToRawPath(body);
+  return pathMarkers.map(({ shape, percentageAlongPath }) => {
+    const { x, y } = MotionPathPlugin.getPositionOnPath(
+      rawPath,
+      percentageAlongPath,
+    );
+    return { x, y, shape };
+  });
+};
+
+/**
  * Converts the specified Arrow into a rasterized SVG path and computes
  * the positions of the centers of the markers that belong to it.
  * @param arrow the Arrow to be rasterized
  * @param textDimensions the TextDimensions of the display text against
  *                       which the specified Arrow should be rasterized
- * @param options the construction options for the associated DiagramAnimation
- * @param appearance the appearance options for the associated DiagramAnimation
- * @returns the RasterizedArrow
+ * @param constructionOptions the construction options for
+ *                            the associated DiagramAnimation
+ * @param appearanceOptions the appearance options for
+ *                          the associated DiagramAnimation
+ * @returns the resulting RasterizedArrow
  */
 export const rasterizeArrow = (
   arrow: Arrow,
   textDimensions: TextDimensions,
-  options: DiagramAnimationOptions["construction"],
-  appearance: DiagramAnimationOptions["appearance"],
+  constructionOptions: DiagramAnimationOptions["construction"],
+  appearanceOptions: DiagramAnimationOptions["appearance"],
 ): RasterizedArrow => {
   // Resolve origin points
   const fromArrowEnd = rasterizeArrowEnd(
     arrow.from,
     textDimensions,
-    options.diagramPadding,
+    constructionOptions.diagramPadding,
   );
   const fromConnectionPoint = getConnectionPoint(fromArrowEnd);
 
   // Resolve destination points
   const toArrowEnd = alignIfClose(
-    rasterizeArrowEnd(arrow.to, textDimensions, options.diagramPadding),
+    rasterizeArrowEnd(
+      arrow.to,
+      textDimensions,
+      constructionOptions.diagramPadding,
+    ),
     fromConnectionPoint,
-    options.snapDistance * textDimensions.em,
+    constructionOptions.snapDistance * textDimensions.em,
   );
   const toConnectionPoint = getConnectionPoint(toArrowEnd);
 
@@ -201,69 +307,29 @@ export const rasterizeArrow = (
     },
   ).path ?? [fromConnectionPoint, toConnectionPoint]; // default on failure
 
-  // Join points into path
+  // Join all resolved points into an initial body path
   const pathArray = simplifyPath([fromArrowEnd, ...connection, toArrowEnd]);
 
-  // Extend ArrowFreeEnds that have markers outward along the path by the
-  // same distance that their markers are about to be shifted inward (see
-  // below) so that those markers end up centered on the ArrowFreeEnds
-  const markerSize = appearance.markerSize * textDimensions.em;
-  const halfStroke = (appearance.strokeWidth * textDimensions.em) / 2;
-  const markerOffset = markerSize / 2 - halfStroke;
-  if (arrow.fromMarker && !("side" in arrow.from)) {
-    pathArray[0] = moveToward(pathArray[0], pathArray[1], -markerOffset);
-  }
-  if (arrow.toMarker && !("side" in arrow.to)) {
-    pathArray[pathArray.length - 1] = moveToward(
-      pathArray[pathArray.length - 1],
-      pathArray[pathArray.length - 2],
-      -markerOffset,
-    );
-  }
+  // Place end markers and trim the body path to make room for them as needed
+  const { markers, trimmedPathArray } = placeEndMarkers(
+    arrow,
+    pathArray,
+    textDimensions.em,
+    constructionOptions,
+    appearanceOptions,
+  );
 
-  const first = pathArray[0];
-  const second = pathArray[1];
-  const last = pathArray[pathArray.length - 1];
-  const penultimate = pathArray[pathArray.length - 2];
-
-  // Shift end markers inward along the path so that their outer edges align
-  // with the round caps (or arrowhead tips) that would otherwise be rendered
-  // at the ends of the path, keeping all Arrow ends aligned with each other
-  const markers: RasterizedMarker[] = [];
-  if (arrow.fromMarker) {
-    const center = moveToward(first, second, markerOffset);
-    markers.push({ ...center, shape: arrow.fromMarker });
-  }
-  if (arrow.toMarker) {
-    const center = moveToward(last, penultimate, markerOffset);
-    markers.push({ ...center, shape: arrow.toMarker });
-  }
-
-  // Trim the path so that it stops short of the inner edges of any end markers
-  const trim = markerSize - halfStroke + options.markerGap * textDimensions.em;
-  if (arrow.fromMarker) pathArray[0] = moveToward(first, second, trim);
-  if (arrow.toMarker) {
-    pathArray[pathArray.length - 1] = moveToward(last, penultimate, trim);
-  }
-
-  // Perform post-processing
+  // Finalize the body path by rounding its corners
   const body = roundCorners(
-    pathArray.map(({ x, y }, i) => `${i ? "L" : "M"}${x} ${y}`).join(" "),
-    options.cornerRadius * textDimensions.em,
-    options.pathPrecision,
+    trimmedPathArray
+      .map(({ x, y }, i) => `${i ? "L" : "M"}${x} ${y}`)
+      .join(" "),
+    constructionOptions.cornerRadius * textDimensions.em,
+    constructionOptions.pathPrecision,
   ).path;
 
-  // Place path markers along the visible (i.e., trimmed) path
-  if (arrow.pathMarkers?.length) {
-    const rawPath = MotionPathPlugin.stringToRawPath(body);
-    for (const { shape, percentageAlongPath } of arrow.pathMarkers) {
-      const { x, y } = MotionPathPlugin.getPositionOnPath(
-        rawPath,
-        percentageAlongPath,
-      );
-      markers.push({ x, y, shape });
-    }
-  }
+  // Place any path markers along the finalized body path
+  markers.push(...placePathMarkers(body, arrow.pathMarkers));
 
   return { body, markers };
 };
@@ -272,17 +338,19 @@ export const rasterizeArrow = (
  * Creates the rasterized SVG path for an arrowhead pointing
  * in the positive x direction with its tip at the origin.
  * The size of the arrowhead is based on the specified TextDimensions.
- * @param textDimensions the TextDimensions of the display text against
- *                       which the arrowhead should be rasterized
- * @param options the appearance options for the associated DiagramAnimation
+ * @param emSize the size, in pixels, of a single em in the context
+ *               relative to which the end markers should be rasterized
+ * @param appearanceOptions the appearance options for
+ *                          the associated DiagramAnimation
  * @returns the rasterized SVG path
  */
 export const getArrowheadPath = (
-  textDimensions: TextDimensions,
-  options: DiagramAnimationOptions["appearance"],
+  emSize: number,
+  appearanceOptions: DiagramAnimationOptions["appearance"],
 ): string => {
-  const rasterizedHeadLength = options.headLength * textDimensions.em;
-  const rasterizedHeadSpread = options.headSpread * rasterizedHeadLength;
+  const rasterizedHeadLength = appearanceOptions.headLength * emSize;
+  const rasterizedHeadSpread =
+    appearanceOptions.headSpread * rasterizedHeadLength;
   return [
     // Outer tip of one arm
     `M${-rasterizedHeadLength} ${-rasterizedHeadSpread}`,
@@ -294,29 +362,33 @@ export const getArrowheadPath = (
 };
 
 /**
- * Creates the rasterized SVG paths for each MarkerShape, centered on the
- * origin. Every path fits within a square whose sides are the markerSize
- * (accounting for the strokeWidth where applicable).
- * The size of each path is based on the specified TextDimensions.
- * @param textDimensions the TextDimensions of the display text against
- *                       which the paths should be rasterized
- * @param options the appearance options for the associated DiagramAnimation
- * @returns the rasterized SVG paths, keyed by MarkerShape
+ * Creates the rasterized SVG paths for each MarkerShape.
+ * Every path is centered on the origin and fits perfectly
+ * within a square sized according to the specified emSize
+ * and the markerSize in the specified appearanceOptions.
+ * @param emSize the size, in pixels, of a single em in the context
+ *               relative to which the end markers should be rasterized
+ * @param appearanceOptions the appearance options for
+ *                          the associated DiagramAnimation
+ * @returns a Record keyed by MarkerShape containing the rasterized SVG paths
  */
 export const getMarkerPaths = (
-  textDimensions: TextDimensions,
-  options: DiagramAnimationOptions["appearance"],
+  emSize: number,
+  appearanceOptions: DiagramAnimationOptions["appearance"],
 ): Record<MarkerShape, string> => {
-  const halfSize = (options.markerSize * textDimensions.em) / 2;
-  const halfStroke = (options.strokeWidth * textDimensions.em) / 2;
+  const rasterizedHalfSize = (appearanceOptions.markerSize * emSize) / 2;
+  const rasterizedHalfStroke = (appearanceOptions.strokeWidth * emSize) / 2;
   const circle = (r: number) =>
     `M${r} 0 A${r} ${r} 0 1 0 ${-r} 0 A${r} ${r} 0 1 0 ${r} 0 Z`;
-  const armLength = halfSize - halfStroke; // round caps extend by halfStroke
+  // Round caps extend armLength by rasterizedHalfStroke
+  const armLength = rasterizedHalfSize - rasterizedHalfStroke;
   return {
-    // Filled circles are rendered without a stroke
-    [MarkerShape.FilledCircle]: circle(halfSize),
-    // Outlined circles' strokes are centered on their radii
-    [MarkerShape.OutlinedCircle]: circle(halfSize - halfStroke),
+    // Filled circle has no stroke
+    [MarkerShape.FilledCircle]: circle(rasterizedHalfSize),
+    // Outlined circle has a stroke centered on its radius
+    [MarkerShape.OutlinedCircle]: circle(
+      rasterizedHalfSize - rasterizedHalfStroke,
+    ),
     [MarkerShape.X]: [
       `M${-armLength} ${-armLength} L${armLength} ${armLength}`,
       `M${-armLength} ${armLength} L${armLength} ${-armLength}`,

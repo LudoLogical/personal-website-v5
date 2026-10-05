@@ -10,12 +10,12 @@ import { MarkerShape, type Arrow } from "./types";
 export type DiagramAnimationProps = {
   /**
    * The display text for this DiagramAnimation.
-   * Subject to whitespace-nowrap.
+   * Subject to leading-none and whitespace-nowrap.
    */
   text: string;
 
   /**
-   * The Arrows in this DiagramAnimation.
+   * The Arrows that comprise this DiagramAnimation.
    */
   arrows: Arrow[];
 
@@ -36,14 +36,14 @@ export type DiagramAnimationProps = {
     construction?: {
       /**
        * The amount of space, in ems, between the text at the center
-       * of a DiagramAnimation and the baseline positions for any
+       * of this DiagramAnimation and the baseline positions for any
        * indirectly positioned diagram elements that surround it.
        */
       diagramPadding?: number;
 
       /**
        * The radius, in ems, of the corners
-       * of the Arrows in a DiagramAnimation.
+       * of the Arrows in this DiagramAnimation.
        */
       cornerRadius?: number;
 
@@ -66,23 +66,23 @@ export type DiagramAnimationProps = {
 
       /**
        * The distance, in ems, between the edge of a marker at the end of an
-       * Arrow in a DiagramAnimation and the end of the body of that Arrow.
+       * Arrow in this DiagramAnimation and the end of the body of that Arrow.
        */
       markerGap?: number;
     };
 
     /**
-     * Optional settings that control how the DiagramElements are rasterized.
+     * Optional settings that control how the diagram elements are rasterized.
      */
     appearance?: {
       /**
-       * The width, in ems, of the lines in a DiagramAnimation.
+       * The width, in ems, of the lines in this DiagramAnimation.
        */
       strokeWidth?: number;
 
       /**
        * The distance, in ems, between (a) the tips of the arms that form the heads
-       * of the Arrows in a DiagramAnimation and (b) the bodies of those Arrows.
+       * of the Arrows in this DiagramAnimation and (b) the bodies of those Arrows.
        */
       headLength?: number;
 
@@ -94,8 +94,7 @@ export type DiagramAnimationProps = {
       headSpread?: number;
 
       /**
-       * The side length, in ems, of the square within which
-       * each marker in a DiagramAnimation fits.
+       * The diameter, in ems, of the markers in this DiagramAnimation.
        */
       markerSize?: number;
     };
@@ -106,25 +105,25 @@ export type DiagramAnimationProps = {
     animation?: {
       /**
        * The duration, in seconds, over which the elements
-       * of a DiagramAnimation should grow.
+       * in this DiagramAnimation should appear.
        */
       forwardDuration?: number;
 
       /**
        * The number of times faster at which the elements
-       * of a DiagramAnimation should shrink.
+       * of this DiagramAnimation should disappear.
        */
       backwardSpeedup?: number;
 
       /**
        * The duration, in seconds, over which the elements
-       * of a DiagramAnimation should fade into view.
+       * of this DiagramAnimation should fade into view.
        */
       fadeInDuration?: number;
 
       /**
-       * The fraction of the overall duration of a DiagramAnimation over which
-       * the arrowheads in that DiagramAnimation should grow into view.
+       * The fraction of the overall duration of this DiagramAnimation
+       * over which its arrowheads should grow into view.
        */
       headGrow?: number;
     };
@@ -216,13 +215,13 @@ const DiagramAnimation = ({
   const arrowhead = useMemo(
     () =>
       textDimensions &&
-      getArrowheadPath(textDimensions, resolvedOptions.appearance),
+      getArrowheadPath(textDimensions.em, resolvedOptions.appearance),
     [textDimensions, resolvedOptions.appearance],
   );
   const markerPaths = useMemo(
     () =>
       textDimensions &&
-      getMarkerPaths(textDimensions, resolvedOptions.appearance),
+      getMarkerPaths(textDimensions.em, resolvedOptions.appearance),
     [textDimensions, resolvedOptions.appearance],
   );
   const rasterizedArrows = useMemo(
@@ -237,8 +236,8 @@ const DiagramAnimation = ({
         ),
       ),
     [
-      textDimensions,
       arrows,
+      textDimensions,
       resolvedOptions.construction,
       resolvedOptions.appearance,
     ],
@@ -247,8 +246,8 @@ const DiagramAnimation = ({
   const animation = useDiagramAnimationTimeline(
     svgRef,
     arrowhead,
-    markerPaths,
     rasterizedArrows,
+    markerPaths,
     resolvedOptions.animation,
   );
 
@@ -290,7 +289,7 @@ const DiagramAnimation = ({
             <g key={i} data-arrow opacity={0}>
               <path data-body d={body} />
               {markers.map(({ x, y, shape }, j) => (
-                // Positioned by the outer group, scaled by the inner path
+                // Positioned here, scaled during path creation
                 <g key={j} transform={`translate(${x} ${y})`}>
                   <path
                     data-marker

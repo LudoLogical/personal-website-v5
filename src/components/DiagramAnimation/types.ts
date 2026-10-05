@@ -15,6 +15,9 @@ export enum Side {
 /**
  * A Point defined relative to one side of the
  * bounding box of the display text in a DiagramAnimation.
+ * If the associated Arrow has a marker at this ArrowAnchor, this Point is
+ * the middle of the outer edge of that marker. Otherwise, it is the end of
+ * the Arrow's body.
  */
 export type ArrowAnchor = {
   /**
@@ -83,7 +86,7 @@ export type PathMarker = {
   shape: PathMarkerShape;
 
   /**
-   * The percentage of the way along the path of the Arrow
+   * The percentage of the way along the body of the Arrow
    * to which this PathMarker belongs at which it is located.
    */
   percentageAlongPath: number;
@@ -106,18 +109,18 @@ export type Arrow = {
   /**
    * The shape of the marker, if any, from which this Arrow originates.
    * If the `from` ArrowEnd is an ArrowFreeEnd, the marker is centered on it.
-   * Otherwise, the marker is placed just inside the `from` ArrowAnchor such
-   * that its outer edge aligns with where the end of this Arrow would be
-   * without it.
+   * Otherwise, the marker is positioned such that its outer edge aligns with
+   * the Point at which the `from` end of this Arrow would be located without
+   * the marker.
    */
   fromMarker?: MarkerShape;
 
   /**
    * The shape of the marker, if any, to which this Arrow points.
    * If the `to` ArrowEnd is an ArrowFreeEnd, the marker is centered on it.
-   * Otherwise, the marker is placed just inside the `to` ArrowAnchor such
-   * that its outer edge aligns with where the end of this Arrow would be
-   * without it.
+   * Otherwise, the marker is placed such that its outer edge aligns with the
+   * Point at which the `to` end of this Arrow would be located without
+   * the marker.
    */
   toMarker?: MarkerShape;
 
