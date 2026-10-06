@@ -1,3 +1,5 @@
+import { CharCodeText } from "@/components/CharCodeText";
+import ConnectTheDots from "@/components/ConnectTheDots";
 import DiagramAnimation, {
   MarkerShape,
   Side,
@@ -6,6 +8,7 @@ import DiagramAnimation, {
   free,
   type Arrow,
 } from "@/components/DiagramAnimation";
+import IcebergDescent from "@/components/IcebergDescent";
 
 // General order: highest -> lowest, leftmost -> rightmost
 const arrows: Arrow[] = [
@@ -92,11 +95,32 @@ const arrows: Arrow[] = [
 export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-48 overflow-hidden py-24">
-      <DiagramAnimation
-        text='Daniel "Ludo" DeAnda'
-        arrows={arrows}
-        className="text-[clamp(1.5rem,6vw,3rem)] font-bold text-primary"
-      />
+      {/* Everything but the name fades out while its diagram is active */}
+      <div className="group/intro flex flex-col gap-2 text-[clamp(1.5rem,6vw,3rem)] leading-none font-bold">
+        <p className="text-lg font-normal transition-opacity duration-300 group-has-data-active/intro:pointer-events-none group-has-data-active/intro:opacity-0">
+          Hello, my name is
+        </p>
+        <DiagramAnimation
+          text='Daniel "Ludo" DeAnda.'
+          arrows={arrows}
+          className="w-fit text-primary"
+        />
+        <div className="mt-1 flex flex-col gap-2 transition-opacity duration-300 group-has-data-active/intro:pointer-events-none group-has-data-active/intro:opacity-0">
+          <div className="flex">
+            <span className="opacity-50">I&apos;m a&nbsp;</span>
+            <CharCodeText />
+            <span className="opacity-50">,</span>
+          </div>
+          <div className="flex">
+            <IcebergDescent />
+            <span className="opacity-50">, and</span>
+          </div>
+          <div className="flex">
+            <ConnectTheDots />
+            <span className="opacity-50">.</span>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

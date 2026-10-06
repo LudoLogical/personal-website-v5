@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
 import { useTextDimensions } from "@/utils/useTextDimensions";
 import { getArrowheadPath, getMarkerPaths, rasterizeArrow } from "./paths";
@@ -190,7 +190,8 @@ const resolveOptions = (
  * Renders the specified display text and adds an animation which causes
  * that display text to become surrounded by diagram elements that "draw"
  * themselves into view. The animation triggers on hover for mouse users
- * and toggles on tap for touch screen users.
+ * and toggles on tap for touch screen users. While active, the root element
+ * carries a `data-active` attribute so that surrounding content can react.
  */
 const DiagramAnimation = ({
   text,
@@ -251,24 +252,34 @@ const DiagramAnimation = ({
     resolvedOptions.animation,
   );
 
+  // Mirrors the timeline's state so it can be exposed via data-active
+  const [active, setActive] = useState(false);
+  const activate = (value: boolean) => {
+    setActive(value);
+    animation.setActive(value);
+  };
+
   const isTouchEvent = (e: PointerEvent) => e.pointerType === "touch";
   const strokeWidth =
     resolvedOptions.appearance.strokeWidth * (textDimensions?.em ?? 0);
 
   return (
-    <div className={twMerge("relative", className)}>
+    <div
+      data-active={active || undefined}
+      className={twMerge("relative", className)}
+    >
       {/* Removing leading brings bounding box closer to the letters */}
       <h1
         ref={textRef}
         className="leading-none whitespace-nowrap"
         onPointerEnter={(e) => {
-          if (!isTouchEvent(e)) animation.setActive(true);
+          if (!isTouchEvent(e)) activate(true);
         }}
         onPointerLeave={(e) => {
-          if (!isTouchEvent(e)) animation.setActive(false);
+          if (!isTouchEvent(e)) activate(false);
         }}
         onPointerUp={(e) => {
-          if (isTouchEvent(e)) animation.toggleActive();
+          if (isTouchEvent(e)) activate(!active);
         }}
       >
         {text}

@@ -1,49 +1,43 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Mulish } from "next/font/google";
-
-const mulish = Mulish({ subsets: ["latin"], weight: ["800"] });
+import { useEffect, useRef, useState } from "react";
+import { twMerge } from "tailwind-merge";
+import { useTextDimensions } from "@/utils/useTextDimensions";
 
 const WORD = "Sense-Maker";
-// Vertical position (px, within the 48px line) of each dot, one per letter.
-const DOT_Y = [30, 12, 36, 18, 28, 40, 8, 24, 14, 34, 20];
+// Vertical position (em, within the 1em line) of each dot, one per letter.
+const DOT_Y = [30, 12, 36, 18, 28, 40, 8, 24, 14, 34, 20].map((y) => y / 48);
 
-const INK = "oklch(0.22 0.01 80)";
-const FADED = "oklch(0.86 0.006 80)";
-const ACCENT = "oklch(0.6 0.17 45)";
+const STROKE_WIDTH = 0.085; // em — matches DiagramAnimation
+const DOT_RADIUS = 0.12; // em
+
+const INK = "var(--color-base-content)";
+const FADED = "color-mix(in oklch, var(--color-base-content) 15%, transparent)";
+const ACCENT = "var(--color-primary)";
+
+const FADE_OUT_MS = 150; // text dims on hover; dots/line start once it's done
 
 type Point = { x: number; y: number };
 
-export default function ConnectTheDots({
-  className = "",
-}: {
-  className?: string;
-}) {
+export default function ConnectTheDots({ className }: { className?: string }) {
   const [active, setActive] = useState(false);
   const [points, setPoints] = useState<Point[]>([]);
-  const [width, setWidth] = useState(0);
   const wrapRef = useRef<HTMLSpanElement>(null);
   const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const dims = useTextDimensions(wrapRef);
+  const em = dims?.em ?? 0;
 
-  const measure = useCallback(() => {
-    const wrap = wrapRef.current;
-    if (!wrap) return;
-    setWidth(wrap.offsetWidth);
+  // Re-measure letter centres whenever the rendered text changes size
+  // (font load, viewport resize, clamp() breakpoints).
+  useEffect(() => {
+    if (!dims) return;
     setPoints(
       letterRefs.current.map((el, i) => ({
         x: el ? Math.round(el.offsetLeft + el.offsetWidth / 2) : 0,
-        y: DOT_Y[i % DOT_Y.length],
+        y: DOT_Y[i % DOT_Y.length] * dims.em,
       })),
     );
-  }, []);
-
-  useEffect(() => {
-    measure();
-    document.fonts?.ready.then(measure);
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [measure]);
+  }, [dims]);
 
   const n = points.length;
   const ease = "cubic-bezier(.65,0,.25,1)";
@@ -57,14 +51,18 @@ export default function ConnectTheDots({
       onMouseLeave={() => setActive(false)}
       onFocus={() => setActive(true)}
       onBlur={() => setActive(false)}
-      className={`${mulish.className} relative inline-block cursor-default text-[48px] leading-none font-extrabold tracking-[-0.01em] whitespace-nowrap outline-none ${className}`}
+      className={twMerge(
+        "relative inline-block cursor-default outline-none",
+        className,
+      )}
     >
+      {/* Leading set here so a caller's text-* class can't override it via twMerge */}
       <span
         aria-hidden="true"
-        className="motion-reduce:transition-none!"
+        className="block leading-none whitespace-nowrap motion-reduce:transition-none!"
         style={{
           color: active ? FADED : INK,
-          transition: "color 400ms ease-out",
+          transition: `color ${active ? FADE_OUT_MS : 400}ms ease-out`,
           // Fade out immediately; fade back in only after the dots are gone.
           transitionDelay: active ? "0ms" : "650ms",
         }}
@@ -83,8 +81,8 @@ export default function ConnectTheDots({
 
       <svg
         aria-hidden="true"
-        width={width}
-        height={48}
+        width={dims?.width ?? 0}
+        height={em}
         className="pointer-events-none absolute top-0 left-0 overflow-visible"
       >
         <polyline
@@ -92,7 +90,7 @@ export default function ConnectTheDots({
           pathLength={1}
           fill="none"
           stroke={ACCENT}
-          strokeWidth={2.5}
+          strokeWidth={STROKE_WIDTH * em}
           strokeLinejoin="round"
           strokeLinecap="round"
           strokeDasharray={1}
@@ -100,7 +98,7 @@ export default function ConnectTheDots({
           className="motion-reduce:transition-none!"
           style={{
             transition: active
-              ? `stroke-dashoffset 900ms ${ease} 520ms` // draw after text has faded
+              ? `stroke-dashoffset 900ms ${ease} ${FADE_OUT_MS + 120}ms` // draw after text has faded
               : `stroke-dashoffset 450ms ${ease} 0ms`, // retract immediately
           }}
         />
@@ -109,17 +107,21 @@ export default function ConnectTheDots({
             key={i}
             cx={p.x}
             cy={p.y}
-            r={4.5}
+            r={DOT_RADIUS * em}
             fill={ACCENT}
             className="motion-reduce:transition-none!"
             style={{
               transformBox: "fill-box",
               transformOrigin: "center",
               transform: active ? "scale(1)" : "scale(0)",
-              transition: "transform 240ms cubic-bezier(.3,1.6,.5,1)",
+              // Springy overshoot only on the way in — on the way out it would
+              // overshoot past scale(0) and linger as a 1px speck.
+              transition: active
+                ? "transform 240ms cubic-bezier(.3,1.6,.5,1)"
+                : "transform 180ms cubic-bezier(.5,0,.75,0)",
               // In: left→right after the fade. Out: right→left, done by ~640ms.
               transitionDelay: active
-                ? `${400 + i * 30}ms`
+                ? `${FADE_OUT_MS + i * 30}ms`
                 : `${150 + (n - 1 - i) * 25}ms`,
             }}
           />

@@ -1,4 +1,5 @@
 import type { ElementType } from "react";
+import { twMerge } from "tailwind-merge";
 
 type CharCodeTextProps = {
   text?: string;
@@ -11,17 +12,17 @@ type CharCodeTextProps = {
 export function CharCodeText({
   text = "Software Engineer",
   as: Tag = "h1",
-  className = "",
+  className,
 }: CharCodeTextProps) {
   return (
     <Tag
       aria-label={text}
-      className={`flex text-5xl leading-none font-semibold whitespace-pre text-[#1b1a19] ${className}`}
+      className={twMerge("flex whitespace-pre", className)}
     >
       {[...text].map((char, i) => {
         if (char === " ")
           return (
-            <span key={i} aria-hidden>
+            <span key={i} aria-hidden className="leading-none">
               {" "}
             </span>
           );
@@ -30,14 +31,15 @@ export function CharCodeText({
           <span
             key={i}
             aria-hidden
-            className="group relative inline-block cursor-default transition-[transform,color] duration-200 ease-out hover:-translate-y-1 hover:text-[oklch(0.58_0.17_35)]"
+            // z-10 on hover so the tooltip floats over whatever sits above
+            className="tooltip cursor-default leading-none transition-[translate,color] duration-200 ease-out hover:z-10 hover:translate-y-[-0.1em] hover:text-primary"
           >
-            <span className="pointer-events-none absolute bottom-full left-1/2 mb-1 flex -translate-x-1/2 flex-col items-center font-mono text-[11px] leading-normal text-[#1b1a19] opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+            <span className="tooltip-content flex flex-col items-center font-mono text-xs leading-normal shadow-lg">
               <span className="font-bold">{code}</span>
-              <span className="text-[#8a867f]">
+              <span className="text-neutral-content/60">
                 0x{code.toString(16).toUpperCase()}
               </span>
-              <span className="text-[#8a867f]">
+              <span className="text-neutral-content/60">
                 {code.toString(2).padStart(8, "0")}
               </span>
             </span>
