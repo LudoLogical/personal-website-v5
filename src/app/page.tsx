@@ -1,5 +1,5 @@
-import { CharCodeText } from "@/components/CharCodeText";
-import ConnectTheDots from "@/components/ConnectTheDots";
+import CharCodeText from "@/components/CharCodeText";
+import ConnectingDotsText from "@/components/ConnectingDotsText";
 import DiagramAnimation, {
   MarkerShape,
   Side,
@@ -8,7 +8,9 @@ import DiagramAnimation, {
   free,
   type Arrow,
 } from "@/components/DiagramAnimation";
-import IcebergDescent from "@/components/IcebergDescent";
+import IcebergExplainerText, {
+  type Tiers,
+} from "@/components/IcebergExplainerText";
 
 // General order: highest -> lowest, leftmost -> rightmost
 const arrows: Arrow[] = [
@@ -92,6 +94,39 @@ const arrows: Arrow[] = [
   },
 ];
 
+// Ordered from the surface to the deepest level
+const tiers: Tiers = [
+  {
+    name: "Events",
+    question: "What happened?",
+    items: ["confused users", "site crashes", "dev slowdowns"],
+    depth: "0 m",
+  },
+  {
+    name: "Patterns",
+    question: "Why do those events keep happening?",
+    items: ["unwieldy UI", "traffic spikes", "technical debt"],
+    depth: "-30 m",
+  },
+  {
+    name: "Structures",
+    question: "What bolsters those patterns?",
+    items: ["design systems", "tech stacks", "policies", "practices"],
+    depth: "-90 m",
+  },
+  {
+    name: "Mental Models",
+    question: "Why are those structures in place?",
+    items: ["assumptions", "values", "heuristics", "instincts"],
+    depth: "-200 m",
+  },
+];
+
+// Hand-tuned so that the dots zig-zag across "Sense-Maker"
+const dotPositions = [30, 12, 36, 18, 28, 40, 8, 24, 14, 34, 20].map(
+  (y) => y / 48,
+);
+
 export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-48 overflow-hidden py-24">
@@ -108,15 +143,18 @@ export default function Home() {
         <div className="mt-1 flex flex-col gap-2 transition-opacity duration-300 group-has-data-active/intro:pointer-events-none group-has-data-active/intro:opacity-0">
           <div className="flex">
             <span className="opacity-50">I&apos;m a&nbsp;</span>
-            <CharCodeText />
+            <CharCodeText text="Software Engineer" />
             <span className="opacity-50">,</span>
           </div>
           <div className="flex">
-            <IcebergDescent />
+            <IcebergExplainerText text="Systems Thinker" tiers={tiers} />
             <span className="opacity-50">, and</span>
           </div>
           <div className="flex">
-            <ConnectTheDots />
+            <ConnectingDotsText
+              text="Sense-Maker"
+              dotPositions={dotPositions}
+            />
             <span className="opacity-50">.</span>
           </div>
         </div>
