@@ -158,7 +158,7 @@ export const DEFAULT_OPTIONS: DiagramAnimationOptions = {
     markerGap: 0.18,
   },
   appearance: {
-    strokeWidth: 0.085,
+    strokeWidth: 0.085, // matches ConnectingDotsText
     headLength: 0.22,
     headSpread: 0.7,
     markerSize: 0.4,
@@ -268,7 +268,8 @@ const DiagramAnimation = ({
       data-active={active || undefined}
       className={twMerge("relative", className)}
     >
-      {/* Removing leading brings bounding box closer to the letters */}
+      {/* Applying leading-none brings bounding box closer to the letters;
+          doing so here prevents the class from being overridden via twMerge() */}
       <h1
         ref={textRef}
         className="leading-none whitespace-nowrap"

@@ -1,46 +1,49 @@
 import { type ConnectingDotsTextOptions } from "./ConnectingDotsText";
 
 /**
- * The delay, in seconds, between the display text finishing fading out
- * and the line beginning to draw itself. Gives the first few dots a head
- * start so that the line has something to connect.
+ * The delay, in seconds, between the moment when the text in a
+ * ConnectingDotsText finishes fading out and the moment when the line
+ * in that ConnectingDotsText begins to draw itself. Exists to give the
+ * first few dots a head start so that the line has something to connect.
  */
-const LINE_DRAW_DELAY = 0.12;
+const LINE_GROW_DELAY = 0.12;
 
 /**
- * The delay, in seconds, between deactivation and the first dot beginning
- * to shrink. Lets the line retract partway before the dots follow it.
+ * The delay, in seconds, between the moment when a ConnectingDotsText is
+ * deactivated and hte moment when its first dot begins to shrink. Exists to
+ * allow the line to begin retracting before the dots follow suit.
  */
-const DOT_EXIT_DELAY = 0.15;
+const DOT_SHRINK_DELAY = 0.15;
 
 /**
- * The delay, in seconds, between the dot-to-dot elements disappearing
- * completely and the display text beginning to fade back in.
+ * The delay, in seconds, between the moment when the dots in a
+ * ConnectingDotsText finish disappearing completely and the moment
+ * when the text in that ConnectingDotsText begins to fade back in.
  */
 const TEXT_FADE_IN_BUFFER = 0.07;
 
-/** The easing curve with which the line draws and retracts. */
-const LINE_EASE = "cubic-bezier(.65,0,.25,1)";
+/** The easing curve according to which the line draws and retracts. */
+const LINE_GROW_SHRINK_CURVE = "cubic-bezier(.65,0,.25,1)";
 
 /**
- * The easing curve with which each dot pops into view.
- * Overshoots for a springy feel.
+ * The easing curve according to which each dot grows into view.
+ * Overshoots to achieve a springy effect.
  */
-const DOT_ENTRANCE_EASE = "cubic-bezier(.3,1.6,.5,1)";
+const DOT_GROW_CURVE = "cubic-bezier(.3,1.6,.5,1)";
 
 /**
- * The easing curve with which each dot shrinks out of view.
- * Must not overshoot, or the dot would grow past scale(0)
- * and linger as a 1px speck.
+ * The easing curve with according to each dot shrinks out of view.
+ * Does not overshoot to ensure that dots do not shrink past scale(0)
+ * and momentarily reappear as tiny specks.
  */
-const DOT_EXIT_EASE = "cubic-bezier(.5,0,.75,0)";
+const DOT_SHRINK_CURVE = "cubic-bezier(.5,0,.75,0)";
 
 /**
  * The CSS transitions for each of the elements in a ConnectingDotsText.
  */
-export type Transitions = {
+export type ConnectingDotsTransitions = {
   /**
-   * The transition for the color of the display text.
+   * The transition for the opacity of the text.
    */
   text: string;
 
@@ -50,76 +53,68 @@ export type Transitions = {
   line: string;
 
   /**
-   * Computes the transition for the transform of the dot at the
-   * specified index, counting from the leftmost dot.
+   * Creates the transition for the transform of the i-th dot.
    */
-  dot: (index: number) => string;
+  dot: (i: number) => string;
 };
 
 /**
- * Computes the delay between successive dots required for a sweep across
- * the specified number of dots to take the specified amount of time.
- * @param spread the time, in seconds, between the first and last dots
- * @param dotCount the number of dots in the sweep
- * @returns the delay, in seconds, between successive dots
- */
-const getStagger = (spread: number, dotCount: number) =>
-  dotCount > 1 ? spread / (dotCount - 1) : 0;
-
-/**
- * Computes the CSS transitions that choreograph the animation of a
- * ConnectingDotsText in the specified direction. Because CSS applies the
- * transition of the state being entered, the activation transitions animate
- * everything in and the deactivation transitions animate everything out.
- * @param active whether the ConnectingDotsText is being activated (true)
- *               or deactivated (false)
+ * Creates the CSS transitions that orchestrate the animation
+ * of a ConnectingDotsText based on the specified active state.
+ * "Activation" means animating the dots and line *into* view.
+ * @param active true if the ConnectingDotsText is being activated;
+ *               false if it is being deactivated
  * @param dotCount the number of dots in the ConnectingDotsText
  * @param animationOptions the animation options for
- *                         the associated ConnectingDotsText
- * @returns the Transitions for the specified direction
+ *                         the ConnectingDotsText
+ * @returns the ConnectingDotsTransitions for the specified state
  */
 export const getTransitions = (
   active: boolean,
   dotCount: number,
   animationOptions: ConnectingDotsTextOptions["animation"],
-): Transitions => {
+): ConnectingDotsTransitions => {
   const {
     textFadeOutDuration,
     textFadeInDuration,
-    lineDrawDuration,
-    lineRetractDuration,
     dotEntranceDuration,
     dotExitDuration,
     dotEntranceSpread,
     dotExitSpread,
+    lineDrawDuration,
+    lineRetractDuration,
   } = animationOptions;
 
+  // How long to wait between animation start times for neighboring dots
+  const getStagger = (spread: number) =>
+    dotCount > 1 ? spread / (dotCount - 1) : 0;
+
   if (active) {
-    const dotStagger = getStagger(dotEntranceSpread, dotCount);
+    const dotStagger = getStagger(dotEntranceSpread);
     return {
       // Fade out immediately
-      text: `color ${textFadeOutDuration}s ease-out 0s`,
-      // Draw once the text has faded out and the first dots have appeared
-      line: `stroke-dashoffset ${lineDrawDuration}s ${LINE_EASE} ${textFadeOutDuration + LINE_DRAW_DELAY}s`,
-      // Pop in from left to right once the text has faded out
+      text: `opacity ${textFadeOutDuration}s ease-out 0s`,
+      // Draw after the first dots have appeared
+      line: `stroke-dashoffset ${lineDrawDuration}s ${LINE_GROW_SHRINK_CURVE} ${textFadeOutDuration + LINE_GROW_DELAY}s`,
+      // Grow into view from left to right after the text has faded
       dot: (index) =>
-        `transform ${dotEntranceDuration}s ${DOT_ENTRANCE_EASE} ${textFadeOutDuration + index * dotStagger}s`,
+        `transform ${dotEntranceDuration}s ${DOT_GROW_CURVE} ${textFadeOutDuration + index * dotStagger}s`,
     };
   }
 
-  const dotStagger = getStagger(dotExitSpread, dotCount);
-  // Fade back in only once both the line and the dots are gone
+  const dotStagger = getStagger(dotExitSpread);
+  // Wait until both the line and the dots are completely gone
   const textFadeInDelay =
     Math.max(
       lineRetractDuration,
-      DOT_EXIT_DELAY + dotExitSpread + dotExitDuration,
+      DOT_SHRINK_DELAY + dotExitSpread + dotExitDuration,
     ) + TEXT_FADE_IN_BUFFER;
   return {
-    text: `color ${textFadeInDuration}s ease-out ${textFadeInDelay}s`,
+    text: `opacity ${textFadeInDuration}s ease-out ${textFadeInDelay}s`,
     // Retract immediately
-    line: `stroke-dashoffset ${lineRetractDuration}s ${LINE_EASE} 0s`,
-    // Shrink from right to left shortly after the line starts retracting
-    dot: (index) =>
-      `transform ${dotExitDuration}s ${DOT_EXIT_EASE} ${DOT_EXIT_DELAY + (dotCount - 1 - index) * dotStagger}s`,
+    line: `stroke-dashoffset ${lineRetractDuration}s ${LINE_GROW_SHRINK_CURVE} 0s`,
+    // Shrink out of view shortly after the line starts retracting
+    dot: (i) =>
+      `transform ${dotExitDuration}s ${DOT_SHRINK_CURVE} ${DOT_SHRINK_DELAY + (dotCount - 1 - i) * dotStagger}s`,
   };
 };

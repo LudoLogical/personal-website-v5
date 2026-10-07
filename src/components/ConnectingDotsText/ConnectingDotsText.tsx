@@ -2,28 +2,37 @@
 
 import { useMemo, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { useDotPoints } from "./points";
+import { useDots } from "./dots";
 import { getTransitions } from "./timing";
 
 export type ConnectingDotsTextProps = {
   /**
-   * The display text for this ConnectingDotsText.
+   * The text in this ConnectingDotsText.
    * Subject to leading-none and whitespace-nowrap.
    */
   text: string;
 
   /**
-   * The vertical position, in ems from the top of the line, of the dot over
-   * each non-whitespace character in the display text, from left to right.
-   * Values should lie between 0 and 1. If fewer positions than dots are
-   * specified, the positions are reused cyclically. If omitted (or empty),
-   * the positions are generated randomly.
+   * The vertical positions, in ems from the top of the bounding box of this
+   * ConnectingDotsText, of the dots that will appear over each non-whitespace
+   * character in the specified text, in order from left to right.
+   *
+   * Because the text is subject to leading-none, it is exactly 1 em tall,
+   * so all values should be between 0 (top) and 1 (bottom).
+   *
+   * If there are fewer position values than there are non-whitespace
+   * characters in the specified text, then the supplied position values are
+   * reused cyclically.
+   *
+   * If this prop is omitted or the array is empty,
+   * then the position values are generated randomly.
    */
   dotPositions?: number[];
 
   /**
    * Classes for the container `<span>` of this ConnectingDotsText.
-   * Inherited by both the text and the dot-to-dot elements.
+   * Inherited by both the text and the animation elements
+   * (i.e., the dots and the line).
    */
   className?: string;
 
@@ -33,7 +42,7 @@ export type ConnectingDotsTextProps = {
    */
   options?: {
     /**
-     * Optional settings that control how the dot-to-dot elements are rendered.
+     * Optional settings that control how the dots and line are rendered.
      */
     appearance?: {
       /**
@@ -47,67 +56,73 @@ export type ConnectingDotsTextProps = {
       dotSize?: number;
 
       /**
-       * The opacity, from 0 to 1, of the display text while it is faded
-       * into the background to make way for the dot-to-dot elements.
+       * The color of both the dots and the line that connects them.
+       * Can be any CSS color value.
+       */
+      accentColor?: string;
+
+      /**
+       * The fraction of its full opacity to which the text should be reduced
+       * to make way for the dots and line at the start of the animation.
        */
       fadedTextOpacity?: number;
     };
 
     /**
-     * Optional settings that control how the dot-to-dot elements are animated.
+     * Optional settings that control how the dots and line are animated.
      */
     animation?: {
       /**
-       * The duration, in seconds, over which the display text
-       * should fade into the background upon activation.
+       * The duration, in seconds, over which the opacity of the text should
+       * be reduced when the animation is triggered.
        */
       textFadeOutDuration?: number;
 
       /**
-       * The duration, in seconds, over which the display text should fade
-       * back into the foreground once the dot-to-dot elements are gone.
+       * The duration, in seconds, over which the opacity of the text should
+       * be restored after the dots and line have disappeared.
        */
       textFadeInDuration?: number;
 
       /**
-       * The duration, in seconds, over which the line
-       * should draw itself through all of the dots.
-       */
-      lineDrawDuration?: number;
-
-      /**
-       * The duration, in seconds, over which the line
-       * should retract back to its starting point.
-       */
-      lineRetractDuration?: number;
-
-      /**
-       * The duration, in seconds, over which each individual dot
-       * should pop into view.
+       * The duration, in seconds, over which each
+       * individual dot should grow into view.
        */
       dotEntranceDuration?: number;
 
       /**
-       * The duration, in seconds, over which each individual dot
-       * should shrink out of view.
+       * The duration, in seconds, over which each
+       * individual dot should shrink out of view.
        */
       dotExitDuration?: number;
 
       /**
-       * The time, in seconds, between the first (leftmost) and the last
-       * (rightmost) dot beginning to pop into view. Divided evenly among the
-       * dots so that the sweep takes the same amount of time (and stays in
-       * step with the line) regardless of the length of the display text.
+       * The amount of time, in seconds, between the moments when the first
+       * (leftmost) and the last (rightmost) dots begin to grow into view.
+       * The duration between neighboring dot appearances is derived by
+       * simply dividing this number by the total number of dots.
        */
       dotEntranceSpread?: number;
 
       /**
-       * The time, in seconds, between the first (rightmost) and the last
-       * (leftmost) dot beginning to shrink out of view. Divided evenly among
-       * the dots so that the sweep takes the same amount of time regardless
-       * of the length of the display text.
+       * The amount of time, in seconds, between the moments when the first
+       * (rightmost) and the last (leftmost) dots begin to shrink out of view.
+       * The duration between neighboring dot disappearances is derived by
+       * simply dividing this number by the total number of dots.
        */
       dotExitSpread?: number;
+
+      /**
+       * The duration, in seconds, over which
+       * the line should draw itself into view.
+       */
+      lineDrawDuration?: number;
+
+      /**
+       * The duration, in seconds, over which the
+       * line should retract itself out of view.
+       */
+      lineRetractDuration?: number;
     };
   };
 };
@@ -135,17 +150,18 @@ export const DEFAULT_OPTIONS: ConnectingDotsTextOptions = {
   appearance: {
     strokeWidth: 0.085, // matches DiagramAnimation
     dotSize: 0.24,
+    accentColor: "var(--color-primary)",
     fadedTextOpacity: 0.15,
   },
   animation: {
     textFadeOutDuration: 0.15,
     textFadeInDuration: 0.4,
-    lineDrawDuration: 0.9,
-    lineRetractDuration: 0.45,
     dotEntranceDuration: 0.24,
     dotExitDuration: 0.18,
     dotEntranceSpread: 0.3,
     dotExitSpread: 0.25,
+    lineDrawDuration: 0.9,
+    lineRetractDuration: 0.45,
   },
 };
 
@@ -163,20 +179,16 @@ const resolveOptions = (
   animation: { ...DEFAULT_OPTIONS.animation, ...options?.animation },
 });
 
-/** The color of the display text while inactive. */
-const INK = "var(--color-base-content)";
-
-/** The color of the dot-to-dot elements. */
-const ACCENT = "var(--color-primary)";
-
 /**
- * Renders the specified display text and adds an animation which turns that
- * display text into a dot-to-dot puzzle that solves itself. The animation
- * triggers on hover and on focus. When activated, the display text fades
- * into the background, a dot pops up over each of its characters from left
- * to right, and a line draws itself through all of the dots. When
- * deactivated, the line retracts, the dots vanish from right to left,
- * and the display text fades back into the foreground.
+ * Renders the specified text and adds an animation which causes that text
+ * to fade partially out of view, at which point a series of dots (one for
+ * each non-whitespace character in the text) grow into view and become
+ * connected by a line that draws itself into view shortly after.
+ *
+ * The animation triggers on both hover and focus. Once it is no longer
+ * triggered, all of its effects are reversed in order from last to first
+ * (i.e., first the line begins to retract, then the dots start to vanish,
+ * and finally the text returns to the foreground).
  */
 const ConnectingDotsText = ({
   text,
@@ -197,14 +209,18 @@ const ConnectingDotsText = ({
 
   const [active, setActive] = useState(false);
 
-  // Keeps the dots and the line from poking out of the top or bottom of the line
+  // Used to keep randomly generated dots inside of the text's bounding box
   const dotMargin = Math.max(appearance.dotSize, appearance.strokeWidth) / 2;
-  const { characters, dotCount, points, setLetterRef, textDimensions } =
-    useDotPoints(containerRef, text, dotPositions, dotMargin);
-  const em = textDimensions?.em ?? 0;
 
-  const transitions = getTransitions(active, dotCount, animation);
-  const fadedInk = `color-mix(in oklch, ${INK} ${appearance.fadedTextOpacity * 100}%, transparent)`;
+  const { characters, points, setLetterRef, textDimensions } = useDots(
+    containerRef,
+    text,
+    dotPositions ?? [],
+    dotMargin,
+  );
+
+  // Note: points.length may not update instantly when the text changes
+  const transitions = getTransitions(active, points.length, animation);
 
   return (
     <span
@@ -220,12 +236,14 @@ const ConnectingDotsText = ({
         className,
       )}
     >
-      {/* Leading set here so a caller's text-* class can't override it via twMerge */}
+      {/* Applying leading-none here prevents the
+          class from being overridden via twMerge() */}
       <span
         aria-hidden="true"
         className="block leading-none whitespace-nowrap motion-reduce:transition-none!"
         style={{
-          color: active ? fadedInk : INK,
+          color: "currentColor",
+          opacity: active ? appearance.fadedTextOpacity : 1,
           transition: transitions.text,
         }}
       >
@@ -233,26 +251,27 @@ const ConnectingDotsText = ({
           <span
             key={i}
             ref={
-              dotIndex === null ? undefined : (el) => setLetterRef(dotIndex, el)
+              dotIndex === null
+                ? undefined
+                : (spanElement) => setLetterRef(dotIndex, spanElement)
             }
           >
             {char}
           </span>
         ))}
       </span>
-
       <svg
         aria-hidden="true"
         width={textDimensions?.width ?? 0}
-        height={em}
+        height={textDimensions?.em ?? 0}
         className="pointer-events-none absolute top-0 left-0 overflow-visible"
       >
         <polyline
           points={points.map(({ x, y }) => `${x},${y}`).join(" ")}
           pathLength={1}
           fill="none"
-          stroke={ACCENT}
-          strokeWidth={appearance.strokeWidth * em}
+          stroke={appearance.accentColor}
+          strokeWidth={appearance.strokeWidth * (textDimensions?.em ?? 0)}
           strokeLinejoin="round"
           strokeLinecap="round"
           strokeDasharray={1}
@@ -265,8 +284,8 @@ const ConnectingDotsText = ({
             key={i}
             cx={x}
             cy={y}
-            r={(appearance.dotSize / 2) * em}
-            fill={ACCENT}
+            r={(appearance.dotSize / 2) * (textDimensions?.em ?? 0)}
+            fill={appearance.accentColor}
             className="motion-reduce:transition-none!"
             style={{
               transformBox: "fill-box",
