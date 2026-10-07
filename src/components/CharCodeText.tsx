@@ -3,13 +3,13 @@ import { twMerge } from "tailwind-merge";
 
 export type CharCodeTextProps = {
   /**
-   * The display text for this CharCodeText.
+   * The text in this CharCodeText.
    * Subject to whitespace-pre.
    */
   text: string;
 
   /**
-   * The element type used to render the root of this CharCodeText.
+   * The ElementType used to render the root of this CharCodeText.
    * Defaults to `h1`.
    */
   as?: ElementType;
@@ -25,19 +25,20 @@ export type CharCodeTextProps = {
    */
   options?: {
     /**
-     * The distance, in ems, by which a hovered character should rise.
+     * The distance, in ems, that a character should rise when hovered.
      */
     liftHeight?: number;
 
     /**
-     * The duration, in seconds, over which a hovered character
-     * should rise and change color.
+     * The duration, in seconds, over which a character
+     * should rise and change color when hovered.
      */
     liftDuration?: number;
 
     /**
-     * The minimum number of digits to display in the binary representation
-     * of a character code. Shorter representations are zero-padded.
+     * The minimum number of digits with which the binary
+     * representation of each character code should be displayed.
+     * Shorter representations are zero-padded.
      */
     minBinaryDigits?: number;
   };
@@ -72,23 +73,12 @@ const resolveOptions = (
 ): CharCodeTextOptions => ({ ...DEFAULT_OPTIONS, ...options });
 
 /**
- * Formats the specified character code in decimal, hexadecimal, and binary.
- * @param code the character code to be formatted
- * @param minBinaryDigits the minimum number of digits in the binary format
- * @returns the decimal, hexadecimal, and binary representations of the code
- */
-const formatCharCode = (code: number, minBinaryDigits: number) => ({
-  decimal: code.toString(),
-  hexadecimal: `0x${code.toString(16).toUpperCase()}`,
-  binary: code.toString(2).padStart(minBinaryDigits, "0"),
-});
-
-/**
- * Renders the specified display text such that hovering over any of its
- * characters lifts that character and reveals a tooltip containing its
- * character code in decimal, hexadecimal, and binary. Implemented with pure
- * CSS hover states, so it requires no client JS and works as a Server
- * Component.
+ * Renders the specified display text such that, when any one of its
+ * non-whitespace) characters is hovered, that character is elevated,
+ * changes color, and reveals a tooltip containing the decimal,
+ * hexadecimal, and binary representations of its codepoint.
+ *
+ * Animated with CSS hover states alone and thus valid as a server component.
  */
 const CharCodeText = ({
   text,
@@ -98,8 +88,8 @@ const CharCodeText = ({
 }: CharCodeTextProps) => {
   const { liftHeight, liftDuration, minBinaryDigits } = resolveOptions(options);
 
-  // Exposed as CSS variables so that the hover styles below stay pure CSS
-  const style = {
+  // Variables injected directly into CSS to avoid introducing client-side JS
+  const liftVariables = {
     "--lift-height": `${liftHeight}em`,
     "--lift-duration": `${liftDuration}s`,
   } as CSSProperties;
@@ -108,10 +98,12 @@ const CharCodeText = ({
     <Tag
       aria-label={text}
       className={twMerge("flex whitespace-pre", className)}
-      style={style}
+      style={liftVariables}
     >
-      {/* Spreading iterates by code point, so astral characters stay whole */}
+      {/* Spreading iterates by code point, so "astral"
+          characters like emoji aren't split up! */}
       {[...text].map((char, i) => {
+        // Ignore whitespace characters
         if (/\s/.test(char)) {
           return (
             <span key={i} aria-hidden className="leading-none">
@@ -120,15 +112,17 @@ const CharCodeText = ({
           );
         }
 
-        const { decimal, hexadecimal, binary } = formatCharCode(
-          char.codePointAt(0)!,
-          minBinaryDigits,
-        );
+        const code = char.codePointAt(0)!;
+        const decimal = code.toString();
+        const hexadecimal = `0x${code.toString(16).toUpperCase()}`;
+        const binary = code.toString(2).padStart(minBinaryDigits, "0");
+
         return (
           <span
             key={i}
             aria-hidden
-            // z-10 on hover so the tooltip floats over whatever sits above
+            // Apply z-10 on hover to the tooltip floats
+            // over any content that might exist below it
             className="tooltip cursor-default leading-none transition-[translate,color] duration-(--lift-duration) ease-out hover:z-10 hover:-translate-y-(--lift-height) hover:text-primary"
           >
             <span className="tooltip-content flex flex-col items-center font-mono text-xs leading-normal shadow-lg">
