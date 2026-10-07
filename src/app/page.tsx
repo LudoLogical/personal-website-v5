@@ -9,7 +9,7 @@ import DiagramAnimation, {
   type Arrow,
 } from "@/components/DiagramAnimation";
 import IcebergExplainerText, {
-  type Tiers,
+  type Levels,
 } from "@/components/IcebergExplainerText";
 
 // General order: highest -> lowest, leftmost -> rightmost
@@ -95,29 +95,29 @@ const arrows: Arrow[] = [
 ];
 
 // Ordered from the surface to the deepest level
-const tiers: Tiers = [
+const levels: Levels = [
   {
     name: "Events",
     question: "What happened?",
-    items: ["confused users", "site crashes", "dev slowdowns"],
+    concepts: ["confused users", "site crashes", "dev slowdowns"],
     depth: "0 m",
   },
   {
     name: "Patterns",
     question: "Why do those events keep happening?",
-    items: ["unwieldy UI", "traffic spikes", "technical debt"],
+    concepts: ["unwieldy UI", "traffic spikes", "technical debt"],
     depth: "-30 m",
   },
   {
     name: "Structures",
     question: "What bolsters those patterns?",
-    items: ["design systems", "tech stacks", "policies", "practices"],
+    concepts: ["design systems", "tech stacks", "policies", "practices"],
     depth: "-90 m",
   },
   {
     name: "Mental Models",
     question: "Why are those structures in place?",
-    items: ["assumptions", "values", "heuristics", "instincts"],
+    concepts: ["assumptions", "values", "heuristics", "instincts"],
     depth: "-200 m",
   },
 ];
@@ -147,8 +147,8 @@ export default function Home() {
             <span className="opacity-50">,</span>
           </div>
           <div className="flex">
-            <IcebergExplainerText text="Systems Thinker" tiers={tiers} />
-            <span className="opacity-50">, and</span>
+            <IcebergExplainerText text="Systems Thinker" levels={levels} />
+            <span className="opacity-50">, and &cdot;</span>
           </div>
           <div className="flex">
             <ConnectingDotsText

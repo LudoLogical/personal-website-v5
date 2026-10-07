@@ -32,7 +32,7 @@ const LINE_GROW_SHRINK_CURVE = "cubic-bezier(.65,0,.25,1)";
 const DOT_GROW_CURVE = "cubic-bezier(.3,1.6,.5,1)";
 
 /**
- * The easing curve with according to each dot shrinks out of view.
+ * The easing curve according to which each dot shrinks out of view.
  * Does not overshoot to ensure that dots do not shrink past scale(0)
  * and momentarily reappear as tiny specks.
  */

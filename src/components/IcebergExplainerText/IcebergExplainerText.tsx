@@ -2,26 +2,26 @@
 
 import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
+import { useGapMidpoint } from "@/utils/useGapMidpoint";
 import Iceberg from "./Iceberg";
-import { TIER_COUNT, type Tiers } from "./types";
-import { useWaterline } from "./useWaterline";
+import { LEVEL_CLASS_NAMES, NUM_LEVELS, type Levels } from "./levels";
 
 export type IcebergExplainerTextProps = {
   /**
-   * The display text for this IcebergExplainerText.
+   * The hoverable text in this IcebergExplainerText.
    * Subject to leading-none.
    */
   text: string;
 
   /**
-   * The Tiers explained by this IcebergExplainerText,
-   * from the surface to the deepest level.
+   * The four Levels in this IcebergExplainerText,
+   * in order from top (the surface) to bottom (the deepest level).
    */
-  tiers: Tiers;
+  levels: Levels;
 
   /**
    * Classes for the container `<span>` of this IcebergExplainerText.
-   * Inherited by the display text and the scrub indicator.
+   * Inherited by the text and the scrub indicator.
    */
   className?: string;
 
@@ -31,58 +31,64 @@ export type IcebergExplainerTextProps = {
    */
   options?: {
     /**
-     * Optional settings that control how the explainer elements are sized.
+     * Optional settings that control how the
+     * explainer card and scrub indicator are sized.
      */
     appearance?: {
       /**
-       * The width, in pixels, of the card in which the Tiers are displayed.
+       * The width, in pixels, of the explainer
+       * card in which the Levels are displayed.
        */
       cardWidth?: number;
 
       /**
-       * The height, in pixels, of the panel in which each Tier is displayed.
-       * Also the height of the card, which shows one panel at a time.
+       * The height, in pixels, of the explainer
+       * card in which the Levels are displayed.
+       * Equivalent to the height of each of the Level panels.
        */
-      panelHeight?: number;
+      cardHeight?: number;
 
       /**
-       * The distance, in pixels, between the bottom
-       * of the display text and the top of the card.
+       * The distance, in pixels, between the bottom of the
+       * hoverable text and the top of the explainer card.
        */
       cardGap?: number;
 
       /**
-       * The thickness, in ems, of the indicator beneath the display text
-       * that marks which Tier is currently being displayed.
+       * The thickness, in ems, of the indicator line that appears beneath
+       * the hoverable text and marks the bounds of the region that causes
+       * the active Level to be displayed.
        */
       indicatorThickness?: number;
     };
 
     /**
-     * Optional settings that control how the explainer elements are animated.
+     * Optional settings that control how the
+     * explainer card and scrub indicator are animated.
      */
     animation?: {
       /**
-       * The duration, in seconds, over which the card and
-       * the scrub indicator should fade into and out of view.
+       * The duration, in seconds, over which the explainer card
+       * and the scrub indicator should fade into and out of view.
        */
       cardFadeDuration?: number;
 
       /**
-       * The duration, in seconds, over which the card should
+       * The duration, in seconds, over which the explainer card should
        * rise into place as it appears and fall away as it disappears.
        */
       cardRiseDuration?: number;
 
       /**
-       * The duration, in seconds, over which the scrub
-       * indicator should slide to the position of a new Tier.
+       * The duration, in seconds, over which the scrub indicator
+       * should slide to the position of the active hoverable region.
        */
       indicatorSlideDuration?: number;
 
       /**
        * The duration, in seconds, over which the panels and the depth
-       * marker should scroll to the position of a new Tier.
+       * marker should scroll to their respective positions corresponding
+       * to the active Level.
        */
       scrollDuration?: number;
     };
@@ -111,9 +117,9 @@ export type IcebergExplainerTextOptions = {
 export const DEFAULT_OPTIONS: IcebergExplainerTextOptions = {
   appearance: {
     cardWidth: 330,
-    panelHeight: 120,
+    cardHeight: 120,
     cardGap: 12,
-    indicatorThickness: 0.085, // matches DiagramAnimation's strokeWidth
+    indicatorThickness: 0.085, // same as other components' strokeWidths
   },
   animation: {
     cardFadeDuration: 0.2,
@@ -138,65 +144,46 @@ const resolveOptions = (
 });
 
 /**
- * The background and text color classes for each panel,
- * from the surface to the deepest level.
- */
-const TIER_CLASS_NAMES: [string, string, string, string] = [
-  "bg-blue-200 text-blue-950",
-  "bg-blue-400 text-blue-950",
-  "bg-blue-700 text-blue-50",
-  "bg-blue-950 text-blue-100",
-];
-
-/**
- * The distance, in pixels, from which the card rises into place.
+ * The distance, in pixels, that the explainer
+ * card traverses as it rises into place.
  */
 const CARD_RISE_DISTANCE = 6;
 
 /**
- * The distance, in pixels, between each end of the depth rail's track
- * and the corresponding edge of the card.
+ * The distance, in pixels, between each end of the depth rail's
+ * track and the corresponding edge of the explainer card.
+ * Also used as the inset for the depth marker at both extrema.
  */
 const DEPTH_RAIL_INSET = 10;
 
 /**
- * The diameter, in pixels, of the depth marker. Keep in sync with its
- * size-1.75 class. Its top edge travels from DEPTH_RAIL_INSET at the first
- * Tier to DEPTH_RAIL_INSET + DEPTH_MARKER_SIZE from the bottom at the last.
+ * The diameter, in pixels, of the depth marker.
  */
-const DEPTH_MARKER_SIZE = 7;
-
-/** The easing curve with which the panels and the depth marker scroll. */
-const SCROLL_EASE = "cubic-bezier(.4,0,.2,1)";
-
-/** The easing curve with which the scrub indicator slides. */
-const INDICATOR_EASE = "cubic-bezier(.2,.7,.2,1)";
+const DEPTH_MARKER_SIZE = 8;
 
 /**
- * Determines which Tier corresponds to the horizontal position of the
- * specified PointerEvent. The width of the element that the event was
- * attached to is divided evenly among the Tiers, from left to right.
- * @param event the PointerEvent to be located
- * @returns the index of the corresponding Tier
+ * The easing curve according to which the panels and
+ * the depth marker scroll to their target positions.
  */
-const getLevelAtPointer = (event: PointerEvent<HTMLElement>): number => {
-  const rect = event.currentTarget.getBoundingClientRect();
-  const fraction = (event.clientX - rect.left) / rect.width;
-  // Clamped below 1 so that the right edge maps to the last Tier
-  return Math.floor(Math.min(0.999, Math.max(0, fraction)) * TIER_COUNT);
-};
+const SCROLL_CURVE = "cubic-bezier(.4,0,.2,1)";
+
+/** The easing curve according to which the
+ * scrub indicator slides to its target position.
+ */
+const SCRUB_CURVE = "cubic-bezier(.2,.7,.2,1)";
 
 /**
- * Renders the specified display text and adds a card beneath it that
- * explains the iceberg model of systems thinking. Scrubbing the pointer
- * horizontally across the display text descends through the specified
- * Tiers, from the surface on the left to the deepest level on the right,
- * past an illustrated iceberg that spans all of them. The card appears
- * while the pointer is over the display text.
+ * Renders the specified text and, while that text is hovered, adds a card
+ * beneath it that explains a concept at four different levels of depth using
+ * an "iceberg" model. Scrubbing horizontally across the display text causes
+ * the card to "descend" through the specified Levels, each of which takes up
+ * the full card when displayed. A single low-poly iceberg SVG spans the
+ * backgrounds of all four Levels, the backgrounds of which get progressively
+ * darker from top to bottom.
  */
 const IcebergExplainerText = ({
   text,
-  tiers,
+  levels,
   className,
   options,
 }: IcebergExplainerTextProps) => {
@@ -210,21 +197,34 @@ const IcebergExplainerText = ({
   );
 
   const [level, setLevel] = useState<number | null>(null);
-  const active = level !== null;
-  const displayedLevel = level ?? 0;
 
-  // The waterline sits between the first Tier's question and items
+  // Position the waterline exactly halfway between the question and concepts
   const questionRef = useRef<HTMLSpanElement>(null);
-  const itemsRef = useRef<HTMLSpanElement>(null);
-  const waterline = useWaterline(questionRef, itemsRef);
+  const conceptsRef = useRef<HTMLSpanElement>(null);
+  const waterline = useGapMidpoint(questionRef, conceptsRef);
 
   const handlePointerMove = (event: PointerEvent<HTMLSpanElement>) => {
-    const nextLevel = getLevelAtPointer(event);
-    if (nextLevel !== level) setLevel(nextLevel);
+    const rect = event.currentTarget.getBoundingClientRect();
+    // The width of the hoverable text is divided evenly among the Levels
+    const xFraction = (event.clientX - rect.left) / rect.width;
+    const targetLevel = Math.floor(
+      // Clamp xFraction within [0, 1) so that right edge maps to 3 and not 4
+      Math.min(0.999, Math.max(0, xFraction)) * NUM_LEVELS,
+    );
+    if (targetLevel !== level) setLevel(targetLevel);
   };
 
-  const scrollTransition = `${animation.scrollDuration}s ${SCROLL_EASE}`;
+  const scrollTransition = `${animation.scrollDuration}s ${SCROLL_CURVE}`;
 
+  // The top edge of depth marker belongs markerTopPercent of the way down
+  // the depth rail, plus markerTopOffset, so we use CSS `calc()` later
+  const markerProgress = (level ?? 0) / (NUM_LEVELS - 1);
+  const markerTopPercent = markerProgress * 100;
+  const markerTopOffset =
+    DEPTH_RAIL_INSET -
+    markerProgress * (2 * DEPTH_RAIL_INSET + DEPTH_MARKER_SIZE);
+
+  // Using spans allows this component to exist inside of an h1, p, a, etc.
   return (
     <span
       onPointerMove={handlePointerMove}
@@ -241,28 +241,28 @@ const IcebergExplainerText = ({
         aria-hidden
         className="absolute bottom-px rounded-full bg-primary"
         style={{
-          width: `${100 / TIER_COUNT}%`,
+          width: `${100 / NUM_LEVELS}%`,
           height: `${appearance.indicatorThickness}em`,
-          left: `${(displayedLevel * 100) / TIER_COUNT}%`,
-          opacity: active ? 1 : 0,
+          left: `${((level ?? 0) * 100) / NUM_LEVELS}%`,
+          opacity: level === null ? 0 : 1,
           // Fades in step with the card
           transition: [
-            `left ${animation.indicatorSlideDuration}s ${INDICATOR_EASE}`,
+            `left ${animation.indicatorSlideDuration}s ${SCRUB_CURVE}`,
             `opacity ${animation.cardFadeDuration}s ease`,
           ].join(", "),
         }}
       />
 
-      {/* Porthole card */}
+      {/* Explainer card */}
       <span
         aria-hidden
         className="pointer-events-none absolute left-1/2 flex overflow-hidden rounded-box border border-base-300 bg-base-200 text-base font-normal shadow-lg"
         style={{
           top: `calc(100% + ${appearance.cardGap}px)`,
           width: appearance.cardWidth,
-          height: appearance.panelHeight,
-          opacity: active ? 1 : 0,
-          transform: `translate(-50%, ${active ? 0 : -CARD_RISE_DISTANCE}px)`,
+          height: appearance.cardHeight,
+          opacity: level === null ? 0 : 1,
+          transform: `translate(-50%, ${level === null ? -CARD_RISE_DISTANCE : 0}px)`,
           transition: [
             `opacity ${animation.cardFadeDuration}s ease`,
             `transform ${animation.cardRiseDuration}s ease`,
@@ -270,55 +270,61 @@ const IcebergExplainerText = ({
         }}
       >
         {/* Depth rail */}
-        <span className="relative w-4 flex-none border-r border-base-300 bg-neutral">
-          {/* Track, centered beneath the marker */}
+        <span className="relative box-content w-4 flex-none border-r border-base-300 bg-neutral">
+          {/* Track */}
           <span
-            className="absolute left-1.75 w-px bg-base-content/20"
+            className="absolute left-1/2 w-0.5 -translate-x-1/2 bg-base-content/20"
             style={{ top: DEPTH_RAIL_INSET, bottom: DEPTH_RAIL_INSET }}
           />
           {/* Marker */}
           <span
-            className="absolute left-1 size-1.75 rounded-full bg-primary"
+            className="absolute left-1/2 -translate-x-1/2 rounded-full bg-primary"
             style={{
-              top: `calc(${DEPTH_RAIL_INSET}px + ${displayedLevel} * (100% - ${2 * DEPTH_RAIL_INSET + DEPTH_MARKER_SIZE}px) / ${TIER_COUNT - 1})`,
+              width: DEPTH_MARKER_SIZE,
+              height: DEPTH_MARKER_SIZE,
+              top: `calc(${markerTopPercent}% + ${markerTopOffset}px)`,
               transition: `top ${scrollTransition}`,
             }}
           />
         </span>
 
-        {/* Sliding strip */}
+        {/* Sliding strip of Level panels */}
         <span className="flex-1 overflow-hidden">
           <span
             className="relative flex flex-col"
             style={{
-              transform: `translateY(${-displayedLevel * appearance.panelHeight}px)`,
+              transform: `translateY(${-(level ?? 0) * appearance.cardHeight}px)`,
               transition: `transform ${scrollTransition}`,
             }}
           >
             <Iceberg
-              height={TIER_COUNT * appearance.panelHeight}
+              height={NUM_LEVELS * appearance.cardHeight}
               waterline={waterline}
             />
-            {tiers.map((tier, i) => (
+            {levels.map(({ depth, name, question, concepts }, i) => (
               <span
                 key={i}
                 className={twMerge(
-                  // Children positioned so they paint above the iceberg
-                  "flex flex-none flex-col gap-1 px-4 py-3 *:relative",
-                  TIER_CLASS_NAMES[i],
+                  // *:relative lets children go above the iceberg
+                  "flex flex-none flex-col gap-1 px-4 py-3 whitespace-nowrap *:relative",
+                  LEVEL_CLASS_NAMES[i],
                 )}
-                style={{ height: appearance.panelHeight }}
+                style={{ height: appearance.cardHeight }}
               >
-                <span className="font-mono text-[10px]">{tier.depth}</span>
-                <span className="text-lg font-bold">{tier.name}</span>
+                <span className="font-mono text-[10px]">{depth}</span>
+                <span className="text-lg font-bold">{name}</span>
+                {/* Refs go on the first panel only */}
                 <span
                   ref={i === 0 ? questionRef : undefined}
                   className="text-xs italic"
                 >
-                  {tier.question}
+                  {question}
                 </span>
-                <span ref={i === 0 ? itemsRef : undefined} className="text-xs">
-                  {tier.items.join(" · ")}
+                <span
+                  ref={i === 0 ? conceptsRef : undefined}
+                  className="text-xs"
+                >
+                  {concepts.join(" · ")}
                 </span>
               </span>
             ))}

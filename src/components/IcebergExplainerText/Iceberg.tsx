@@ -1,33 +1,34 @@
 import { useId } from "react";
-import { TIER_COUNT } from "./types";
+import { NUM_LEVELS } from "./levels";
 
-// The iceberg is drawn in a fixed "art space" whose units are NOT pixels.
-// The SVG stretches that space over the entire sliding strip without
-// preserving its aspect ratio, so the art always spans every panel exactly.
+/*
+ * IMPORTANT:
+ * The iceberg is drawn on an SVG canvas with fixed, non-pixel units.
+ * It is stretched over the entire sliding strip prior to rasterization,
+ * meaning that its aspect ratio is NOT preserved.
+ */
 
-/** The width of the art space, in art units. */
-const ICE_W = 312;
+/** The width of SVG canvas. */
+const CANVAS_W = 312;
 
-/** The height of one panel in the art space, in art units. */
-const ICE_PANEL_H = 120;
+/** The height, in canvas units, of one IcebergExplainerText panel. */
+const PANEL_H = 120;
 
-/** The height of the art space, in art units. Spans every panel. */
-const ICE_H = TIER_COUNT * ICE_PANEL_H;
+/** The height of the entire SVG canvas. */
+const CANVAS_H = NUM_LEVELS * PANEL_H;
 
 /**
- * The y-coordinate, in art units, at which the iceberg was drawn to break
- * the surface of the water. Note the outline vertices that lie exactly on it.
- * The iceberg is shifted vertically so that this line meets the actual
- * waterline.
+ * The y-coordinate, in canvas units, at which the iceberg was originally
+ * drawn to break the surface of the water (as evidenced by the outline
+ * vertices that lie exactly on it). Used as a baseline against which the
+ * vertical position of the entire iceberg can be dynamically adjusted.
  */
-const ICE_WATERLINE = 82;
+const WATERLINE = 82;
 
 /**
- * The vertices of the low-poly iceberg, in art units.
- * The tip pokes above the waterline in the first panel,
- * and the bulk sinks through the rest.
+ * The vertices of the iceberg SVG, written in canvas units.
  */
-const ICE_POINTS: [number, number][] = [
+const POINTS: [number, number][] = [
   // Outline, clockwise from the peak
   [228, 16],
   [244, 34],
@@ -49,6 +50,7 @@ const ICE_POINTS: [number, number][] = [
   [180, 82],
   [194, 54],
   [210, 36],
+
   // Interior
   [226, 60],
   [230, 112],
@@ -67,10 +69,11 @@ const ICE_POINTS: [number, number][] = [
 ];
 
 /**
- * The triangular facets of the iceberg, as triples of indices into ICE_POINTS.
- * Computed as the Delaunay triangulation of ICE_POINTS, clipped to the outline.
+ * The triangular facets of the iceberg SVG, written as triples of
+ * indices in POINTS. Computed as the Delaunay triangulation of POINTS
+ * (excluding everything outside of the outline).
  */
-const ICE_FACETS: [number, number, number][] = [
+const FACETS: [number, number, number][] = [
   [0, 1, 19],
   [2, 3, 20],
   [17, 18, 20],
@@ -119,81 +122,97 @@ const ICE_FACETS: [number, number, number][] = [
   [11, 32, 33],
 ];
 
-/** The x-coordinate, in art units, of the leftmost point of the iceberg. */
-const ICE_MIN_X = Math.min(...ICE_POINTS.map(([x]) => x));
+/** The x coordinate of the leftmost point of the iceberg. */
+const MIN_X = Math.min(...POINTS.map(([x]) => x)); // i.e., [x, _]; 94
 
-/** The x-coordinate, in art units, of the rightmost point of the iceberg. */
-const ICE_MAX_X = Math.max(...ICE_POINTS.map(([x]) => x));
+/** The x coordinate of the rightmost point of the iceberg. */
+const MAX_X = Math.max(...POINTS.map(([x]) => x)); // i.e., [x, _]; 304
 
 /**
- * The precomputed rendering information for each facet of the iceberg.
- * Shading fakes lighting from the upper left, plus a little per-facet jitter
- * so that neighbouring facets read as distinct planes.
+ * Rendering information for a single facet of the iceberg SVG.
  */
-const ICE_FACET_SHADING = ICE_FACETS.map((facet, i) => {
+type FacetShading = {
+  /**
+   * The facet's vertices, formatted for an SVG `<polygon>`.
+   */
+  svgPoints: string;
+
+  /**
+   * How brightly the facet should be lit based the horizontal position of its
+   * centroid, expressed as a number between 0 (darkest) and 1 (brightest).
+   */
+  brightness: number;
+
+  /**
+   * The ratio between the y coordinate of the facet's centroid and CANVAS_H.
+   */
+  depth: number;
+};
+
+/**
+ * FacetShading info is static, so it can be pre-computed for every facet.
+ *
+ * Brightness values assume evenly-distributed lighting from the left side,
+ * but include some noise to ensure that neighboring facets appear distinct.
+ */
+const ALL_FACET_SHADING: FacetShading[] = FACETS.map((facet, i) => {
   const [centroidX, centroidY] = facet
-    .map((vertex) => ICE_POINTS[vertex])
-    .reduce(([ax, ay], [bx, by]) => [ax + bx / 3, ay + by / 3], [0, 0]);
-  const lit = 1 - (centroidX - ICE_MIN_X) / (ICE_MAX_X - ICE_MIN_X);
-  const jitter = ((i * 37) % 11) / 10;
+    // De-reference the vertices
+    .map((vertex) => POINTS[vertex])
+    // Compute the average x and y coordinates
+    .reduce(([accX, accY], [x, y]) => [accX + x / 3, accY + y / 3], [0, 0]);
+  const lighting = 1 - (centroidX - MIN_X) / (MAX_X - MIN_X);
+  const noise = ((i * 37) % 11) / 10; // Context: MAX_X - MIN_X is 210
   return {
-    /** The facet's vertices, formatted for an SVG `<polygon>`. */
-    points: facet.map((vertex) => ICE_POINTS[vertex].join(",")).join(" "),
-    /** How brightly lit the facet is, from 0 (darkest) to 1 (brightest). */
-    shade: 0.6 * lit + 0.4 * jitter,
-    /** How deep the facet lies, from 0 (top) to 1 (bottom). */
-    depth: centroidY / ICE_H,
+    svgPoints: facet.map((vertex) => POINTS[vertex].join(",")).join(" "),
+    brightness: 0.6 * lighting + 0.4 * noise,
+    depth: centroidY / CANVAS_H,
   };
 });
 
-type FacetShading = (typeof ICE_FACET_SHADING)[number];
-
 type IcebergProps = {
   /**
-   * The height, in pixels, of the sliding strip that the iceberg spans.
+   * The height, in pixels, of the entire sliding strip that the iceberg spans.
    */
   height: number;
 
   /**
    * The position, in pixels from the top of the sliding strip, of the
-   * surface of the water, or null to use the position at which the iceberg
-   * was originally drawn to break the surface.
+   * surface of the water. Used to shift the vertical position of the entire
+   * iceberg so that it aligns with the waterline as it was originally drawn
+   * to do. If null, the original positioning is used without any shifting.
    */
   waterline: number | null;
 };
 
 /**
- * Renders a low-poly iceberg that spans the entire sliding strip of an
- * IcebergExplainerText. Above the waterline, the ice is solid. Below it,
- * the ice is translucent and fades with depth.
+ * Renders an SVG of a low-poly iceberg that spans the entire sliding strip
+ * of an IcebergExplainerText. The facets above the waterline are fully opaque,
+ * but those below it become more and more translucent (i.e., fade) with depth.
  */
 const Iceberg = ({ height, waterline }: IcebergProps) => {
+  // Necessary b/c there could be more than one Iceberg instance on a page
+  // and inline SVG IDs apply to the entire page on which they appear
   const id = useId();
 
-  // Converted from pixels into art units
+  // The specified waterline must be converted to canvas units
   const waterlineY =
-    waterline === null ? ICE_WATERLINE : (waterline / height) * ICE_H;
-  const shift = waterlineY - ICE_WATERLINE;
+    waterline === null ? WATERLINE : (waterline / height) * CANVAS_H;
+  const shift = waterlineY - WATERLINE;
 
-  /**
-   * Renders every facet of the iceberg, clipped to the specified region.
-   * @param clip the suffix of the ID of the clipPath to be applied
-   * @param fill computes the fill color of the specified facet
-   * @param opacity computes the fill opacity of the specified facet
-   * @returns the rendered facets
-   */
+  // Renders the entire iceberg, but clips it to the specified region
   const renderFacets = (
-    clip: "above" | "below",
-    fill: (facet: FacetShading) => string,
-    opacity: (facet: FacetShading) => number,
+    region: "surface" | "submerged",
+    fill: (facet: FacetShading) => string, // Formula varies by region
+    opacity: (facet: FacetShading) => number, // Formula varies by region
   ) => (
-    <g clipPath={`url(#${id}-${clip})`}>
-      {/* Shifted separately so that the clipPath stays put */}
+    <g clipPath={`url(#${id}-${region})`}>
+      {/* Shifted separately so the clipPath doesn't move */}
       <g transform={`translate(0 ${shift})`}>
-        {ICE_FACET_SHADING.map((facet) => (
+        {ALL_FACET_SHADING.map((facet) => (
           <polygon
-            key={facet.points}
-            points={facet.points}
+            key={facet.svgPoints}
+            points={facet.svgPoints}
             fill={fill(facet)}
             fillOpacity={opacity(facet)}
             stroke="white"
@@ -207,47 +226,49 @@ const Iceberg = ({ height, waterline }: IcebergProps) => {
     </g>
   );
 
+  // Shadowed facets above the water are tints of color-blue-300
+  const surfaceFill = ({ brightness }: FacetShading) => {
+    const percentBlue = Math.round((1 - brightness) * 40);
+    return `color-mix(in oklch, var(--color-blue-300) ${percentBlue}%, white)`;
+  };
+
+  // Submerged facets are translucent and fade with depth
+  const submergedOpacity = ({ brightness, depth }: FacetShading) =>
+    (0.06 + 0.2 * brightness) * (1 - 0.6 * depth);
+
   return (
     <svg
       aria-hidden
-      viewBox={`0 0 ${ICE_W} ${ICE_H}`}
+      viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}
       preserveAspectRatio="none"
       className="absolute inset-x-0 top-0 w-full"
       style={{ height }}
     >
       <defs>
-        <clipPath id={`${id}-above`}>
-          <rect width={ICE_W} height={waterlineY} />
+        <clipPath id={`${id}-surface`}>
+          <rect width={CANVAS_W} height={waterlineY} />
         </clipPath>
-        <clipPath id={`${id}-below`}>
-          <rect y={waterlineY} width={ICE_W} height={ICE_H - waterlineY} />
+        <clipPath id={`${id}-submerged`}>
+          <rect
+            y={waterlineY}
+            width={CANVAS_W}
+            height={CANVAS_H - waterlineY}
+          />
         </clipPath>
       </defs>
-      {/* Water between the waterline and the bottom of the first panel */}
+      {/* The water between the waterline and the bottom of the first panel */}
       <rect
         y={waterlineY}
-        width={ICE_W}
-        height={Math.max(0, ICE_PANEL_H - waterlineY)}
+        width={CANVAS_W}
+        height={Math.max(0, PANEL_H - waterlineY)}
         fill="var(--color-blue-400)"
         fillOpacity={0.45}
       />
-      {/* Solid ice above water, shadowed facets tinted blue */}
-      {renderFacets(
-        "above",
-        ({ shade }) =>
-          `color-mix(in oklch, var(--color-blue-300) ${Math.round((1 - shade) * 40)}%, white)`,
-        () => 1,
-      )}
-      {/* Submerged ice: translucent, fading with depth */}
-      {renderFacets(
-        "below",
-        () => "white",
-        ({ shade, depth }) => (0.06 + 0.2 * shade) * (1 - 0.6 * depth),
-      )}
-      {/* Surface of the water */}
+      {renderFacets("surface", surfaceFill, () => 1)}
+      {renderFacets("submerged", () => "white", submergedOpacity)}
       <line
         x1={0}
-        x2={ICE_W}
+        x2={CANVAS_W}
         y1={waterlineY}
         y2={waterlineY}
         stroke="white"
