@@ -148,7 +148,7 @@ export default function Home() {
           </div>
           <div className="flex">
             <IcebergExplainerText text="Systems Thinker" levels={levels} />
-            <span className="opacity-50">, and &cdot;</span>
+            <span className="opacity-50">, and</span>
           </div>
           <div className="flex">
             <ConnectingDotsText
