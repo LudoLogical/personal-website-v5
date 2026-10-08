@@ -1,4 +1,4 @@
-import type { CSSProperties, ElementType } from "react";
+import type { CSSProperties } from "react";
 import { twMerge } from "tailwind-merge";
 
 export type CharCodeTextProps = {
@@ -7,12 +7,6 @@ export type CharCodeTextProps = {
    * Subject to whitespace-pre.
    */
   text: string;
-
-  /**
-   * The ElementType used to render the root of this CharCodeText.
-   * Defaults to `h1`.
-   */
-  as?: ElementType;
 
   /**
    * Classes for the root element of this CharCodeText.
@@ -80,12 +74,7 @@ const resolveOptions = (
  *
  * Animated with CSS hover states alone and thus valid as a server component.
  */
-const CharCodeText = ({
-  text,
-  as: Tag = "h1",
-  className,
-  options,
-}: CharCodeTextProps) => {
+const CharCodeText = ({ text, className, options }: CharCodeTextProps) => {
   const { liftHeight, liftDuration, minBinaryDigits } = resolveOptions(options);
 
   // Variables injected directly into CSS to avoid introducing client-side JS
@@ -95,7 +84,7 @@ const CharCodeText = ({
   } as CSSProperties;
 
   return (
-    <Tag
+    <span
       aria-label={text}
       className={twMerge("flex whitespace-pre", className)}
       style={liftVariables}
@@ -134,7 +123,7 @@ const CharCodeText = ({
           </span>
         );
       })}
-    </Tag>
+    </span>
   );
 };
 

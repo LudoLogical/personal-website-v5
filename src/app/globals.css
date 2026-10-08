@@ -5,10 +5,63 @@
 
 @plugin "daisyui/theme" {
   name: "dark";
+  /* Primary content color uses daisyUI 4's algorithm, which daisyUI 5 no
+     longer applies automatically: blend the color 80% of the way (in OKLCH)
+     toward whichever of black or white contrasts with it more */
   --color-primary: #ffef14;
+  --color-primary-content: oklch(18.7059% 0.039134 104.568725);
+  /* Pure white instead, since that algorithm's result (91% lightness)
+     falls short of WCAG AA contrast (4.5:1) against this color */
   --color-secondary: #0569f3;
+  --color-secondary-content: #ffffff;
 }
 
 @theme inline {
   --font-sans: var(--font-mulish), ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme {
+  /* Rounds the bottom corners of the page where it meets the footer */
+  --radius-paper: 2rem;
+  --breakpoint-xxs: 26rem;
+  --breakpoint-xs: 32rem;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 56rem;
+  --breakpoint-xl: 72rem;
+}
+
+/* Makes text (and icons) look as if carved into the surface beneath them */
+@utility engraved {
+  text-shadow:
+    0 -1px 0 rgb(0 0 0 / 0.7),
+    0 1px 0 rgb(255 255 255 / 0.08);
+
+  & svg {
+    filter: drop-shadow(0 -1px 0 rgb(0 0 0 / 0.7))
+      drop-shadow(0 1px 0 rgb(255 255 255 / 0.08));
+  }
+}
+
+/* Adds a soft, static glow in the specified theme color (e.g., glow-primary)
+   that follows the element's shape, including any rounded corners. Its
+   intensity can be scaled by setting --glow-strength (defaults to 1). */
+@utility glow-* {
+  --glow-color: --value(--color-*);
+  filter: drop-shadow(
+      0 0 0.375rem
+        color-mix(
+          in oklab,
+          var(--glow-color) calc(35% * var(--glow-strength, 1)),
+          transparent
+        )
+    )
+    drop-shadow(
+      0 0 1.5rem
+        color-mix(
+          in oklab,
+          var(--glow-color) calc(20% * var(--glow-strength, 1)),
+          transparent
+        )
+    );
 }
