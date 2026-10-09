@@ -26,6 +26,62 @@ export type IcebergExplainerTextProps = {
   className?: string;
 
   /**
+   * Classes for the child elements of this IcebergExplainerText.
+   * Each is applied after (and so takes precedence over) the element's own.
+   */
+  childClassNames?: {
+    /**
+     * Classes for the scrub indicator that appears beneath the hoverable text
+     * and marks the bounds of the region that causes the active Level to be
+     * displayed.
+     */
+    scrub?: string;
+
+    /**
+     * Classes for the explainer card in which the Levels are displayed.
+     * Inherited by the text in every Level panel.
+     */
+    card?: string;
+
+    /**
+     * Classes for the depth marker that slides along the depth
+     * rail to indicate which Level is currently displayed.
+     */
+    marker?: string;
+
+    /**
+     * Classes for each of the Level panels.
+     * Applied after the panel's background classes.
+     */
+    panel?: string;
+
+    /**
+     * Classes for the text in each of the Level panels.
+     */
+    text?: {
+      /**
+       * Classes for the depth text in each of the Level panels.
+       */
+      depth?: string;
+
+      /**
+       * Classes for the name text in each of the Level panels.
+       */
+      name?: string;
+
+      /**
+       * Classes for the question text in each of the Level panels.
+       */
+      question?: string;
+
+      /**
+       * Classes for the concepts text in each of the Level panels.
+       */
+      concepts?: string;
+    };
+  };
+
+  /**
    * Optional settings for this IcebergExplainerText.
    * Unspecified values are set according to DEFAULT_OPTIONS.
    */
@@ -150,6 +206,33 @@ const resolveOptions = (
 const CARD_RISE_DISTANCE = 6;
 
 /**
+ * The minimum distance, in pixels, that the explainer card
+ * keeps from either edge of the viewport whenever it fits.
+ */
+const CARD_VIEWPORT_MARGIN = 16;
+
+/**
+ * Determines how far the explainer card must be shifted horizontally from its
+ * default position (centered beneath the hoverable text) so that it stays
+ * CARD_VIEWPORT_MARGIN away from both edges of the viewport. If the viewport
+ * is too narrow for that, the card is centered within the viewport instead.
+ * @param textRect the bounding rectangle of the hoverable text
+ * @param cardWidth the width, in pixels, of the explainer card
+ * @returns the horizontal shift, in pixels
+ */
+const getCardShift = (textRect: DOMRect, cardWidth: number) => {
+  const viewportWidth = document.documentElement.clientWidth;
+  const centeredLeft = textRect.left + (textRect.width - cardWidth) / 2;
+  const minLeft = CARD_VIEWPORT_MARGIN;
+  const maxLeft = viewportWidth - CARD_VIEWPORT_MARGIN - cardWidth;
+  const left =
+    minLeft <= maxLeft
+      ? Math.min(Math.max(centeredLeft, minLeft), maxLeft)
+      : (viewportWidth - cardWidth) / 2;
+  return left - centeredLeft;
+};
+
+/**
  * The distance, in pixels, between each end of the depth rail's
  * track and the corresponding edge of the explainer card.
  * Also used as the inset for the depth marker at both extrema.
@@ -185,6 +268,7 @@ const IcebergExplainerText = ({
   text,
   levels,
   className,
+  childClassNames,
   options,
 }: IcebergExplainerTextProps) => {
   // Keyed after serialization so that changes are only registered when the
@@ -197,6 +281,7 @@ const IcebergExplainerText = ({
   );
 
   const [level, setLevel] = useState<number | null>(null);
+  const [cardShift, setCardShift] = useState(0);
 
   // Position the waterline exactly halfway between the question and concepts
   const questionRef = useRef<HTMLSpanElement>(null);
@@ -211,7 +296,10 @@ const IcebergExplainerText = ({
       // Clamp xFraction within [0, 1) so that right edge maps to 3 and not 4
       Math.min(0.999, Math.max(0, xFraction)) * NUM_LEVELS,
     );
-    if (targetLevel !== level) setLevel(targetLevel);
+    if (targetLevel === level) return;
+    // Measured as the card appears to keep it from hanging off the viewport
+    if (level === null) setCardShift(getCardShift(rect, appearance.cardWidth));
+    setLevel(targetLevel);
   };
 
   const scrollTransition = `${animation.scrollDuration}s ${SCROLL_CURVE}`;
@@ -239,7 +327,10 @@ const IcebergExplainerText = ({
       {/* Scrub indicator */}
       <span
         aria-hidden
-        className="absolute bottom-px rounded-full bg-primary"
+        className={twMerge(
+          "absolute -bottom-0.5 rounded-full bg-primary",
+          childClassNames?.scrub,
+        )}
         style={{
           width: `${100 / NUM_LEVELS}%`,
           height: `${appearance.indicatorThickness}em`,
@@ -256,13 +347,16 @@ const IcebergExplainerText = ({
       {/* Explainer card */}
       <span
         aria-hidden
-        className="pointer-events-none absolute left-1/2 flex overflow-hidden rounded-box border border-base-300 bg-base-200 text-base font-normal shadow-lg"
+        className={twMerge(
+          "pointer-events-none absolute left-1/2 flex overflow-hidden rounded-box border border-base-300 bg-base-200 text-base font-normal shadow-lg",
+          childClassNames?.card,
+        )}
         style={{
           top: `calc(100% + ${appearance.cardGap}px)`,
           width: appearance.cardWidth,
           height: appearance.cardHeight,
           opacity: level === null ? 0 : 1,
-          transform: `translate(-50%, ${level === null ? -CARD_RISE_DISTANCE : 0}px)`,
+          transform: `translate(calc(-50% + ${cardShift}px), ${level === null ? -CARD_RISE_DISTANCE : 0}px)`,
           transition: [
             `opacity ${animation.cardFadeDuration}s ease`,
             `transform ${animation.cardRiseDuration}s ease`,
@@ -278,7 +372,10 @@ const IcebergExplainerText = ({
           />
           {/* Marker */}
           <span
-            className="absolute left-1/2 -translate-x-1/2 rounded-full bg-primary"
+            className={twMerge(
+              "absolute left-1/2 -translate-x-1/2 rounded-full bg-primary",
+              childClassNames?.marker,
+            )}
             style={{
               width: DEPTH_MARKER_SIZE,
               height: DEPTH_MARKER_SIZE,
@@ -308,21 +405,42 @@ const IcebergExplainerText = ({
                   // *:relative lets children go above the iceberg
                   "flex flex-none flex-col gap-1 px-4 py-3 whitespace-nowrap *:relative",
                   LEVEL_CLASS_NAMES[i],
+                  childClassNames?.panel,
                 )}
                 style={{ height: appearance.cardHeight }}
               >
-                <span className="font-mono text-[10px]">{depth}</span>
-                <span className="text-lg font-bold">{name}</span>
+                <span
+                  className={twMerge(
+                    "font-mono text-[10px]",
+                    childClassNames?.text?.depth,
+                  )}
+                >
+                  {depth}
+                </span>
+                <span
+                  className={twMerge(
+                    "text-lg font-bold",
+                    childClassNames?.text?.name,
+                  )}
+                >
+                  {name}
+                </span>
                 {/* Refs go on the first panel only */}
                 <span
                   ref={i === 0 ? questionRef : undefined}
-                  className="text-xs italic"
+                  className={twMerge(
+                    "text-xs italic",
+                    childClassNames?.text?.question,
+                  )}
                 >
                   {question}
                 </span>
                 <span
                   ref={i === 0 ? conceptsRef : undefined}
-                  className="text-xs"
+                  className={twMerge(
+                    "text-xs",
+                    childClassNames?.text?.concepts,
+                  )}
                 >
                   {concepts.join(" · ")}
                 </span>

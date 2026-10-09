@@ -1,6 +1,11 @@
 "use client";
 
-import { type PointerEvent, type ReactNode, useState } from "react";
+import {
+  type CSSProperties,
+  type PointerEvent,
+  type ReactNode,
+  useState,
+} from "react";
 import { twMerge } from "tailwind-merge";
 
 export type AvatarTipsProps = {
@@ -23,6 +28,27 @@ export type AvatarTipsProps = {
 };
 
 /**
+ * The outline of a vertically symmetrical replacement for the tail of
+ * daisyUI's chat bubble, whose flat bottom is instead designed to line up with
+ * the bottom of an avatar. Drawn in a 13×12 box: two straight sides run from
+ * the corners of its right edge to an arc (centered at (2, 6) with a radius of
+ * 2) that rounds off its tip at the middle of its left edge, with each side
+ * meeting the arc at a tangent so that the tip stays blunt rather than spiky.
+ * Its rightmost column is solid so that it can overlap the bubble's body by
+ * 1px without leaving a seam.
+ */
+const TAIL_PATH = "M13 0V12H12L1.28 7.87A2 2 0 0 1 1.28 4.13L12 0Z";
+
+/**
+ * Replaces daisyUI's tail by overriding the mask that it reads.
+ */
+const tailMask = {
+  "--mask-chat": `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="12"><path d="${TAIL_PATH}"/></svg>`,
+  )}")`,
+} as CSSProperties;
+
+/**
  * Picks a random index into a list of the specified length, skipping over
  * the previously picked index (if any) so that no tip appears twice in a row.
  * @param length the length of the list
@@ -40,9 +66,9 @@ const pickIndex = (length: number, previous: number | null) => {
 /**
  * Renders the specified avatar such that, while it is hovered, it swells
  * slightly and a speech bubble containing a randomly chosen tip pops into
- * view above and to the right of it, with the bubble's tail touching its
- * edge. The interaction triggers on hover for mouse users and toggles on tap
- * for touch screen users. While active, the root element carries a
+ * view beside it (centered on it), with the bubble's tail touching its edge.
+ * The interaction triggers on hover for mouse users and toggles on tap for
+ * touch screen users. While active, the root element carries a
  * `data-speaking` attribute so that surrounding content can react.
  */
 const AvatarTips = ({ children, tips, className }: AvatarTipsProps) => {
@@ -81,19 +107,22 @@ const AvatarTips = ({ children, tips, className }: AvatarTipsProps) => {
         {children}
       </div>
 
-      {/* Anchored so that the tip of the bubble's tail (at the bottom-left
-          corner of the chat) lands on the avatar's edge 60° above its
-          horizontal centerline, i.e., at (½ + ½cos 60°, ½ - ½sin 60°) ≈
-          (75%, 7%), then nudged toward its center to overlap it slightly.
-          Steep enough to keep the bubble clear of most of the adjacent text.
-          Grows out of that tail, but only fades if motion is reduced */}
+      {/* Centered on the avatar and anchored so that the tip of the bubble's
+          tail (at the left edge of the chat) points at the avatar's rightmost
+          point from 1rem away, leaving a small gap that narrows (but doesn't
+          close) as the avatar swells. Sized to fit between the avatar and the
+          page's gutter at the narrowest viewport of each breakpoint. Grows out
+          of the tail, but only fades if motion is reduced */}
       <div
         aria-hidden={!speaking}
-        className="pointer-events-none absolute chat-start bottom-[91%] left-[74%] z-30 chat w-60 origin-bottom-left scale-50 opacity-0 drop-shadow-lg transition-[opacity,scale] duration-200 ease-out group-data-speaking/avatar:scale-100 group-data-speaking/avatar:opacity-100 motion-reduce:scale-100 xs:w-72 md:w-80"
+        className="pointer-events-none absolute chat-start top-1/2 left-full z-30 ml-4 chat w-50 origin-left -translate-y-1/2 scale-50 opacity-0 drop-shadow-lg transition-[opacity,scale] duration-200 ease-out group-data-speaking/avatar:scale-100 group-data-speaking/avatar:opacity-100 motion-reduce:scale-100 xxs:w-60 xs:w-72 sm:w-80"
+        style={tailMask}
       >
-        {/* Matches the avatar's background and glow */}
-        <div className="chat-bubble max-w-full chat-bubble-secondary text-sm leading-snug">
-          <span className="mb-0.5 block text-xs font-bold tracking-widest text-primary uppercase">
+        {/* Matches the avatar's background and glow. The tail is centered
+            vertically (rather than sitting at the bottom), so the corner that
+            daisyUI squares off to meet it is rounded like the others */}
+        <div className="chat-bubble max-w-full rounded-es-(--radius-field) chat-bubble-secondary px-5 py-4 text-sm leading-snug before:top-1/2 before:bottom-auto before:h-3 before:w-3.25 before:-translate-y-1/2 before:mask-size-[100%_100%] before:mask-position-[0_0] xs:text-base">
+          <span className="mb-0.5 block text-xs font-bold tracking-widest text-primary uppercase xs:mb-1 xs:text-sm">
             Tip
           </span>
           {tipIndex !== null && tips[tipIndex]}

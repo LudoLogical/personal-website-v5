@@ -53,4 +53,4 @@ const tipsByCategory = {
   ],
 };
 
-export const loadingTips = Object.values(tipsByCategory).flat();
+export const tips = Object.values(tipsByCategory).flat();

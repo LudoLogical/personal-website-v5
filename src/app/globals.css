@@ -17,6 +17,17 @@
   --color-secondary-content: #ffffff;
 }
 
+/* Always emitted as :root variables (rather than only being inlined into
+   media queries) so that @/utils/useBreakpoint can read them at runtime */
+@theme static {
+  --breakpoint-xxs: 26rem;
+  --breakpoint-xs: 32rem;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 56rem;
+  --breakpoint-xl: 72rem;
+}
+
 @theme inline {
   --font-sans: var(--font-mulish), ui-sans-serif, system-ui, sans-serif;
 }
@@ -24,12 +35,19 @@
 @theme {
   /* Rounds the bottom corners of the page where it meets the footer */
   --radius-paper: 2rem;
-  --breakpoint-xxs: 26rem;
-  --breakpoint-xs: 32rem;
-  --breakpoint-sm: 40rem;
-  --breakpoint-md: 48rem;
-  --breakpoint-lg: 56rem;
-  --breakpoint-xl: 72rem;
+
+  /* Gently bobs an element up and down by 15% of its own height */
+  --animate-bob: bob 1.6s ease-in-out infinite;
+
+  @keyframes bob {
+    0%,
+    100% {
+      translate: 0 -10%;
+    }
+    50% {
+      translate: 0 10%;
+    }
+  }
 }
 
 /* Makes text (and icons) look as if carved into the surface beneath them */

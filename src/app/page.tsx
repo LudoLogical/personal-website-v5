@@ -1,7 +1,7 @@
 import { ArrowDown } from "lucide-react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
-import { loadingTips } from "@/app/loadingTips";
+import { tips } from "@/components/AvatarTips";
 import AvatarTips from "@/components/AvatarTips";
 import CharCodeText from "@/components/CharCodeText";
 import ConnectingDotsText from "@/components/ConnectingDotsText";
@@ -13,9 +13,8 @@ import DiagramAnimation, {
   free,
   type Arrow,
 } from "@/components/DiagramAnimation";
-import IcebergExplainerText, {
-  type Levels,
-} from "@/components/IcebergExplainerText";
+import { type Levels } from "@/components/IcebergExplainerText";
+import ResponsiveIcebergExplainerText from "@/components/ResponsiveIcebergExplainerText";
 import WaveText from "@/components/WaveText";
 
 // General order: highest -> lowest, leftmost -> rightmost
@@ -150,7 +149,7 @@ export default function Home() {
             text while active) fits within the narrowest viewport of each */}
         <div className="group/intro flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-14 lg:gap-16 xl:gap-20">
           <div className={twMerge("shrink-0", fadeWhileDiagramActive)}>
-            <AvatarTips tips={loadingTips}>
+            <AvatarTips tips={tips}>
               <Image
                 src="/avatar.png"
                 alt='Illustrated portrait of Daniel "Ludo" DeAnda'
@@ -193,9 +192,23 @@ export default function Home() {
                     <span className="opacity-50">,</span>
                   </div>
                   <div className="flex flex-nowrap">
-                    <IcebergExplainerText
+                    <ResponsiveIcebergExplainerText
                       text="Systems Thinker"
                       levels={levels}
+                      childClassNames={{
+                        scrub: "xs:-bottom-1",
+                        text: {
+                          depth: "xs:text-xs",
+                          question: "xs:text-sm",
+                          concepts: "xs:text-sm",
+                        },
+                      }}
+                      options={{
+                        appearance: {
+                          cardWidth: { base: 330, xs: 364 },
+                          cardHeight: { base: 120, xs: 128 },
+                        },
+                      }}
                     />
                     <span className="opacity-50">, and</span>
                   </div>
@@ -213,12 +226,12 @@ export default function Home() {
             <div className={fadeWhileDiagramActive}>
               <a
                 href="#wonderful"
-                className="btn rounded-lg glow-primary btn-primary btn-sm [--glow-strength:1] xs:btn-md xl:btn-lg"
+                className="btn gap-2 rounded-lg glow-primary btn-primary btn-sm [--glow-strength:1] xs:btn-md xl:gap-3 xl:btn-lg"
               >
                 Show me something wonderful
                 <ArrowDown
                   aria-hidden
-                  className="size-3 xs:ml-0.5 xs:size-4 xl:ml-1 xl:size-5"
+                  className="size-3 motion-safe:animate-bob xs:ml-0.5 xs:size-4 xl:size-5"
                 />
               </a>
             </div>

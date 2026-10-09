@@ -116,7 +116,7 @@ const CharCodeText = ({ text, className, options }: CharCodeTextProps) => {
             // over any content that might exist below it
             className="tooltip cursor-default leading-none transition-[translate,color] duration-(--lift-duration) ease-out hover:z-10 hover:-translate-y-(--lift-height) hover:text-primary"
           >
-            <span className="tooltip-content flex flex-col items-center font-mono text-xs leading-normal shadow-lg">
+            <span className="tooltip-content flex flex-col items-center font-mono text-xs leading-normal shadow-lg xs:text-sm">
               <span className="font-bold">{decimal}</span>
               <span className="text-neutral-content/60">{hexadecimal}</span>
               <span className="text-neutral-content/60">{binary}</span>
