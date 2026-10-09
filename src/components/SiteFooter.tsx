@@ -72,18 +72,29 @@ const linkClassName =
  * so that it is revealed as the page above it scrolls away.
  */
 const SiteFooter = () => (
-  <footer className="sticky bottom-0 z-0 mx-auto footer max-w-5xl grid-cols-2 gap-y-10 px-8 pt-14 pb-12 text-base-content/55 engraved sm:grid-cols-4">
-    <aside className="col-span-2 gap-3 sm:col-span-1">
+  // Columns are sized to their contents and given equal space on either side
+  // so that the gaps between sections stay even and everything stays
+  // centered. Stacks every section until there's room for the link groups to
+  // share a row (beneath the aside), then puts all four sections in one row
+  <footer className="sticky bottom-0 z-0 mx-auto footer max-w-5xl grid-cols-1 justify-around justify-items-center gap-y-10 px-10 pt-14 pb-12 text-base-content/55 engraved xxs:grid-cols-[repeat(3,auto)] sm:grid-cols-[repeat(4,auto)]">
+    <aside className="col-span-full place-items-center gap-3 text-center sm:col-span-1 sm:place-items-start sm:text-left">
       <Logo className="size-12 opacity-60" />
       <p>
-        &copy; {new Date().getFullYear()}{" "}
+        &copy; {new Date().getFullYear()}
+        {/* Broken here to keep the aside about as narrow as the link groups */}
+        <br />
         <span className="whitespace-nowrap">
           Daniel &quot;Ludo&quot; DeAnda
         </span>
       </p>
     </aside>
     {LINK_GROUPS.map(({ title, links }) => (
-      <nav key={title} aria-label={title}>
+      <nav
+        key={title}
+        aria-label={title}
+        // Centered along with everything else while stacked
+        className="place-items-center xxs:place-items-start"
+      >
         <h2 className="footer-title">{title}</h2>
         {links.map(({ label, href, icon: Icon }) => {
           const content = (
@@ -92,11 +103,7 @@ const SiteFooter = () => (
               {label}
             </>
           );
-          return href.startsWith("mailto:") ? (
-            <a key={label} href={href} className={linkClassName}>
-              {content}
-            </a>
-          ) : (
+          return (
             <ExternalLink key={label} href={href} className={linkClassName}>
               {content}
             </ExternalLink>

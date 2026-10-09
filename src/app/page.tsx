@@ -1,6 +1,8 @@
 import { ArrowDown } from "lucide-react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
+import { loadingTips } from "@/app/loadingTips";
+import AvatarTips from "@/components/AvatarTips";
 import CharCodeText from "@/components/CharCodeText";
 import ConnectingDotsText from "@/components/ConnectingDotsText";
 import DiagramAnimation, {
@@ -14,6 +16,7 @@ import DiagramAnimation, {
 import IcebergExplainerText, {
   type Levels,
 } from "@/components/IcebergExplainerText";
+import WaveText from "@/components/WaveText";
 
 // General order: highest -> lowest, leftmost -> rightmost
 const arrows: Arrow[] = [
@@ -147,15 +150,17 @@ export default function Home() {
             text while active) fits within the narrowest viewport of each */}
         <div className="group/intro flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-14 lg:gap-16 xl:gap-20">
           <div className={twMerge("shrink-0", fadeWhileDiagramActive)}>
-            <Image
-              src="/avatar.png"
-              alt='Illustrated portrait of Daniel "Ludo" DeAnda'
-              width={288}
-              height={288}
-              sizes="(min-width: 1152px) 320px, (min-width: 896px) 272px, (min-width: 768px) 240px, (min-width: 640px) 96px, (min-width: 512px) 80px, 64px"
-              preload
-              className="block size-16 rounded-full glow-secondary [--glow-strength:3] xs:size-20 sm:size-24 md:size-60 lg:size-68 xl:size-80"
-            />
+            <AvatarTips tips={loadingTips}>
+              <Image
+                src="/avatar.png"
+                alt='Illustrated portrait of Daniel "Ludo" DeAnda'
+                width={288}
+                height={288}
+                sizes="(min-width: 1152px) 320px, (min-width: 896px) 272px, (min-width: 768px) 240px, (min-width: 640px) 96px, (min-width: 512px) 80px, 64px"
+                preload
+                className="block size-16 rounded-full glow-secondary [--glow-strength:3] xs:size-20 sm:size-24 md:size-60 lg:size-68 xl:size-80"
+              />
+            </AvatarTips>
           </div>
           <div className="flex flex-col items-start gap-8 md:gap-6 xl:gap-8">
             <div className="flex flex-col gap-2 text-xl leading-none font-bold whitespace-nowrap xxs:text-2xl xs:text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-5xl">
@@ -165,7 +170,10 @@ export default function Home() {
                   fadeWhileDiagramActive,
                 )}
               >
-                Hello, my name is
+                <WaveText
+                  text="Hello, my name is"
+                  className="sm:wave-height-[0.15em] lg:wave-height-[0.2em]"
+                />
               </p>
               <div className="my-1 flex flex-col gap-2">
                 <DiagramAnimation

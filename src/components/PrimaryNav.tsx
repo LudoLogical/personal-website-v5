@@ -55,7 +55,7 @@ const PrimaryNav = () => {
     <header
       ref={headerRef}
       data-hidden={hidden || undefined}
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 px-4 pt-4 transition-transform duration-300 ease-out data-hidden:not-has-focus-visible:-translate-y-[calc(100%+1rem)] motion-reduce:transition-none"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 px-6 pt-6 transition-transform duration-300 ease-out data-hidden:not-has-focus-visible:-translate-y-[calc(100%+1rem)] motion-reduce:transition-none"
     >
       <nav
         aria-label="Primary"

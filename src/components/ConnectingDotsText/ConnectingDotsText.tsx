@@ -226,7 +226,6 @@ const ConnectingDotsText = ({
     <span
       ref={containerRef}
       tabIndex={0}
-      aria-label={text}
       onMouseEnter={() => setActive(true)}
       onMouseLeave={() => setActive(false)}
       onFocus={() => setActive(true)}
@@ -236,6 +235,9 @@ const ConnectingDotsText = ({
         className,
       )}
     >
+      {/* Screen readers ignore aria-label on generic elements like spans, so
+          the full text is exposed this way instead of character by character */}
+      <span className="sr-only">{text}</span>
       {/* Applying leading-none here prevents the
           class from being overridden via twMerge() */}
       <span

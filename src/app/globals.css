@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../components/WaveText/WaveText.css";
 @plugin "daisyui" {
   themes: dark --default --prefersdark;
 }

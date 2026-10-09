@@ -1,0 +1,48 @@
+/* Styles for WaveText, imported by globals.css so that Tailwind registers its
+   utilities. The wave-* utilities below are WaveText's public API; any of
+   them can be combined with variants (e.g., sm:wave-height-[0.15em]). */
+
+/* The values used for any wave-* utilities that aren't applied */
+@theme {
+  --default-wave-height: 0.1em;
+  --default-wave-period: 2s;
+  --default-wave-stagger: 0.1s;
+}
+
+/* Sets the distance between the lowest and highest points that each
+   character reaches as the wave passes (e.g., wave-height-[0.15em]) */
+@utility wave-height-* {
+  --wave-height: --value([length]);
+}
+
+/* Sets the duration of one full rise and fall of each character
+   (e.g., wave-period-[3s]) */
+@utility wave-period-* {
+  --wave-period: --value([*]);
+}
+
+/* Sets the delay between the movements of adjacent characters
+   (e.g., wave-stagger-[0.2s]) */
+@utility wave-stagger-* {
+  --wave-stagger: --value([*]);
+}
+
+/* Inlined so that the variables below resolve against each character (which
+   inherits them from WaveText's root) rather than :root (where they'd be
+   undefined). Alternates, so each run covers only half of a period, and is
+   delayed by the character's --wave-offset multiples of the stagger */
+@theme inline {
+  --animate-wave: wave calc(var(--wave-period, var(--default-wave-period)) / 2)
+    ease-in-out
+    calc(var(--wave-offset) * var(--wave-stagger, var(--default-wave-stagger)))
+    infinite alternate;
+
+  @keyframes wave {
+    from {
+      translate: 0 calc(var(--wave-height, var(--default-wave-height)) / 2);
+    }
+    to {
+      translate: 0 calc(var(--wave-height, var(--default-wave-height)) / -2);
+    }
+  }
+}

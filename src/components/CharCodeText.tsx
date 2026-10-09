@@ -85,10 +85,12 @@ const CharCodeText = ({ text, className, options }: CharCodeTextProps) => {
 
   return (
     <span
-      aria-label={text}
       className={twMerge("flex whitespace-pre", className)}
       style={liftVariables}
     >
+      {/* Screen readers ignore aria-label on generic elements like spans, so
+          the full text is exposed this way instead of character by character */}
+      <span className="sr-only">{text}</span>
       {/* Spreading iterates by code point, so "astral"
           characters like emoji aren't split up! */}
       {[...text].map((char, i) => {
