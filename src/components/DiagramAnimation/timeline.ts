@@ -35,28 +35,26 @@ const animateArrow = (
     )
     // Draw the main polyline from tail to tip
     .fromTo(body, { drawSVG: "0%" }, { drawSVG: "100%" }, 0)
-    // Move the arrowhead along the main polyline
-    .to(
+    // Move the arrowhead along the main polyline. The tip shares the body's
+    // coordinate space and the arrowhead's tip is at the origin, so the path
+    // can be followed as-is; aligning would force costly layout measurements
+    .fromTo(
       tip,
-      {
-        motionPath: {
-          path: body,
-          align: body,
-          alignOrigin: [1, 0.5], // [x, y]; arrowhead tip is at top middle
-          autoRotate: true,
-        },
-      },
+      // Set origin from the start so the tip pivots around itself
+      { svgOrigin: "0 0" },
+      { motionPath: { path: body, autoRotate: true } },
       0,
     )
     // Scale the arrowhead up from nothing
     .fromTo(
       head,
-      { scale: 0 },
+      // Set origin from the start so GSAP doesn't offset the head to keep it
+      // in place, which would knock its tip off of the path
+      { scale: 0, transformOrigin: "100% 50%" }, // grow out from arrowhead tip
       {
         scale: 1,
         duration: animationOptions.forwardDuration * animationOptions.headGrow,
         ease: "power2.in",
-        transformOrigin: `100% 50%`, // x y; grow out from arrowhead tip
       },
       0,
     );
@@ -144,8 +142,11 @@ export const useDiagramAnimationTimeline = (
       for (const arrow of self.selector!("[data-arrow]")) {
         animateArrow(arrow, tl, animationOptions);
       }
-      // Pick up where the previous timeline left off
-      timeline.current = tl.progress(savedProgress.current);
+      // Render the end state once so that every tween initializes now rather
+      // than on first play, then pick up where the previous timeline left off
+      timeline.current = tl
+        .progress(1, true)
+        .progress(savedProgress.current, true);
     }, svgRef);
 
     // Set the new timeline in motion

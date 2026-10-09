@@ -13,6 +13,7 @@ import DiagramAnimation, {
   free,
   type Arrow,
 } from "@/components/DiagramAnimation";
+import HoverOrTapAffordance from "@/components/HoverOrTapAffordance";
 import { type Levels } from "@/components/IcebergExplainerText";
 import ResponsiveIcebergExplainerText from "@/components/ResponsiveIcebergExplainerText";
 import WaveText from "@/components/WaveText";
@@ -132,6 +133,9 @@ const dotPositions = [30, 12, 36, 18, 28, 40, 8, 24, 14, 34, 20].map(
   (y) => y / 48,
 );
 
+// Shared by every interactive element in the intro so that they match
+const affordanceLineClassName = "sm:border-t-3";
+
 // Applied to everything in the intro but the name itself
 const fadeWhileDiagramActive =
   "transition-opacity duration-300 group-has-data-active/intro:pointer-events-none group-has-data-active/intro:opacity-15";
@@ -150,15 +154,24 @@ export default function Home() {
         <div className="group/intro flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-14 lg:gap-16 xl:gap-20">
           <div className={twMerge("shrink-0", fadeWhileDiagramActive)}>
             <AvatarTips tips={tips}>
-              <Image
-                src="/avatar.png"
-                alt='Illustrated portrait of Daniel "Ludo" DeAnda'
-                width={288}
-                height={288}
-                sizes="(min-width: 1152px) 320px, (min-width: 896px) 272px, (min-width: 768px) 240px, (min-width: 640px) 96px, (min-width: 512px) 80px, 64px"
-                preload
-                className="block size-16 rounded-full glow-secondary [--glow-strength:3] xs:size-20 sm:size-24 md:size-60 lg:size-68 xl:size-80"
-              />
+              {/* Inside the tips so that the circle swells with the avatar and
+                  the speech bubble isn't trapped in its stacking context.
+                  Displayed as a block so that no line box pads its bottom */}
+              <HoverOrTapAffordance
+                shape="circle"
+                className="block"
+                lineClassName="sm:border-3 -inset-1.5 md:-inset-2 xl:-inset-3"
+              >
+                <Image
+                  src="/avatar.png"
+                  alt='Illustrated portrait of Daniel "Ludo" DeAnda'
+                  width={288}
+                  height={288}
+                  sizes="(min-width: 1152px) 320px, (min-width: 896px) 272px, (min-width: 768px) 240px, (min-width: 640px) 96px, (min-width: 512px) 80px, 64px"
+                  preload
+                  className="block size-16 rounded-full glow-secondary [--glow-strength:3] xs:size-20 sm:size-24 md:size-60 lg:size-68 xl:size-80"
+                />
+              </HoverOrTapAffordance>
             </AvatarTips>
           </div>
           <div className="flex flex-col items-start gap-8 md:gap-6 xl:gap-8">
@@ -175,48 +188,82 @@ export default function Home() {
                 />
               </p>
               <div className="my-1 flex flex-col gap-2">
-                <DiagramAnimation
-                  text='Daniel "Ludo" DeAnda.'
-                  arrows={arrows}
-                  className="w-fit text-primary"
-                />
+                {/* Sized to fit the name so that the underline doesn't
+                    stretch across the whole column */}
+                <HoverOrTapAffordance
+                  className="w-fit"
+                  lineClassName={affordanceLineClassName}
+                >
+                  <DiagramAnimation
+                    text='Daniel "Ludo" DeAnda.'
+                    arrows={arrows}
+                    className="w-fit text-primary"
+                  />
+                </HoverOrTapAffordance>
+                {/* Its opacity makes it a stacking context while fading, so
+                    it's raised above the name for tooltips to overlap it, but
+                    lowered while the diagram is active for arrows to overlap
+                    it in turn */}
                 <div
                   className={twMerge(
-                    "flex flex-col gap-2",
+                    "relative z-10 flex flex-col gap-2 group-has-data-active/intro:z-0",
                     fadeWhileDiagramActive,
                   )}
                 >
                   <div className="flex flex-nowrap">
                     <span className="opacity-50">I&apos;m a&nbsp;</span>
-                    <CharCodeText text="Software Engineer" />
+                    <HoverOrTapAffordance
+                      inline
+                      lineClassName={affordanceLineClassName}
+                    >
+                      <CharCodeText text="Software Engineer" />
+                    </HoverOrTapAffordance>
                     <span className="opacity-50">,</span>
                   </div>
                   <div className="flex flex-nowrap">
-                    <ResponsiveIcebergExplainerText
-                      text="Systems Thinker"
-                      levels={levels}
-                      childClassNames={{
-                        scrub: "xs:-bottom-1",
-                        text: {
-                          depth: "xs:text-xs",
-                          question: "xs:text-sm",
-                          concepts: "xs:text-sm",
-                        },
-                      }}
-                      options={{
-                        appearance: {
-                          cardWidth: { base: 330, xs: 364 },
-                          cardHeight: { base: 120, xs: 128 },
-                        },
-                      }}
-                    />
+                    {/* Raised so that the explainer card
+                        overlaps the "Sense-Maker" row below */}
+                    <HoverOrTapAffordance
+                      inline
+                      className="z-20"
+                      lineClassName={affordanceLineClassName}
+                    >
+                      <ResponsiveIcebergExplainerText
+                        text="Systems Thinker"
+                        levels={levels}
+                        childClassNames={{
+                          scrub: "xs:-bottom-1",
+                          text: {
+                            depth: "xs:text-xs",
+                            question: "xs:text-sm",
+                            concepts: "xs:text-sm",
+                          },
+                        }}
+                        options={{
+                          appearance: {
+                            cardWidth: { base: 330, xs: 364 },
+                            cardHeight: { base: 120, xs: 128 },
+                          },
+                        }}
+                      />
+                    </HoverOrTapAffordance>
                     <span className="opacity-50">, and</span>
                   </div>
                   <div className="flex flex-nowrap">
-                    <ConnectingDotsText
-                      text="Sense-Maker"
-                      dotPositions={dotPositions}
-                    />
+                    <HoverOrTapAffordance
+                      inline
+                      // (first dot starts shrinking)
+                      // + (last dot starts shrinking)
+                      // + (shrinking duration)
+                      // + (buffer before text starts fading in)
+                      lineClassName={affordanceLineClassName}
+                      fadeInDelay={0.15 + 0.25 + 0.18 + 0.07}
+                    >
+                      <ConnectingDotsText
+                        text="Sense-Maker"
+                        dotPositions={dotPositions}
+                      />
+                    </HoverOrTapAffordance>
                     <span className="opacity-50">.</span>
                   </div>
                 </div>
