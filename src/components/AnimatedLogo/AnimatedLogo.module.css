@@ -1,0 +1,90 @@
+/* Timeline of the animation, measured from the moment when the parent of the
+   AnimatedLogo is hovered or keyboard-focused:
+
+     0–133ms    Wind-up: the arrowhead, arrow body, and dot all pull back 3px
+                together (as one so that the body never pokes out past the
+                arrowhead)
+     133–209ms  Strike: the arrowhead lunges 5px forward; the body and dot
+                follow 1px
+     190ms      Contact: the D starts its own (476ms) timeline
+     190–330ms  The D is pushed 6px away and tilts 6°
+     330–490ms  The D rebounds to -1px and -1°
+     490–666ms  The D settles back to rest */
+
+.root {
+  /* Parts move a few pixels outside of the viewBox mid-animation */
+  overflow: visible;
+
+  /* Moves (and rotates) each part around its own center
+     rather than the origin of the SVG */
+  & path {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(:hover) > .root {
+    & [data-arrowhead] {
+      animation: strike-arrowhead 380ms cubic-bezier(0.2, 0, 0, 1) both;
+    }
+
+    & [data-arrow-body],
+    & [data-dot] {
+      animation: strike-trailing 380ms cubic-bezier(0.2, 0, 0, 1) both;
+    }
+
+    /* Each segment sets its own easing curve (see the keyframes) */
+    & [data-letter-d] {
+      animation: recoil 476ms 190ms both;
+    }
+  }
+}
+
+@keyframes strike-arrowhead {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  35% {
+    transform: translateX(-3px);
+  }
+  55% {
+    transform: translateX(5px);
+  }
+}
+
+/* Winds up along with the arrowhead but follows through less on the strike */
+@keyframes strike-trailing {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  35% {
+    transform: translateX(-3px);
+  }
+  55% {
+    transform: translateX(1px);
+  }
+}
+
+@keyframes recoil {
+  0% {
+    transform: translateX(0) rotate(0);
+    animation-timing-function: cubic-bezier(0.15, 0.7, 0.3, 1);
+  }
+  /* 140ms push */
+  29.41% {
+    transform: translateX(6px) rotate(6deg);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  /* 160ms rebound */
+  63.03% {
+    transform: translateX(-1px) rotate(-1deg);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  /* 176ms settle */
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+}

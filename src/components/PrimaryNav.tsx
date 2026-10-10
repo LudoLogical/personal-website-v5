@@ -4,7 +4,7 @@ import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
-import Logo from "@/components/Logo";
+import AnimatedLogo from "@/components/AnimatedLogo";
 import { useHideOnScrollDown } from "@/utils/useHideOnScrollDown";
 
 const NAV_ITEMS = [
@@ -63,7 +63,7 @@ const PrimaryNav = () => {
       >
         <div className="my-1 navbar-start w-auto">
           <Link href="/" aria-label="Home" className="rounded-md p-2">
-            <Logo className="my-0.5 h-11 w-auto" />
+            <AnimatedLogo className="my-0.5 h-11 w-auto" />
           </Link>
         </div>
         <div className="navbar-end grow">
