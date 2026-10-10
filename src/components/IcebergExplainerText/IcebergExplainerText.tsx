@@ -348,7 +348,7 @@ const IcebergExplainerText = ({
       <span
         aria-hidden
         className={twMerge(
-          "pointer-events-none absolute left-1/2 flex overflow-hidden rounded-box border border-base-300 bg-base-200 text-base font-normal shadow-lg",
+          "pointer-events-none absolute left-1/2 flex overflow-hidden rounded-lg border border-base-300 bg-base-200 text-base font-normal shadow-lg",
           childClassNames?.card,
         )}
         style={{
