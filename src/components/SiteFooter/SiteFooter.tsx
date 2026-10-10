@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa6";
 import ExternalLink from "@/components/ExternalLink";
 import Logo from "@/components/Logo";
+import styles from "./SiteFooter.module.css";
 
 type FooterLink = {
   label: string;
@@ -76,7 +77,9 @@ const SiteFooter = () => (
   // so that the gaps between sections stay even and everything stays
   // centered. Stacks every section until there's room for the link groups to
   // share a row (beneath the aside), then puts all four sections in one row
-  <footer className="sticky bottom-0 z-0 mx-auto footer max-w-5xl grid-cols-1 justify-around justify-items-center gap-y-10 px-10 pt-14 pb-12 text-base-content/55 engraved xxs:grid-cols-[repeat(3,auto)] sm:grid-cols-[repeat(4,auto)]">
+  <footer
+    className={`${styles.engraved} sticky bottom-0 z-0 mx-auto footer max-w-5xl grid-cols-1 justify-around justify-items-center gap-y-10 px-10 pt-14 pb-12 text-base-content/55 xxs:grid-cols-[repeat(3,auto)] sm:grid-cols-[repeat(4,auto)]`}
+  >
     <aside className="col-span-full place-items-center gap-3 text-center sm:col-span-1 sm:place-items-start sm:text-left">
       <Logo className="size-12 opacity-60" />
       <p>

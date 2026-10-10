@@ -184,7 +184,7 @@ export default function Home() {
               >
                 <WaveText
                   text="Hello, my name is"
-                  className="sm:wave-height-[0.15em] lg:wave-height-[0.2em]"
+                  className="sm:[--wave-height:0.15em] lg:[--wave-height:0.2em]"
                 />
               </p>
               <div className="my-1 flex flex-col gap-2">

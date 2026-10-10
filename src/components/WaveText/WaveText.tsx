@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { twMerge } from "tailwind-merge";
+import styles from "./WaveText.module.css";
 
 export type WaveTextProps = {
   /**
@@ -10,7 +11,7 @@ export type WaveTextProps = {
 
   /**
    * Classes for the root element of this WaveText.
-   * Accepts the wave-* utilities described on WaveText itself.
+   * Accepts the --wave-* variables described on WaveText itself.
    */
   className?: string;
 };
@@ -20,13 +21,14 @@ export type WaveTextProps = {
  * characters gently bob up and down in a continuous wave that travels
  * from its start to its end. Motionless if the user prefers reduced motion.
  *
- * The wave is customized via the following utilities (defined in
- * WaveText.css), which can be passed through className alongside any variants:
- * - `wave-height-[<length>]`: the distance between the lowest and highest
+ * The wave is customized via the following CSS variables, which can be set
+ * through className as arbitrary properties alongside any variants
+ * (e.g., `sm:[--wave-height:0.15em]`):
+ * - `--wave-height`: the distance between the lowest and highest
  *   points that each character reaches (defaults to 0.1em)
- * - `wave-period-[<time>]`: the duration of one full rise and fall of each
+ * - `--wave-period`: the duration of one full rise and fall of each
  *   character (defaults to 2s)
- * - `wave-stagger-[<time>]`: the delay between the movements of adjacent
+ * - `--wave-stagger`: the delay between the movements of adjacent
  *   characters (defaults to 0.1s)
  *
  * Animated with CSS keyframes alone and thus valid as a server component.
@@ -52,7 +54,7 @@ const WaveText = ({ text, className }: WaveTextProps) => (
         <span
           key={i}
           aria-hidden
-          className="inline-block motion-safe:animate-wave"
+          className={twMerge("inline-block", styles.char)}
           // Each character lags the one before it by the stagger so that the
           // wave travels forward. Offsetting every delay by the full length
           // keeps them all negative, which starts each character mid-wave

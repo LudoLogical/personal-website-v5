@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "../components/WaveText/WaveText.css";
 @plugin "daisyui" {
   themes: dark --default --prefersdark;
 }
@@ -47,18 +46,6 @@
     50% {
       translate: 0 10%;
     }
-  }
-}
-
-/* Makes text (and icons) look as if carved into the surface beneath them */
-@utility engraved {
-  text-shadow:
-    0 -1px 0 rgb(0 0 0 / 0.7),
-    0 1px 0 rgb(255 255 255 / 0.08);
-
-  & svg {
-    filter: drop-shadow(0 -1px 0 rgb(0 0 0 / 0.7))
-      drop-shadow(0 1px 0 rgb(255 255 255 / 0.08));
   }
 }
 

@@ -1,0 +1,23 @@
+/* The --wave-height, --wave-period, and --wave-stagger variables are
+   WaveText's public API (see WaveText itself). Their defaults are supplied as
+   fallbacks rather than declared on the root so that a caller's classes never
+   have to compete with this file to override them */
+
+/* Read from each character (which inherits the variables from WaveText's
+   root). Alternates, so each run covers only half of a period, and is
+   delayed by the character's --wave-offset multiples of the stagger */
+.char {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: wave calc(var(--wave-period, 2s) / 2) ease-in-out
+      calc(var(--wave-offset) * var(--wave-stagger, 0.1s)) infinite alternate;
+  }
+}
+
+@keyframes wave {
+  from {
+    translate: 0 calc(var(--wave-height, 0.1em) / 2);
+  }
+  to {
+    translate: 0 calc(var(--wave-height, 0.1em) / -2);
+  }
+}
