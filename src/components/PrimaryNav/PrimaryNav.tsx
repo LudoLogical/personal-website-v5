@@ -3,9 +3,10 @@
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import AnimatedLogo from "@/components/AnimatedLogo";
 import { useHideOnScrollDown } from "@/utils/useHideOnScrollDown";
+import styles from "./PrimaryNav.module.css";
 
 const NAV_ITEMS = [
   { label: "Work", href: "/work" },
@@ -20,12 +21,37 @@ const NAV_ITEMS = [
  * Slides out of view when the user scrolls down and back into view when the
  * user scrolls up (or moves keyboard focus into it), but stays in view while
  * its dropdown menu (shown in place of its links on narrow viewports) is open.
+ *
+ * While in view, it exposes how far down the viewport it reaches (including
+ * the gutter above it) as the `--primary-nav-inset` variable on :root, which
+ * is unset while it's out of view. Content that sticks to the top of the
+ * viewport can thus stay clear of it, e.g.,
+ * `top-[calc(var(--primary-nav-inset,0px)+1rem)]`.
  */
 const PrimaryNav = () => {
   const headerRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
   const hidden = useHideOnScrollDown(headerRef);
   const pathname = usePathname();
+
+  // Publishes the header's height for the module to expose as the inset,
+  // since CSS can't read it. Unaffected by the header's translation
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const root = document.documentElement;
+    const observer = new ResizeObserver(() => {
+      root.style.setProperty(
+        "--primary-nav-height",
+        `${header.offsetHeight}px`,
+      );
+    });
+    observer.observe(header);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--primary-nav-height");
+    };
+  }, []);
 
   const items = NAV_ITEMS.map(({ label, href }) => {
     const active = pathname === href || pathname.startsWith(`${href}/`);
@@ -50,7 +76,7 @@ const PrimaryNav = () => {
     <header
       ref={headerRef}
       data-hidden={hidden || undefined}
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 px-6 pt-6 transition-transform duration-300 ease-out data-hidden:not-has-focus-visible:not-has-[:popover-open]:-translate-y-[calc(100%+1rem)] motion-reduce:transition-none"
+      className={`${styles.root} pointer-events-none fixed inset-x-0 top-0 z-50 px-6 pt-6 transition-transform duration-300 ease-out motion-reduce:transition-none`}
     >
       <nav
         aria-label="Primary"

@@ -1,0 +1,15 @@
+/* Hides every extra element (one marked with data-extra) until the root is
+   expanded, then fades each one in as it reappears */
+.root:not([data-expanded]) [data-extra] {
+  display: none;
+}
+
+.root [data-extra] {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: opacity 0.3s ease-out;
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+}

@@ -1,0 +1,543 @@
+import {
+  BookOpenText,
+  Database,
+  FlaskConical,
+  HandHelping,
+  Network,
+  PenTool,
+  Presentation,
+  Puzzle,
+  ScanSearch,
+  Server,
+  Sparkles,
+  Users,
+  Workflow,
+} from "lucide-react";
+import type { ComponentType, ReactNode } from "react";
+import { FaAws, FaJava } from "react-icons/fa6";
+import {
+  SiAngular,
+  SiClaude,
+  SiFigma,
+  SiGithub,
+  SiJavascript,
+  SiJira,
+  SiNextdotjs,
+  SiNotion,
+  SiPython,
+  SiReact,
+  SiTypescript,
+} from "react-icons/si";
+import InlineExternalLink from "./InlineExternalLink";
+
+// The content of the resume page, which mirrors (and should be kept in sync
+// with) public/resume-daniel-ludo-deanda.pdf. Every list is displayed in the
+// order in which it's written here. Dates are written as on the PDF
+// (YYYY-MM or YYYY-MM-DD), and links to pages outside of this website are
+// annotated as such automatically.
+
+/**
+ * A company, school, or other organization.
+ */
+export type Organization = {
+  name: string;
+
+  /**
+   * The organization's website.
+   */
+  href?: string;
+
+  /**
+   * The path (within public/) to the organization's logo, which is masked to a
+   * squircle. For consistency, it should be a square image that's at least
+   * 96px wide and fills its whole area (with its own background color, rather
+   * than transparency). Displays the organization's initials if omitted.
+   */
+  logo?: string;
+};
+
+/**
+ * A link to a case study in the Work section of this website.
+ */
+export type CaseStudyLink = {
+  title: string;
+
+  /**
+   * The path to the case study (e.g., "/work/vibrant-grants").
+   */
+  href: string;
+};
+
+/**
+ * The groups into which the skills are sorted, in the order they appear.
+ */
+export const skillGroups = [
+  "Engineering",
+  "Tools",
+  "Practices",
+  "Design",
+] as const;
+
+export type Skill = {
+  name: string;
+
+  /**
+   * An icon that represents the skill (e.g., its logo, for a technology).
+   */
+  icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+
+  group: (typeof skillGroups)[number];
+
+  /**
+   * Whether the skill is visible in the Skills section without expanding it.
+   */
+  featured?: boolean;
+
+  /**
+   * Whether the skill is emphasized everywhere it appears (both in the Skills
+   * section and in the Experience section). Should only be set for skills
+   * that are also featured.
+   */
+  highlighted?: boolean;
+
+  /**
+   * Case studies that demonstrate the skill, which can be opened from the
+   * skill in the Skills section.
+   */
+  caseStudies?: CaseStudyLink[];
+};
+
+// Every skill, keyed by the ID with which experiences refer to it.
+// Each group lists its skills in the order in which they're written here
+const skillsById = {
+  // Engineering
+  react: {
+    name: "React",
+    icon: SiReact,
+    group: "Engineering",
+    featured: true,
+    highlighted: true,
+  },
+  nextjs: {
+    name: "Next.js",
+    icon: SiNextdotjs,
+    group: "Engineering",
+    featured: true,
+  },
+  typescript: {
+    name: "TypeScript",
+    icon: SiTypescript,
+    group: "Engineering",
+    featured: true,
+  },
+  javascript: {
+    name: "JavaScript",
+    icon: SiJavascript,
+    group: "Engineering",
+    featured: true,
+  },
+  java: { name: "Java", icon: FaJava, group: "Engineering", featured: true },
+  python: {
+    name: "Python",
+    icon: SiPython,
+    group: "Engineering",
+    featured: true,
+  },
+  angularjs: { name: "Angular.js", icon: SiAngular, group: "Engineering" },
+  restApis: { name: "REST APIs", icon: Server, group: "Engineering" },
+  automatedTesting: {
+    name: "Automated Testing",
+    icon: FlaskConical,
+    group: "Engineering",
+  },
+  dataModeling: { name: "Data Modeling", icon: Database, group: "Engineering" },
+
+  // Tools
+  figma: {
+    name: "Figma",
+    icon: SiFigma,
+    group: "Tools",
+    featured: true,
+    highlighted: true,
+  },
+  notion: { name: "Notion", icon: SiNotion, group: "Tools", featured: true },
+  github: { name: "GitHub", icon: SiGithub, group: "Tools", featured: true },
+  jira: { name: "Jira", icon: SiJira, group: "Tools", featured: true },
+  claudeCode: { name: "Claude Code", icon: SiClaude, group: "Tools" },
+  aws: { name: "AWS", icon: FaAws, group: "Tools" },
+
+  // Practices
+  informationArchitecture: {
+    name: "Information Architecture",
+    icon: Network,
+    group: "Practices",
+    featured: true,
+    highlighted: true,
+  },
+  diagramming: {
+    name: "Diagramming",
+    icon: Workflow,
+    group: "Practices",
+    featured: true,
+  },
+  documentation: {
+    name: "Documentation",
+    icon: BookOpenText,
+    group: "Practices",
+    featured: true,
+  },
+  problemSolving: {
+    name: "Problem Solving",
+    icon: Puzzle,
+    group: "Practices",
+    featured: true,
+  },
+  mentorship: {
+    name: "Mentorship",
+    icon: HandHelping,
+    group: "Practices",
+    featured: true,
+  },
+  teamLeadership: { name: "Team Leadership", icon: Users, group: "Practices" },
+  publicSpeaking: {
+    name: "Public Speaking",
+    icon: Presentation,
+    group: "Practices",
+  },
+
+  // Design
+  aiInteractionDesign: {
+    name: "AI Interaction Design",
+    icon: Sparkles,
+    group: "Design",
+    featured: true,
+    highlighted: true,
+  },
+  uiUxDesign: { name: "UI/UX Design", icon: PenTool, group: "Design" },
+  userResearch: { name: "User Research", icon: ScanSearch, group: "Design" },
+} satisfies Record<string, Skill>;
+
+export type SkillId = keyof typeof skillsById;
+
+// Widened so that every skill can be read as a Skill (with all optional keys)
+export const skills: Record<SkillId, Skill> = skillsById;
+
+/**
+ * A role held at an organization.
+ */
+export type Experience = {
+  role: string;
+  organization: Organization;
+
+  /**
+   * The nature of the role (e.g., "MHCI Capstone"), which
+   * appears in parentheses after the organization's name.
+   */
+  context?: ReactNode;
+
+  location: string;
+  start: string;
+
+  /**
+   * Omitted if the role is ongoing.
+   */
+  end?: string;
+
+  /**
+   * Roles previously held at the same organization, from most to least recent.
+   */
+  formerRoles?: { role: string; start: string; end: string }[];
+
+  highlights: ReactNode[];
+
+  /**
+   * Publicly accessible work products (e.g., a live app or its source code).
+   */
+  links?: { label: string; href: string }[];
+
+  /**
+   * The skills that are most relevant to the role, in the order to display.
+   */
+  skills?: SkillId[];
+
+  caseStudies?: CaseStudyLink[];
+
+  /**
+   * Whether the role is visible in the Experience
+   * section without expanding it.
+   */
+  featured?: boolean;
+};
+
+export const experience: Experience[] = [
+  {
+    role: "Director of Student Experience",
+    organization: {
+      name: "CodeDay",
+      href: "https://www.codeday.org",
+      logo: "/logos/codeday.png",
+    },
+    location: "Remote (Seattle, Washington)",
+    start: "2025-08",
+    formerRoles: [
+      {
+        role: "Head of Software Engineering Education",
+        start: "2024-12",
+        end: "2025-08",
+      },
+      {
+        role: "Consulting Software Engineer",
+        start: "2023-10",
+        end: "2024-12",
+      },
+    ],
+    highlights: [
+      "Manage, train, and hire for a team of 6 consulting software engineers",
+      "Design, deliver, and maintain kickoff presentations for an internship-style program that have dramatically improved interns’ awareness of resources",
+      "Conduct novel, federally-backed research on program outcomes",
+      "Co-develop organizational strategies for AI use and alumni engagement",
+      "Helped interns make 40+ code contributions to 10+ open-source projects",
+      "Assisted interns with 100s of novel software engineering challenges by teaching them relevant skills",
+    ],
+    links: [{ label: "CodeDay Labs", href: "https://labs.codeday.org" }],
+    skills: [
+      "teamLeadership",
+      "mentorship",
+      "publicSpeaking",
+      "informationArchitecture",
+      "problemSolving",
+      "github",
+    ],
+    featured: true,
+  },
+  {
+    role: "Lead Engineer",
+    organization: {
+      name: "New Sun Rising",
+      href: "https://www.newsunrising.org",
+      logo: "/logos/nsr.png",
+    },
+    context: (
+      <InlineExternalLink href="https://hcii.cmu.edu/academics/mhci/capstone">
+        MHCI Capstone
+      </InlineExternalLink>
+    ),
+    location: "Pittsburgh, Pennsylvania",
+    start: "2026-01",
+    end: "2026-07",
+    highlights: [
+      "Implemented a novel, AI-powered ingestion mechanism for a web application that helps non-profits find and win grant opportunities",
+      "Developed a formula for assessing grant relevance based on 13 heuristic factors and controlled by 21 hyperparameters",
+      "Architected a comprehensive data type schema to ensure code extensibility",
+      "Leveraged Claude Code and other AI tools to accelerate development",
+      "Supported numerous user research and UX design processes throughout",
+    ],
+    links: [
+      {
+        label: "Vibrant Grants",
+        href: "https://capstone-project-eight-pied.vercel.app",
+      },
+      {
+        label: "Source code",
+        href: "https://github.com/LudoLogical/capstone-project",
+      },
+      {
+        label: "Relevance formula",
+        href: "https://github.com/LudoLogical/capstone-project/blob/main/docs/RELEVANCE.md",
+      },
+    ],
+    skills: [
+      "aiInteractionDesign",
+      "react",
+      "nextjs",
+      "typescript",
+      "dataModeling",
+      "claudeCode",
+      "userResearch",
+      "uiUxDesign",
+    ],
+    featured: true,
+  },
+  {
+    role: "Lead Front-End Engineer",
+    organization: {
+      name: "Nebula Labs",
+      href: "https://www.utdnebula.com",
+      logo: "/logos/nebula-labs.png",
+    },
+    location: "Richardson, Texas",
+    start: "2023-01",
+    end: "2023-05",
+    highlights: [
+      "Co-architected a novel account and identity access management system",
+      "Designed UIs for two front-end microservices and implemented one of them",
+    ],
+    links: [
+      {
+        label: "Nebula Platform",
+        href: "https://github.com/UTDNebula/platform",
+      },
+      {
+        label: "My pull requests",
+        href: "https://github.com/UTDNebula/platform/pulls?q=is%3Apr+author%3ALudoLogical",
+      },
+    ],
+    skills: ["react", "nextjs", "typescript", "uiUxDesign", "github"],
+    featured: true,
+  },
+  {
+    role: "Software Engineering Intern",
+    organization: {
+      name: "Cvent, Inc.",
+      href: "https://www.cvent.com",
+      logo: "/logos/cvent.png",
+    },
+    location: "Remote (Dallas, Texas)",
+    start: "2022-06",
+    end: "2022-08",
+    highlights: [
+      "Wrote 3 novel REST API endpoints and deployed them to production",
+      "Authored 20+ unit tests, integration tests, and automation tests",
+      "Reduced technical debt by investigating issues with several existing integration tests and presenting findings",
+      "Improved internal documentation by correcting outdated information and creating new diagrams and resources",
+    ],
+    skills: ["restApis", "automatedTesting", "documentation", "diagramming"],
+  },
+  {
+    role: "Software Engineering Intern",
+    organization: {
+      name: "Onfleet, Inc.",
+      href: "https://onfleet.com",
+      logo: "/logos/onfleet.png",
+    },
+    location: "Remote (San Francisco, California)",
+    start: "2021-05",
+    end: "2021-08",
+    highlights: [
+      "Fixed a bug in a software-as-a-service (SaaS) web application that caused phone numbers to be displayed incorrectly",
+      "Migrated a complex Single-Page Application (SPA) from Angular.js to React and added dozens of unit tests",
+    ],
+    skills: ["react", "angularjs", "javascript", "automatedTesting"],
+  },
+];
+
+/**
+ * A degree earned (or being earned) at a school.
+ */
+export type Education = {
+  degree: string;
+
+  /**
+   * The page for the degree program.
+   */
+  href?: string;
+
+  institution: Organization;
+  start: string;
+
+  /**
+   * Omitted if the degree is still in progress.
+   */
+  end?: string;
+
+  notes?: ReactNode;
+};
+
+export const education: Education[] = [
+  {
+    degree: "Master of Human-Computer Interaction",
+    href: "https://hcii.cmu.edu/academics/mhci",
+    institution: {
+      name: "Carnegie Mellon University",
+      href: "https://www.cmu.edu",
+      logo: "/logos/cmu.png",
+    },
+    start: "2025-08",
+    end: "2026-07",
+  },
+  {
+    degree: "B.S. in Computer Science",
+    href: "https://cs.utdallas.edu",
+    institution: {
+      name: "University of Texas at Dallas",
+      href: "https://www.utdallas.edu",
+      logo: "/logos/ut-dallas.png",
+    },
+    start: "2019-08",
+    end: "2023-05",
+    notes: (
+      <>
+        Graduated <em>summa cum laude</em> w/ additional major (
+        <InlineExternalLink href="https://cs.utdallas.edu/education/computing-scholars-honors-program/">
+          CS²
+        </InlineExternalLink>
+        ) and university (
+        <InlineExternalLink href="https://honors.utdallas.edu/collegium-v/">
+          Collegium V
+        </InlineExternalLink>
+        ) honors
+      </>
+    ),
+  },
+];
+
+/**
+ * A certification or honor bestowed by an organization.
+ */
+export type Recognition = {
+  title: string;
+
+  /**
+   * A page about the recognition itself (e.g., a credential's details).
+   */
+  href?: string;
+
+  organization: Organization;
+  location?: string;
+  date: string;
+};
+
+export const certifications: Recognition[] = [
+  {
+    title: "AWS Cloud Solutions Architect",
+    href: "https://www.coursera.org/professional-certificates/aws-cloud-solutions-architect",
+    organization: {
+      name: "Coursera",
+      href: "https://www.coursera.org",
+      logo: "/logos/coursera.png",
+    },
+    date: "2023-09-01",
+  },
+  {
+    title: "Seal of Biliteracy in Spanish",
+    href: "https://www.cde.ca.gov/sp/el/er/sealofbiliteracy.asp",
+    organization: {
+      name: "State of California",
+      href: "https://www.ca.gov",
+      logo: "/logos/california.png",
+    },
+    date: "2023-06-06",
+  },
+];
+
+export const honors: Recognition[] = [
+  {
+    title: "Valedictorian",
+    organization: {
+      name: "Homestead High School",
+      href: "https://hhs.fuhsd.org",
+      logo: "/logos/homestead.png",
+    },
+    location: "Cupertino, California",
+    date: "2023-06-06",
+  },
+  {
+    title: "National Merit Scholar",
+    organization: {
+      name: "National Merit Scholarship Corporation (NMSC)",
+      href: "https://www.nationalmerit.org",
+      logo: "/logos/national-merit.png",
+    },
+    date: "2019-02",
+  },
+];
