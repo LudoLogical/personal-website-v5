@@ -385,7 +385,7 @@ export const experience: Experience[] = [
     links: [
       {
         label: "Final prototype",
-        href: "https://github.com/UTDNebula/platform",
+        href: "https://platform-liart-mu.vercel.app/",
       },
       {
         label: "Source code",
