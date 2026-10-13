@@ -4,9 +4,11 @@ import {
   type CSSProperties,
   type PointerEvent,
   type ReactNode,
+  useRef,
   useState,
 } from "react";
 import { twMerge } from "tailwind-merge";
+import { useTapOutside } from "@/utils/useTapOutside";
 
 export type AvatarTipsProps = {
   /**
@@ -68,10 +70,12 @@ const pickIndex = (length: number, previous: number | null) => {
  * slightly and a speech bubble containing a randomly chosen tip pops into
  * view beside it (centered on it), with the bubble's tail touching its edge.
  * The interaction triggers on hover for mouse users and toggles on tap for
- * touch screen users. While active, the root element carries a
+ * touch screen users, who can also dismiss it by tapping anywhere else.
+ * While active, the root element carries a
  * `data-speaking` attribute so that surrounding content can react.
  */
 const AvatarTips = ({ children, tips, className }: AvatarTipsProps) => {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [speaking, setSpeaking] = useState(false);
 
   // Picked when the bubble appears rather than during
@@ -85,10 +89,13 @@ const AvatarTips = ({ children, tips, className }: AvatarTipsProps) => {
     setSpeaking(value);
   };
 
+  useTapOutside(rootRef, speaking, () => speak(false));
+
   const isTouchEvent = (e: PointerEvent) => e.pointerType === "touch";
 
   return (
     <div
+      ref={rootRef}
       data-speaking={speaking || undefined}
       className={twMerge("group/avatar relative", className)}
       onPointerEnter={(e) => {

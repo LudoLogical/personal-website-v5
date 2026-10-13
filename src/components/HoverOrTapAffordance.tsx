@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { twMerge } from "tailwind-merge";
+import { useTapOutside } from "@/utils/useTapOutside";
 
 /**
  * The shapes that a HoverOrTapAffordance's dashed line can take.
@@ -66,6 +67,23 @@ export type HoverOrTapAffordanceProps = {
    * rather than a div (so that it can contain block-level content).
    */
   inline?: boolean;
+
+  /**
+   * Whether the line should also fade back in, for touch screen users, when
+   * the user taps anywhere outside of the content. Set this when the content
+   * itself is dismissed by such taps so that the two stay in sync.
+   * Defaults to `false`.
+   */
+  dismissOnTapOutside?: boolean;
+
+  /**
+   * Whether tapping the content should toggle the line (for touch screen
+   * users) rather than only fading it out. Set this to false (along with
+   * dismissOnTapOutside) when the content follows :hover directly, since
+   * touch screens keep the content :hover between taps on it.
+   * Defaults to `true`.
+   */
+  toggleOnTap?: boolean;
 };
 
 /**
@@ -100,7 +118,11 @@ const HoverOrTapAffordance = ({
   fadeDuration = 0.25,
   fadeInDelay = 0,
   inline = false,
+  dismissOnTapOutside = false,
+  toggleOnTap = true,
 }: HoverOrTapAffordanceProps) => {
+  // Typed to fit either a div or a span (see inline)
+  const rootRef = useRef<HTMLDivElement & HTMLSpanElement>(null);
   const [active, setActive] = useState(false);
   const [visited, setVisited] = useState(false);
   const dwellTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -110,12 +132,15 @@ const HoverOrTapAffordance = ({
   // Don't let a pending timeout outlive the component
   useEffect(() => clearDwellTimeout, []);
 
+  useTapOutside(rootRef, dismissOnTapOutside && active, () => setActive(false));
+
   const isTouchEvent = (e: PointerEvent) => e.pointerType === "touch";
 
   const Root = inline ? "span" : "div";
 
   return (
     <Root
+      ref={rootRef}
       className={twMerge("relative inline-block", className)}
       onPointerEnter={(e) => {
         if (isTouchEvent(e)) return;
@@ -134,7 +159,7 @@ const HoverOrTapAffordance = ({
       }}
       onPointerUp={(e) => {
         if (!isTouchEvent(e)) return;
-        setActive(!active);
+        setActive(toggleOnTap ? !active : true);
         setVisited(true);
       }}
     >

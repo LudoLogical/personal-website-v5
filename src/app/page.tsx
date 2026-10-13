@@ -161,6 +161,7 @@ export default function Home() {
                 shape="circle"
                 className="block"
                 lineClassName="sm:border-3 -inset-1.5 md:-inset-2 xl:-inset-3"
+                dismissOnTapOutside
               >
                 <Image
                   src="/avatar.png"
@@ -193,6 +194,7 @@ export default function Home() {
                 <HoverOrTapAffordance
                   className="w-fit"
                   lineClassName={affordanceLineClassName}
+                  dismissOnTapOutside
                 >
                   <DiagramAnimation
                     text='Daniel "Ludo" DeAnda.'
@@ -215,6 +217,8 @@ export default function Home() {
                     <HoverOrTapAffordance
                       inline
                       lineClassName={affordanceLineClassName}
+                      toggleOnTap={false}
+                      dismissOnTapOutside
                     >
                       <CharCodeText text="Software Engineer" />
                     </HoverOrTapAffordance>
@@ -258,6 +262,7 @@ export default function Home() {
                       // + (buffer before text starts fading in)
                       lineClassName={affordanceLineClassName}
                       fadeInDelay={0.15 + 0.25 + 0.18 + 0.07}
+                      dismissOnTapOutside
                     >
                       <ConnectingDotsText
                         text="Sense-Maker"

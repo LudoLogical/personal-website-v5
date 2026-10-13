@@ -49,6 +49,13 @@
   }
 }
 
+/* Applies on :hover alone, whereas Tailwind's hover: also requires the device
+   to support hovering (@media (hover: hover)). On touch screens, an element
+   stays :hover after it's tapped until the user taps elsewhere, so base-hover:
+   applies there too, matching CSS that targets :hover directly (e.g., daisyUI's
+   tooltip). Prefer hover: unless an effect has to stay in sync with such CSS */
+@custom-variant base-hover (&:hover);
+
 /* Adds a soft, static glow in the specified theme color (e.g., glow-primary)
    that follows the element's shape, including any rounded corners. Its
    intensity can be scaled by setting --glow-strength (defaults to 1). */

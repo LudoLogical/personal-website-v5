@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
+import { useTapOutside } from "@/utils/useTapOutside";
 import { useDots } from "./dots";
 import { getTransitions } from "./timing";
 
@@ -185,8 +186,9 @@ const resolveOptions = (
  * each non-whitespace character in the text) grow into view and become
  * connected by a line that draws itself into view shortly after.
  *
- * The animation triggers on both hover and focus. Once it is no longer
- * triggered, all of its effects are reversed in order from last to first
+ * The animation triggers on hover for mouse users and toggles on tap for
+ * touch screen users, who can also dismiss it by tapping anywhere else.
+ * Once it is no longer triggered, all of its effects are reversed in order from last to first
  * (i.e., first the line begins to retract, then the dots start to vanish,
  * and finally the text returns to the foreground).
  */
@@ -209,6 +211,10 @@ const ConnectingDotsText = ({
 
   const [active, setActive] = useState(false);
 
+  useTapOutside(containerRef, active, () => setActive(false));
+
+  const isTouchEvent = (e: PointerEvent) => e.pointerType === "touch";
+
   // Used to keep randomly generated dots inside of the text's bounding box
   const dotMargin = Math.max(appearance.dotSize, appearance.strokeWidth) / 2;
 
@@ -225,15 +231,16 @@ const ConnectingDotsText = ({
   return (
     <span
       ref={containerRef}
-      tabIndex={0}
-      onMouseEnter={() => setActive(true)}
-      onMouseLeave={() => setActive(false)}
-      onFocus={() => setActive(true)}
-      onBlur={() => setActive(false)}
-      className={twMerge(
-        "relative inline-block cursor-default outline-none",
-        className,
-      )}
+      onPointerEnter={(e) => {
+        if (!isTouchEvent(e)) setActive(true);
+      }}
+      onPointerLeave={(e) => {
+        if (!isTouchEvent(e)) setActive(false);
+      }}
+      onPointerUp={(e) => {
+        if (isTouchEvent(e)) setActive(!active);
+      }}
+      className={twMerge("relative inline-block cursor-default", className)}
     >
       {/* Screen readers ignore aria-label on generic elements like spans, so
           the full text is exposed this way instead of character by character */}

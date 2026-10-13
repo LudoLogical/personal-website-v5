@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
+import { useTapOutside } from "@/utils/useTapOutside";
 import { useTextDimensions } from "@/utils/useTextDimensions";
 import { getArrowheadPath, getMarkerPaths, rasterizeArrow } from "./paths";
 import { useDiagramAnimationTimeline } from "./timeline";
@@ -190,7 +191,8 @@ const resolveOptions = (
  * Renders the specified display text and adds an animation which causes
  * that display text to become surrounded by diagram elements that "draw"
  * themselves into view. The animation triggers on hover for mouse users
- * and toggles on tap for touch screen users. While active, the root element
+ * and toggles on tap for touch screen users, who can also dismiss it by
+ * tapping anywhere else. While active, the root element
  * carries a `data-active` attribute so that surrounding content can react.
  */
 const DiagramAnimation = ({
@@ -258,6 +260,8 @@ const DiagramAnimation = ({
     setActive(value);
     animation.setActive(value);
   };
+
+  useTapOutside(textRef, active, () => activate(false));
 
   const isTouchEvent = (e: PointerEvent) => e.pointerType === "touch";
   const strokeWidth =

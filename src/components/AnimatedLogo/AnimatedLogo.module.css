@@ -1,5 +1,5 @@
 /* Timeline of the animation, measured from the moment when the parent of the
-   AnimatedLogo is hovered or keyboard-focused:
+   AnimatedLogo is hovered or tapped:
 
      0–133ms    Wind-up: the arrowhead, arrow body, and dot all pull back 3px
                 together (as one so that the body never pokes out past the
