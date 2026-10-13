@@ -1,5 +1,6 @@
 import {
   BookOpenText,
+  ChartNetwork,
   Database,
   FlaskConical,
   HandHelping,
@@ -18,8 +19,10 @@ import { FaAws, FaJava } from "react-icons/fa6";
 import {
   SiAngular,
   SiClaude,
+  SiCss,
   SiFigma,
   SiGithub,
+  SiHtml5,
   SiJavascript,
   SiJira,
   SiNextdotjs,
@@ -151,6 +154,13 @@ const skillsById = {
     group: "Engineering",
   },
   dataModeling: { name: "Data Modeling", icon: Database, group: "Engineering" },
+  networkAnalysis: {
+    name: "Network Analysis",
+    icon: ChartNetwork,
+    group: "Engineering",
+  },
+  html: { name: "HTML", icon: SiHtml5, group: "Engineering" },
+  css: { name: "CSS", icon: SiCss, group: "Engineering" },
 
   // Tools
   figma: {
@@ -334,7 +344,7 @@ export const experience: Experience[] = [
     ],
     links: [
       {
-        label: "Vibrant Grants",
+        label: "Final prototype",
         href: "https://capstone-project-eight-pied.vercel.app",
       },
       {
@@ -374,12 +384,12 @@ export const experience: Experience[] = [
     ],
     links: [
       {
-        label: "Nebula Platform",
+        label: "Final prototype",
         href: "https://github.com/UTDNebula/platform",
       },
       {
-        label: "My pull requests",
-        href: "https://github.com/UTDNebula/platform/pulls?q=is%3Apr+author%3ALudoLogical",
+        label: "Source code",
+        href: "https://github.com/UTDNebula/platform",
       },
     ],
     skills: ["react", "nextjs", "typescript", "uiUxDesign", "github"],
@@ -402,6 +412,7 @@ export const experience: Experience[] = [
       "Improved internal documentation by correcting outdated information and creating new diagrams and resources",
     ],
     skills: ["restApis", "automatedTesting", "documentation", "diagramming"],
+    featured: true,
   },
   {
     role: "Software Engineering Intern",
@@ -418,6 +429,52 @@ export const experience: Experience[] = [
       "Migrated a complex Single-Page Application (SPA) from Angular.js to React and added dozens of unit tests",
     ],
     skills: ["react", "angularjs", "javascript", "automatedTesting"],
+    featured: true,
+  },
+  {
+    role: "CS Researcher",
+    organization: {
+      name: "University of Texas at Dallas",
+      href: "https://www.utdallas.edu",
+      logo: "/logos/ut-dallas.png",
+    },
+    location: "Richardson, Texas",
+    start: "2020-05",
+    end: "2020-09",
+    highlights: [
+      "Analyzed a 3.7 million-edge network constructed from university enrollment data",
+      "Investigated the effectiveness and disruptiveness of strategies for minimizing COVID-19 transmission rates",
+      "Collaborated with 6 peers and an honors professor",
+    ],
+    links: [
+      {
+        label: "Research paper",
+        href: "https://www.alphaxiv.org/abs/2104.01261",
+      },
+    ],
+    skills: ["networkAnalysis"],
+  },
+  {
+    role: "Early Website Designer",
+    // The company's domain (peoplesv.com) has since been parked
+    organization: {
+      name: "People at Silicon Valley",
+      logo: "/logos/peoplesv.png",
+    },
+    location: "Milpitas, California",
+    start: "2017-05",
+    end: "2017-06",
+    highlights: [
+      "Constructed a template for the company’s new website alongside a small team and under the direction of its founder",
+    ],
+    links: [
+      {
+        label: "Website template",
+        href: "https://anke-hao.github.io/PeopleSV/",
+      },
+      { label: "Source code", href: "https://github.com/anke-hao/PeopleSV" },
+    ],
+    skills: ["html", "css", "uiUxDesign"],
   },
 ];
 
