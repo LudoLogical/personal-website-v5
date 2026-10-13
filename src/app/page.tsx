@@ -1,8 +1,8 @@
 import { ArrowDown } from "lucide-react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
-import { tips } from "@/components/AvatarTips";
-import AvatarTips from "@/components/AvatarTips";
+import { tips } from "@/components/SpokenTips";
+import SpokenTips from "@/components/SpokenTips";
 import CharCodeText from "@/components/CharCodeText";
 import ConnectingDotsText from "@/components/ConnectingDotsText";
 import DiagramAnimation, {
@@ -154,7 +154,7 @@ export default function Home() {
             text while active) fits within the narrowest viewport of each */}
         <div className="group/intro flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-14 lg:gap-16 xl:gap-20">
           <div className={twMerge("shrink-0", fadeWhileDiagramActive)}>
-            <AvatarTips tips={tips}>
+            <SpokenTips tips={tips}>
               {/* Inside the tips so that the circle swells with the avatar and
                   the speech bubble isn't trapped in its stacking context.
                   Displayed as a block so that no line box pads its bottom */}
@@ -174,7 +174,7 @@ export default function Home() {
                   className="block size-16 rounded-full glow-secondary [--glow-strength:3] xs:size-20 sm:size-24 md:size-60 lg:size-68 xl:size-80"
                 />
               </HoverOrTapAffordance>
-            </AvatarTips>
+            </SpokenTips>
           </div>
           <div className="flex flex-col items-start gap-8 md:gap-6 xl:gap-8">
             <div className="flex flex-col gap-2 text-xl leading-none font-bold whitespace-nowrap xxs:text-2xl xs:text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-5xl">
