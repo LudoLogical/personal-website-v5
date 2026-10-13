@@ -8,29 +8,27 @@ import styles from "./AnimatedLogo.module.css";
 export type AnimatedLogoProps = Omit<LogoProps, "ref">;
 
 /**
- * Renders the brand icon (see Logo) such that, while its parent (e.g., a home
- * link) is hovered, the arrow winds up and strikes the D, which recoils and
- * then settles back into place. Each tap (or pen press) on the parent replays
- * the animation, even though touch devices keep the parent hovered between
- * taps. Motionless if the user prefers reduced motion. Like Logo, hidden from
- * assistive technology by default since its parent is expected to supply the
- * label.
+ * Renders the Logo such that, while its parent is hovered (or, on mobile
+ * devices, every time that its parent is tapped), the arrow strikes the D,
+ * causing it to teeter, recoil, and then settle back into place.
+ * The animation does not play if the user `prefers-reduced-motion`.
+ * Like Logo, this component is hidden from ATs; its parent
+ * is responsible for supplying a label if one is necessary.
  */
 const AnimatedLogo = ({ className, ...props }: AnimatedLogoProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
-  // Restarts the CSS animations, which would otherwise play only once while
-  // the parent stays hovered after a tap. Does nothing if the parent isn't
-  // hovered yet (the hover itself starts them) or the user prefers reduced
-  // motion (there are no animations)
+  // On mobile devices, the parent stays "hovered" after being tapped,
+  // so tapping it again doesn't cause the CSS animations to play again.
+  // This useEffect() fixes that by restarting the animations manually.
   useEffect(() => {
     const svg = svgRef.current;
     const parent = svg?.parentElement;
-    if (!svg || !parent) return;
+    if (!svg || !parent) return; // Both Elements must exist
     const onPointerDown = (e: PointerEvent) => {
-      if (e.pointerType === "mouse") return;
+      if (e.pointerType === "mouse") return; // Mobile devices only
       for (const animation of svg.getAnimations({ subtree: true })) {
-        animation.currentTime = 0;
+        animation.currentTime = 0; // Reset *everything* to 0
       }
     };
     parent.addEventListener("pointerdown", onPointerDown);
@@ -41,8 +39,7 @@ const AnimatedLogo = ({ className, ...props }: AnimatedLogoProps) => {
     <Logo
       {...props}
       ref={svgRef}
-      // Sized to match the native dimensions of the artwork (44×37)
-      className={twMerge(styles.root, "h-9.25 w-11", className)}
+      className={twMerge(styles.root, "", className)}
     />
   );
 };

@@ -4,11 +4,10 @@ import { twMerge } from "tailwind-merge";
 export type LogoProps = ComponentProps<"svg">;
 
 /**
- * Renders the brand icon (mirrors public/logo.svg) as an inline
- * SVG so that its individual parts remain addressable for styling and
- * animation via the data attributes on each path. Hidden from assistive
- * technology by default since its parent (e.g., a home link) is expected to
- * supply the label.
+ * Renders the `public/logo.svg` inline so that its individual parts remain
+ * addressable for styling and animation via the data attributes on each path.
+ * Hidden from ATs; its parent is responsible
+ * for supplying a label if one is necessary.
  */
 const Logo = ({ className, ...props }: LogoProps) => (
   <svg
