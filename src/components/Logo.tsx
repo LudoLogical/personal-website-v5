@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 export type LogoProps = ComponentProps<"svg">;
 
 /**
- * Renders the brand icon (mirrors public/logo-transparent.svg) as an inline
+ * Renders the brand icon (mirrors public/logo.svg) as an inline
  * SVG so that its individual parts remain addressable for styling and
  * animation via the data attributes on each path. Hidden from assistive
  * technology by default since its parent (e.g., a home link) is expected to
