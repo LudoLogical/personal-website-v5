@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
 import { useGapMidpoint } from "@/utils/useGapMidpoint";
+import { useTapOutside } from "@/utils/useTapOutside";
 import Iceberg from "./Iceberg";
 import { LEVEL_CLASS_NAMES, NUM_LEVELS, type Levels } from "./levels";
 
@@ -39,7 +40,8 @@ export type IcebergExplainerTextProps = {
 
     /**
      * Classes for the explainer card in which the Levels are displayed.
-     * Inherited by the text in every Level panel.
+     * Inherited by the text in every Level panel. Sets the card's width,
+     * which defaults to `w-82.5` (330px).
      */
     card?: string;
 
@@ -51,7 +53,8 @@ export type IcebergExplainerTextProps = {
 
     /**
      * Classes for each of the Level panels.
-     * Applied after the panel's background classes.
+     * Applied after the panel's background classes. The card is exactly as
+     * tall as a single panel, so vertical padding here sets its height.
      */
     panel?: string;
 
@@ -91,19 +94,6 @@ export type IcebergExplainerTextProps = {
      * explainer card and scrub indicator are sized.
      */
     appearance?: {
-      /**
-       * The width, in pixels, of the explainer
-       * card in which the Levels are displayed.
-       */
-      cardWidth?: number;
-
-      /**
-       * The height, in pixels, of the explainer
-       * card in which the Levels are displayed.
-       * Equivalent to the height of each of the Level panels.
-       */
-      cardHeight?: number;
-
       /**
        * The distance, in pixels, between the bottom of the
        * hoverable text and the top of the explainer card.
@@ -172,8 +162,6 @@ export type IcebergExplainerTextOptions = {
  */
 export const DEFAULT_OPTIONS: IcebergExplainerTextOptions = {
   appearance: {
-    cardWidth: 330,
-    cardHeight: 120,
     cardGap: 12,
     indicatorThickness: 0.085, // same as other components' strokeWidths
   },
@@ -263,6 +251,10 @@ const SCRUB_CURVE = "cubic-bezier(.2,.7,.2,1)";
  * the full card when displayed. A single low-poly iceberg SVG spans the
  * backgrounds of all four Levels, the backgrounds of which get progressively
  * darker from top to bottom.
+ *
+ * On touch screens, tapping a region of the text displays the corresponding
+ * Level, dragging horizontally across the text scrubs through the Levels,
+ * and tapping anywhere else dismisses the card.
  */
 const IcebergExplainerText = ({
   text,
@@ -280,6 +272,10 @@ const IcebergExplainerText = ({
     [serializedOptions],
   );
 
+  const rootRef = useRef<HTMLSpanElement>(null);
+  const cardRef = useRef<HTMLSpanElement>(null);
+  const stripRef = useRef<HTMLSpanElement>(null);
+
   const [level, setLevel] = useState<number | null>(null);
   const [cardShift, setCardShift] = useState(0);
 
@@ -288,7 +284,26 @@ const IcebergExplainerText = ({
   const conceptsRef = useRef<HTMLSpanElement>(null);
   const waterline = useGapMidpoint(questionRef, conceptsRef);
 
-  const handlePointerMove = (event: PointerEvent<HTMLSpanElement>) => {
+  // The strip's height follows from the panels' natural heights, so the card
+  // can be sized to show exactly one panel. Unaffected by the strip's
+  // translation, and the card's size never feeds back into the strip's
+  const [stripHeight, setStripHeight] = useState<number | null>(null);
+  useEffect(() => {
+    const strip = stripRef.current;
+    if (!strip) return;
+    const observer = new ResizeObserver(() =>
+      setStripHeight(strip.offsetHeight),
+    );
+    observer.observe(strip);
+    return () => observer.disconnect();
+  }, []);
+  const panelHeight = stripHeight === null ? null : stripHeight / NUM_LEVELS;
+
+  useTapOutside(rootRef, level !== null, () => setLevel(null));
+
+  const isTouchEvent = (e: PointerEvent) => e.pointerType === "touch";
+
+  const scrubTo = (event: PointerEvent<HTMLSpanElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     // The width of the hoverable text is divided evenly among the Levels
     const xFraction = (event.clientX - rect.left) / rect.width;
@@ -298,7 +313,9 @@ const IcebergExplainerText = ({
     );
     if (targetLevel === level) return;
     // Measured as the card appears to keep it from hanging off the viewport
-    if (level === null) setCardShift(getCardShift(rect, appearance.cardWidth));
+    if (level === null) {
+      setCardShift(getCardShift(rect, cardRef.current?.offsetWidth ?? 0));
+    }
     setLevel(targetLevel);
   };
 
@@ -313,12 +330,22 @@ const IcebergExplainerText = ({
     markerProgress * (2 * DEPTH_RAIL_INSET + DEPTH_MARKER_SIZE);
 
   // Using spans allows this component to exist inside of an h1, p, a, etc.
+  // touch-pan-y lets horizontal drags scrub (rather than pan) on touch
+  // screens. Touch pointers are captured by the text, so drags that stray
+  // off of it keep scrubbing (clamped) and don't count as taps outside of it
   return (
     <span
-      onPointerMove={handlePointerMove}
-      onPointerLeave={() => setLevel(null)}
+      ref={rootRef}
+      onPointerMove={scrubTo}
+      onPointerUp={(e) => {
+        if (isTouchEvent(e)) scrubTo(e);
+      }}
+      // Touch pointers leave once lifted, which shouldn't dismiss the card
+      onPointerLeave={(e) => {
+        if (!isTouchEvent(e)) setLevel(null);
+      }}
       className={twMerge(
-        "relative z-20 inline-block cursor-default",
+        "relative z-20 inline-block cursor-default touch-pan-y",
         className,
       )}
     >
@@ -346,15 +373,14 @@ const IcebergExplainerText = ({
 
       {/* Explainer card */}
       <span
+        ref={cardRef}
         aria-hidden
         className={twMerge(
-          "pointer-events-none absolute left-1/2 flex overflow-hidden rounded-lg border border-base-300 bg-base-200 text-base font-normal shadow-lg",
+          "pointer-events-none absolute left-1/2 flex w-82.5 overflow-hidden rounded-lg border border-base-300 bg-base-200 text-base font-normal shadow-lg",
           childClassNames?.card,
         )}
         style={{
           top: `calc(100% + ${appearance.cardGap}px)`,
-          width: appearance.cardWidth,
-          height: appearance.cardHeight,
           opacity: level === null ? 0 : 1,
           transform: `translate(calc(-50% + ${cardShift}px), ${level === null ? -CARD_RISE_DISTANCE : 0}px)`,
           transition: [
@@ -385,29 +411,32 @@ const IcebergExplainerText = ({
           />
         </span>
 
-        {/* Sliding strip of Level panels */}
-        <span className="flex-1 overflow-hidden">
+        {/* Sliding strip of Level panels, shown one panel at a time */}
+        <span
+          className="flex-1 overflow-hidden"
+          style={{ height: panelHeight ?? undefined }}
+        >
+          {/* auto-rows-fr makes every panel as tall as the tallest one */}
           <span
-            className="relative flex flex-col"
+            ref={stripRef}
+            className="relative grid auto-rows-fr"
             style={{
-              transform: `translateY(${-(level ?? 0) * appearance.cardHeight}px)`,
+              transform: `translateY(${(-(level ?? 0) * 100) / NUM_LEVELS}%)`,
               transition: `transform ${scrollTransition}`,
             }}
           >
-            <Iceberg
-              height={NUM_LEVELS * appearance.cardHeight}
-              waterline={waterline}
-            />
+            {stripHeight !== null && (
+              <Iceberg height={stripHeight} waterline={waterline} />
+            )}
             {levels.map(({ depth, name, question, concepts }, i) => (
               <span
                 key={i}
                 className={twMerge(
                   // *:relative lets children go above the iceberg
-                  "flex flex-none flex-col gap-1 px-4 py-3 whitespace-nowrap *:relative",
+                  "flex flex-col gap-1 px-4 py-3 whitespace-nowrap *:relative",
                   LEVEL_CLASS_NAMES[i],
                   childClassNames?.panel,
                 )}
-                style={{ height: appearance.cardHeight }}
               >
                 <span
                   className={twMerge(

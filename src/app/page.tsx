@@ -14,8 +14,9 @@ import DiagramAnimation, {
   type Arrow,
 } from "@/components/DiagramAnimation";
 import HoverOrTapAffordance from "@/components/HoverOrTapAffordance";
-import { type Levels } from "@/components/IcebergExplainerText";
-import ResponsiveIcebergExplainerText from "@/components/ResponsiveIcebergExplainerText";
+import IcebergExplainerText, {
+  type Levels,
+} from "@/components/IcebergExplainerText";
 import WaveText from "@/components/WaveText";
 
 // General order: highest -> lowest, leftmost -> rightmost
@@ -231,22 +232,20 @@ export default function Home() {
                       inline
                       className="z-20"
                       lineClassName={affordanceLineClassName}
+                      toggleOnTap={false}
+                      dismissOnTapOutside
                     >
-                      <ResponsiveIcebergExplainerText
+                      <IcebergExplainerText
                         text="Systems Thinker"
                         levels={levels}
                         childClassNames={{
                           scrub: "xs:-bottom-1",
+                          card: "xs:w-91",
+                          panel: "pb-4.75 xs:pb-4.5",
                           text: {
                             depth: "xs:text-xs",
                             question: "xs:text-sm",
                             concepts: "xs:text-sm",
-                          },
-                        }}
-                        options={{
-                          appearance: {
-                            cardWidth: { base: 330, xs: 364 },
-                            cardHeight: { base: 120, xs: 128 },
                           },
                         }}
                       />
