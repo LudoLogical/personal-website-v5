@@ -22,7 +22,7 @@ export type TextDimensions = {
  * specified targetRef. Updates whenever the dimensions of the HTMLElement
  * change (which includes when web fonts finish loading).
  * @param ref a RefObject for the HTMLElement to be measured  
- * @returns the TextDimensions of the HMTLElement, or null if ref is null
+ * @returns the TextDimensions of the HTMLElement, or null if ref is null
  */
 export const useTextDimensions = (
   ref: RefObject<HTMLElement | null>,

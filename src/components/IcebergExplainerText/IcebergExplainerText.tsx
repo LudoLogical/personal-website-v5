@@ -157,8 +157,7 @@ export type IcebergExplainerTextOptions = {
 };
 
 /**
- * The values used for any settings that are
- * omitted from the IcebergExplainerTextOptions prop.
+ * The values used for any settings that are omitted from the options prop.
  */
 export const DEFAULT_OPTIONS: IcebergExplainerTextOptions = {
   appearance: {
@@ -172,20 +171,6 @@ export const DEFAULT_OPTIONS: IcebergExplainerTextOptions = {
     scrollDuration: 0.45,
   },
 };
-
-/**
- * Populates all of the settings that were omitted from the specified options
- * prop with the corresponding DEFAULT_OPTIONS.
- * Assumes that missing settings were not simply set to `undefined`.
- * @param options the options to be resolved
- * @returns the resolved IcebergExplainerTextOptions
- */
-const resolveOptions = (
-  options: IcebergExplainerTextProps["options"],
-): IcebergExplainerTextOptions => ({
-  appearance: { ...DEFAULT_OPTIONS.appearance, ...options?.appearance },
-  animation: { ...DEFAULT_OPTIONS.animation, ...options?.animation },
-});
 
 /**
  * The distance, in pixels, that the explainer
@@ -263,14 +248,21 @@ const IcebergExplainerText = ({
   childClassNames,
   options,
 }: IcebergExplainerTextProps) => {
-  // Keyed after serialization so that changes are only registered when the
-  // actual values differ to guard against the caller simply passing a new but
-  // identical object. Also drops any settings explicitly set to undefined.
+  // Keyed by value so receiving an identical copy won't re-run the memo
   const serializedOptions = JSON.stringify(options ?? {});
-  const { appearance, animation } = useMemo(
-    () => resolveOptions(JSON.parse(serializedOptions)),
-    [serializedOptions],
-  );
+  const { appearance, animation } = useMemo(() => {
+    const deserializedOptions = JSON.parse(serializedOptions);
+    return {
+      appearance: {
+        ...DEFAULT_OPTIONS.appearance,
+        ...deserializedOptions?.appearance,
+      },
+      animation: {
+        ...DEFAULT_OPTIONS.animation,
+        ...deserializedOptions?.animation,
+      },
+    };
+  }, [serializedOptions]);
 
   const rootRef = useRef<HTMLSpanElement>(null);
   const cardRef = useRef<HTMLSpanElement>(null);

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState, type PointerEvent } from "react";
-import { twMerge } from "tailwind-merge";
 import { useTapOutside } from "@/utils/useTapOutside";
 import { useDots } from "./dots";
 import { getTransitions } from "./timing";
@@ -19,7 +18,9 @@ export type ConnectingDotsTextProps = {
    * character in the specified text, in order from left to right.
    *
    * Because the text is subject to leading-none, it is exactly 1 em tall,
-   * so all values should be between 0 (top) and 1 (bottom).
+   * so all values should be between 0 (top) and 1 (bottom), though values
+   * close to either extreme should account for the dotSize to prevent them
+   * from sticking out of the bounding box of this ConnectingDotsText.
    *
    * If there are fewer position values than there are non-whitespace
    * characters in the specified text, then the supplied position values are
@@ -31,19 +32,13 @@ export type ConnectingDotsTextProps = {
   dotPositions?: number[];
 
   /**
-   * Classes for the container `<span>` of this ConnectingDotsText.
-   * Inherited by both the text and the animation elements
-   * (i.e., the dots and the line).
-   */
-  className?: string;
-
-  /**
    * Optional settings for this ConnectingDotsText.
    * Unspecified values are set according to DEFAULT_OPTIONS.
    */
   options?: {
     /**
-     * Optional settings that control how the dots and line are rendered.
+     * Optional settings that control how the contents
+     * of this ConnectingDotsText are rendered.
      */
     appearance?: {
       /**
@@ -70,7 +65,8 @@ export type ConnectingDotsTextProps = {
     };
 
     /**
-     * Optional settings that control how the dots and line are animated.
+     * Optional settings that control how the contents
+     * of this ConnectingDotsText are animated.
      */
     animation?: {
       /**
@@ -100,16 +96,14 @@ export type ConnectingDotsTextProps = {
       /**
        * The amount of time, in seconds, between the moments when the first
        * (leftmost) and the last (rightmost) dots begin to grow into view.
-       * The duration between neighboring dot appearances is derived by
-       * simply dividing this number by the total number of dots.
+       * The delay between neighboring dot entrances is always the same.
        */
       dotEntranceSpread?: number;
 
       /**
        * The amount of time, in seconds, between the moments when the first
        * (rightmost) and the last (leftmost) dots begin to shrink out of view.
-       * The duration between neighboring dot disappearances is derived by
-       * simply dividing this number by the total number of dots.
+       * The delay between neighboring dot exits is always the same.
        */
       dotExitSpread?: number;
 
@@ -144,8 +138,7 @@ export type ConnectingDotsTextOptions = {
 };
 
 /**
- * The values used for any settings that are
- * omitted from the ConnectingDotsTextOptions prop.
+ * The values used for any settings that are omitted from the options prop.
  */
 export const DEFAULT_OPTIONS: ConnectingDotsTextOptions = {
   appearance: {
@@ -167,47 +160,40 @@ export const DEFAULT_OPTIONS: ConnectingDotsTextOptions = {
 };
 
 /**
- * Populates all of the settings that were omitted from the specified options
- * prop with the corresponding DEFAULT_OPTIONS.
- * Assumes that missing settings were not simply set to `undefined`.
- * @param options the options to be resolved
- * @returns the resolved ConnectingDotsTextOptions
- */
-const resolveOptions = (
-  options: ConnectingDotsTextProps["options"],
-): ConnectingDotsTextOptions => ({
-  appearance: { ...DEFAULT_OPTIONS.appearance, ...options?.appearance },
-  animation: { ...DEFAULT_OPTIONS.animation, ...options?.animation },
-});
-
-/**
  * Renders the specified text and adds an animation which causes that text
  * to fade partially out of view, at which point a series of dots (one for
  * each non-whitespace character in the text) grow into view and become
  * connected by a line that draws itself into view shortly after.
  *
- * The animation triggers on hover for mouse users and toggles on tap for
- * touch screen users, who can also dismiss it by tapping anywhere else.
- * Once it is no longer triggered, all of its effects are reversed in order from last to first
- * (i.e., first the line begins to retract, then the dots start to vanish,
- * and finally the text returns to the foreground).
+ * The animation triggers on hover, except on touch screens, for which it
+ * toggles on tap and can be dismissed by tapping anywhere.
+ *
+ * Once it is no longer triggered, all of the animation's effects are reversed
+ * in order from last to first (i.e., first the line begins to retract, then
+ * the dots start to vanish, and finally the text returns to the foreground).
  */
 const ConnectingDotsText = ({
   text,
   dotPositions,
-  className,
   options,
 }: ConnectingDotsTextProps) => {
   const containerRef = useRef<HTMLSpanElement>(null);
 
-  // Keyed after serialization so that changes are only registered when the
-  // actual values differ to guard against the caller simply passing a new but
-  // identical object. Also drops any settings explicitly set to undefined.
+  // Keyed by value so receiving an identical copy won't re-run the memo
   const serializedOptions = JSON.stringify(options ?? {});
-  const { appearance, animation } = useMemo(
-    () => resolveOptions(JSON.parse(serializedOptions)),
-    [serializedOptions],
-  );
+  const { appearance, animation } = useMemo(() => {
+    const deserializedOptions = JSON.parse(serializedOptions);
+    return {
+      appearance: {
+        ...DEFAULT_OPTIONS.appearance,
+        ...deserializedOptions?.appearance,
+      },
+      animation: {
+        ...DEFAULT_OPTIONS.animation,
+        ...deserializedOptions?.animation,
+      },
+    };
+  }, [serializedOptions]);
 
   const [active, setActive] = useState(false);
 
@@ -215,17 +201,17 @@ const ConnectingDotsText = ({
 
   const isTouchEvent = (e: PointerEvent) => e.pointerType === "touch";
 
-  // Used to keep randomly generated dots inside of the text's bounding box
+  // Used to keep randomly generated dots (and the line that joins them,
+  // if that line is thick enough) inside the text's bounding box
   const dotMargin = Math.max(appearance.dotSize, appearance.strokeWidth) / 2;
 
   const { characters, points, setLetterRef, textDimensions } = useDots(
-    containerRef,
     text,
-    dotPositions ?? [],
+    containerRef,
+    dotPositions,
     dotMargin,
   );
 
-  // Note: points.length may not update instantly when the text changes
   const transitions = getTransitions(active, points.length, animation);
 
   return (
@@ -240,13 +226,11 @@ const ConnectingDotsText = ({
       onPointerUp={(e) => {
         if (isTouchEvent(e)) setActive(!active);
       }}
-      className={twMerge("relative inline-block cursor-default", className)}
+      className="relative inline-block cursor-default"
     >
-      {/* Screen readers ignore aria-label on generic elements like spans, so
-          the full text is exposed this way instead of character by character */}
+      {/* Screen readers ignore aria-label on generic elements like spans,
+          so the text is exposed this way instead of character by character */}
       <span className="sr-only">{text}</span>
-      {/* Applying leading-none here prevents the
-          class from being overridden via twMerge() */}
       <span
         aria-hidden="true"
         className="block leading-none whitespace-nowrap motion-reduce:transition-none!"

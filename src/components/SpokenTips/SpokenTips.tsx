@@ -65,8 +65,8 @@ const randomDistinctInteger = (max: number, forbiddenValue: number | null) => {
  * children to swell slightly and a vertically centered speech bubble
  * containing a randomly chosen tip to grow into view on its right side.
  *
- * The animation triggers on hover for mouse users. On mobile devices,
- * it toggles on tap and can be dismissed by tapping anywhere.
+ * The animation triggers on hover, except on touch screens, for which it
+ * toggles on tap and can be dismissed by tapping anywhere.
  *
  * While active, the root element carries a `data-speaking`
  * attribute so that surrounding content can react.

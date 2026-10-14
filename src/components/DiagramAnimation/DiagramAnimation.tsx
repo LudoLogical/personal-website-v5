@@ -147,8 +147,7 @@ export type DiagramAnimationOptions = {
 };
 
 /**
- * The values used for any settings that are
- * omitted from the DiagramAnimationOptions prop.
+ * The values used for any settings that are omitted from the options prop.
  */
 export const DEFAULT_OPTIONS: DiagramAnimationOptions = {
   construction: {
@@ -173,27 +172,15 @@ export const DEFAULT_OPTIONS: DiagramAnimationOptions = {
 };
 
 /**
- * Populates all of the settings that were omitted from the specified options
- * prop with the corresponding DEFAULT_OPTIONS.
- * Assumes that missing settings were not simply set to `undefined`.
- * @param options the options to be resolved
- * @returns the resolved DiagramAnimationOptions
- */
-const resolveOptions = (
-  options: DiagramAnimationProps["options"],
-): DiagramAnimationOptions => ({
-  construction: { ...DEFAULT_OPTIONS.construction, ...options?.construction },
-  appearance: { ...DEFAULT_OPTIONS.appearance, ...options?.appearance },
-  animation: { ...DEFAULT_OPTIONS.animation, ...options?.animation },
-});
-
-/**
  * Renders the specified display text and adds an animation which causes
  * that display text to become surrounded by diagram elements that "draw"
- * themselves into view. The animation triggers on hover for mouse users
- * and toggles on tap for touch screen users, who can also dismiss it by
- * tapping anywhere else. While active, the root element
- * carries a `data-active` attribute so that surrounding content can react.
+ * themselves into view.
+ *
+ * The animation triggers on hover, except on touch screens, for which it
+ * toggles on tap and can be dismissed by tapping anywhere.
+ *
+ * While active, the root element carries a `data-active`
+ * attribute so that surrounding content can react.
  */
 const DiagramAnimation = ({
   text,
@@ -204,14 +191,25 @@ const DiagramAnimation = ({
   const textRef = useRef<HTMLHeadingElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  // Keyed after serialization so that changes are only registered when the
-  // actual values differ to guard against the caller simply passing a new but
-  // identical object. Also drops any settings explicitly set to undefined.
+  // Keyed by value so receiving an identical copy won't re-run the memo
   const serializedOptions = JSON.stringify(options ?? {});
-  const resolvedOptions = useMemo(
-    () => resolveOptions(JSON.parse(serializedOptions)),
-    [serializedOptions],
-  );
+  const resolvedOptions = useMemo(() => {
+    const deserializedOptions = JSON.parse(serializedOptions);
+    return {
+      construction: {
+        ...DEFAULT_OPTIONS.construction,
+        ...deserializedOptions?.construction,
+      },
+      appearance: {
+        ...DEFAULT_OPTIONS.appearance,
+        ...deserializedOptions?.appearance,
+      },
+      animation: {
+        ...DEFAULT_OPTIONS.animation,
+        ...deserializedOptions?.animation,
+      },
+    };
+  }, [serializedOptions]);
 
   const textDimensions = useTextDimensions(textRef);
 

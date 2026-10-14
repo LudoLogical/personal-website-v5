@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import {
   useTextDimensions,
   type TextDimensions,
@@ -7,11 +13,12 @@ import {
 /**
  * The position, in pixels, of the center of a dot
  * relative to the upper-left corner of a ConnectingDotsText.
+ * (This holds because the root element has `position: relative`.)
  */
 export type Point = { x: number; y: number };
 
 /**
- * A single character of the text in a ConnectingDotsText.
+ * A single code point from the text in a ConnectingDotsText.
  */
 export type Character = {
   /**
@@ -20,8 +27,8 @@ export type Character = {
   char: string;
 
   /**
-   * The index of the Dot that appears over this Character,
-   * or null if no dot appears over it (i.e., because it is whitespace).
+   * The index of the dot that appears over this Character,
+   * or null if no dot appears over it (because it is whitespace).
    */
   dotIndex: number | null;
 };
@@ -36,77 +43,85 @@ export type Dots = {
   characters: Character[];
 
   /**
-   * The Points at which the Dots should be centered, in order
+   * The Points at which the dots should be centered, in order
    * from left to right. Empty until textDimensions is non-null.
    */
   points: Point[];
 
   /**
    * Registers the rendered HTMLSpanElement for the Character that corresponds
-   * with the dot at the specified index so that its position  can be measured.
+   * to the dot at the specified index so that its position can be measured.
    * Intended to be called from within a ref callback.
    */
   setLetterRef: (dotIndex: number, element: HTMLSpanElement | null) => void;
 
   /**
    * The TextDimensions of the text in the ConnectingDotsText,
-   * or null if said text has not yet measured.
+   * or null if said text has not yet been measured.
    */
   textDimensions: TextDimensions | null;
 };
 
 /**
- * Generates random vertical positions for the specified number of Dots.
+ * Generates random vertical positions for the specified number of dots.
  * @param count the number of positions to be generated
- * @param margin the minimum distance, in ems, between each position and both
- *               horizontal edges of the bounding box of the ConnectingDotsText
- *               to which the Dots will be assigned.
+ * @param margin the minimum vertical distance, in ems, between each position
+ *               and the edges of the bounding box of the ConnectingDotsText
+ *               to which the dots will be assigned
  * @returns the generated positions, in ems from the top of the bounding box
  */
 const generateDotPositions = (count: number, margin: number): number[] =>
   Array.from(
     { length: count },
-    // The text is 1 em tall by definition, so just subtract the total margin
+    // The text is exactly 1 em tall due to leading-none,
+    // so just subtract the total margin
     () => margin + Math.random() * (1 - 2 * margin),
   );
 
 /**
- * Rasterizes (and randomly generates, if necessary) the position of one dot
- * for every non-whitespace character of the specified text.
+ * Computes (and randomly generates, if necessary) the position of one dot
+ * for every non-whitespace code point in the specified text.
  *
  * Horizontally, each dot is centered over its corresponding character.
  * Vertically, each dot is positioned according to the specified dotPositions,
- * or randomly if dotPositions are not specified.
+ * or randomly if dotPositions is empty or unspecified.
  *
- * Updates whenever the rendered text in the specified containerRef changes,
- * but preserves randomly-generated dot positions unless the total number
- * of dots or the specified dotMargin changes.
+ * Updates whenever the specified text, the TextDimensions of the
+ * specified containerRef, the specified dotPositions, or the specified
+ * dotMargin changes, but preserves randomly generated dot positions unless
+ * the total number of dots or the dotMargin changes.
  * @param text the text over which the dots should be placed
  * @param containerRef a RefObject for the HTMLElement
  *                     containing the specified text
  * @param dotPositions the vertical position, in ems from the top of the
  *                     HTMLElement in the specified containerRef, of each dot;
+ *                     extra positions are ignored if there are too many,
  *                     positions are reused cyclically if there are too few,
- *                     and are generated randomly if there are none
- * @param dotMargin the minimum distance, in ems, between each randomly
- *                  generated position and both horizontal edges of the
- *                  bounding box of the HTMLElement in the specified
- *                  containerRef; unused unless dotPositions is empty
- * @returns the rasterized Dots
+ *                     and positions are generated randomly if there are none
+ * @param dotMargin the minimum vertical distance, in ems, between each
+ *                  randomly generated position and the edges of the bounding
+ *                  box of the the bounding box of the ConnectingDotsText
+ *                  to which the computed Dots will be assigned;
+ *                  unused unless dotPositions is empty or unspecified
+ * @returns the computed Dots
  */
 export const useDots = (
-  containerRef: RefObject<HTMLElement | null>,
   text: string,
-  dotPositions: number[],
+  containerRef: RefObject<HTMLElement | null>,
+  dotPositions: number[] | undefined,
   dotMargin: number,
 ): Dots => {
   const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const randomDotPositions = useRef<{ margin: number; positions: number[] }>({
     margin: 0,
     positions: [],
-  }); // caching circumvents regeneration on every resize
+  }); // caching prevents regeneration on every resize
 
   const [points, setPoints] = useState<Point[]>([]);
+
+  // Will be (at least) one frame (i.e., paint) out of
+  // date if the size of the text's container changes
+  // (because useTextDimensions updates asynchronously)
   const textDimensions = useTextDimensions(containerRef);
 
   // Construct and cache characters array
@@ -119,12 +134,19 @@ export const useDots = (
     return { characters, dotCount };
   }, [text]);
 
-  useEffect(() => {
+  // Serialized so the effect below evaluates this dependency by value;
+  // prevents an identical copy of dotPositions from re-triggering the effect
+  const serializedDotPositions = JSON.stringify(dotPositions ?? []);
+
+  // useLayoutEffect instead of useEffect to ensure that, when the specified
+  // text, dotPositions, or dotMargin changes, the returned points can reflect
+  // the new letter offsets in time for the next paint.
+  useLayoutEffect(() => {
     // Wait until the TextDimensions can be determined
     if (!textDimensions) return;
 
     // Randomly generate the dotPositions if necessary
-    let positions = dotPositions;
+    let positions: number[] = JSON.parse(serializedDotPositions);
     if (!positions?.length) {
       const cache = randomDotPositions.current;
       // Only regenerate on dotCount or dotMargin change
@@ -144,7 +166,7 @@ export const useDots = (
         y: positions[i % positions.length] * textDimensions.em,
       })),
     );
-  }, [textDimensions, text, dotPositions, dotCount, dotMargin]);
+  }, [text, textDimensions, serializedDotPositions, dotCount, dotMargin]);
 
   const setLetterRef = (dotIndex: number, element: HTMLSpanElement | null) => {
     letterRefs.current[dotIndex] = element;

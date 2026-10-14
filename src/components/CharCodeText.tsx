@@ -46,25 +46,13 @@ export type CharCodeTextOptions = Required<
 >;
 
 /**
- * The values used for any settings that are
- * omitted from the CharCodeTextOptions prop.
+ * The values used for any settings that are omitted from the options prop.
  */
 export const DEFAULT_OPTIONS: CharCodeTextOptions = {
   liftHeight: 0.1,
   liftDuration: 0.2,
   minBinaryDigits: 8,
 };
-
-/**
- * Populates all of the settings that were omitted from the specified options
- * prop with the corresponding DEFAULT_OPTIONS.
- * Assumes that missing settings were not simply set to `undefined`.
- * @param options the options to be resolved
- * @returns the resolved CharCodeTextOptions
- */
-const resolveOptions = (
-  options: CharCodeTextProps["options"],
-): CharCodeTextOptions => ({ ...DEFAULT_OPTIONS, ...options });
 
 /**
  * Renders the specified display text such that, when any one of its
@@ -75,7 +63,10 @@ const resolveOptions = (
  * Animated with CSS hover states alone and thus valid as a server component.
  */
 const CharCodeText = ({ text, className, options }: CharCodeTextProps) => {
-  const { liftHeight, liftDuration, minBinaryDigits } = resolveOptions(options);
+  const { liftHeight, liftDuration, minBinaryDigits } = {
+    ...DEFAULT_OPTIONS,
+    ...options,
+  };
 
   // Variables injected directly into CSS to avoid introducing client-side JS
   const liftVariables = {
