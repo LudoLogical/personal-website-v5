@@ -8,47 +8,50 @@ import styles from "./Expandable.module.css";
 
 export type ExpandableProps = {
   /**
-   * The content of this Expandable. Any descendant that carries a
-   * `data-extra` attribute stays hidden until this Expandable is expanded,
-   * so extra content can be interleaved with the content that's always
-   * visible (e.g., to keep a list in chronological order). Since extra
-   * elements fade in via their `transition` property, avoid setting one on
-   * them directly (wrap them instead).
+   * The content of this Expandable. Any descendant bearing the `data-extra`
+   * attribute stays hidden until this Expandable is expanded, so `data-extra`
+   * and always-visible content can be interwoven (e.g., to keep a list in
+   * chronological order).
+   *
+   * Note: `data-extra` elements use their `transition` property to fade into
+   * view, so avoid overriding that property by wrapping them if necessary.
    */
   children: ReactNode;
 
   /**
-   * The labels for the toggle button while collapsed (e.g., "Show 2 more")
-   * and while expanded (e.g., "Show fewer"), or undefined to omit the toggle
-   * button (e.g., because there's no extra content to show).
+   * The labels for the toggle button in this Expandable, or undefined
+   * if the toggle button should be omitted (e.g., because there is no
+   * extra content to show).
    */
-  labels?: { expand: string; collapse: string };
+  labels?: {
+    /**
+     * The label for the toggle button in this Expandable when its
+     * `data-extra` descendants are hidden (meaning that clicking
+     * on the button would expand this Expandable).
+     */
+    expand: string;
+    /**
+     * The label for the toggle button in this Expandable when its
+     * `data-extra` descendants are visible (meaning that clicking
+     * on the button would collapse this Expandable).
+     */
+    collapse: string;
+  };
 
   /**
-   * Classes for the root element of this Expandable, which
-   * contains the content followed by the toggle button.
+   * Classes for the root element of this Expandable.
    */
   className?: string;
-
-  /**
-   * Classes for the toggle button.
-   */
-  buttonClassName?: string;
 };
 
 /**
- * Renders the specified content, with all of its extra elements hidden,
- * above a button that toggles whether they are visible.
+ * Renders its children above a button that toggles whether descendants
+ * bearing a `data-extra` attribute (which are hidden by default) are visible.
  *
- * Since the extra elements are hidden with CSS, their content can be rendered
- * by server components and passed in as children.
+ * Because `data-extra` elements are hidden through CSS,
+ * their content can be rendered by server compnonents.
  */
-const Expandable = ({
-  children,
-  labels,
-  className,
-  buttonClassName,
-}: ExpandableProps) => {
+const Expandable = ({ children, labels, className }: ExpandableProps) => {
   const [expanded, setExpanded] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const contentId = useId();
@@ -57,9 +60,9 @@ const Expandable = ({
     const button = buttonRef.current;
     const topBefore = button?.getBoundingClientRect().top;
     flushSync(() => setExpanded(!expanded));
-    // Collapsing removes content from above the button, which would otherwise
-    // leave the user stranded further down the page, so the page is scrolled
-    // to keep the button right where it was
+
+    // Scroll the page on collapse to compensate for the content that was
+    // removed so the user is not suddenly shunted further down than they were
     if (expanded && button && topBefore !== undefined) {
       const topAfter = button.getBoundingClientRect().top;
       window.scrollBy({ top: topAfter - topBefore, behavior: "instant" });
@@ -81,7 +84,7 @@ const Expandable = ({
           aria-expanded={expanded}
           aria-controls={contentId}
           onClick={toggle}
-          className={twMerge("btn gap-1.5 btn-soft btn-sm", buttonClassName)}
+          className="btn gap-1.5 btn-soft btn-sm"
         >
           <ChevronDown
             aria-hidden
