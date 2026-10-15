@@ -5,7 +5,6 @@ import { useEffect, useEffectEvent, type RefObject } from "react";
  * touch screen) anywhere outside of the Element assigned to the specified
  * ref. Gestures that scroll the page end in a pointercancel rather than a
  * pointerup and so are ignored.
- *
  * @param ref a RefObject for the Element to tap outside of
  * @param enabled whether taps should currently be listened for
  * @param onTapOutside the callback to call upon each tap outside

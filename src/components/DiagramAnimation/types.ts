@@ -3,7 +3,7 @@ import type { Point } from "orthogonal-path-finding";
 export type { Point };
 
 /**
- * One of the four sides of a Rectangle.
+ * One of the four sides of a bounding box.
  */
 export enum Side {
   Top = "top",
@@ -13,53 +13,88 @@ export enum Side {
 }
 
 /**
- * A Point defined relative to one side of the
- * bounding box of the display text in a DiagramAnimation.
- * If the associated Arrow has a marker at this ArrowAnchor, this Point is
- * the middle of the outer edge of that marker. Otherwise, it is the end of
- * the Arrow's body.
+ * An ArrowEnd located on (but separated from by diagramPadding) one side of
+ * the bounding box of the display text in a DiagramAnimation and possessing
+ * a connection point located `depth` ems away from its location in the
+ * direction of its defining side.
+ *
+ * The line between an ArrowAnchor's location and its connection point is
+ * referred to as its "extension" and rendered as part of the body of its
+ * parent Arrow.
+ *
+ * If an ArrowAnchor is given an end marker by its parent Arrow, its location
+ * is the middle of the outer edge of that marker. Otherwise, its location is
+ * the relevant end of the body of its parent Arrow (not accounting for that
+ * body's round cap).
  */
 export type ArrowAnchor = {
   /**
-   * The side of the bounding box of the display text in the
-   * DiagramAnimation relative to which this ArrowAnchor is defined.
+   * The side of the bounding box of the display text in the DiagramAnimation
+   * relative to which this ArrowAnchor is defined and directly away from
+   * which its extension runs.
    */
   side: Side;
 
   /**
-   * The percentage of the way along the side relative to which this
+   * The fraction of the way along the side relative to which this
    * ArrowAnchor is defined at which this ArrowAnchor is located.
+   * Not constrained to [0, 1].
+   *
+   * If the side is Top or Bottom, 0 and 1 are the left and right edges of
+   * the bounding box of the display text, respectively. If the side is Left
+   * or Right, 0 and 1 are the top and bottom edges of the bounding box of
+   * the display text, respectively.
    */
-  percentageAlongSide: number;
+  fractionAlongSide: number;
 
   /**
-   * The number of ems away from the side relative to which this
-   * ArrowAnchor is defined at which this ArrowAnchor is located.
+   * The length, in ems, of this ArrowAnchor's extension
+   * (i.e., the line that runs from its location directly
+   * away from its side to its connection point).
    */
   depth: number;
 };
 
 /**
- * A Point defined relative to the upper-left corner of the
- * bounding box of the display text in a DiagramAnimation.
- * If the associated Arrow has a marker at this ArrowFreeEnd, this Point is
- * the center of that marker. Otherwise, it is the end of the Arrow's body.
+ * An ArrowEnd located relative to the upper-left corner of the bounding box
+ * of the display text in a DiagramAnimation and possessing a connection point
+ * coincident with its location.
+ *
+ * If an ArrowFreeEnd is given an end marker by its parent Arrow, its location
+ * is the center of that marker. Otherwise, its location is the relevant end
+ * of the body of its parent Arrow (not accounting for that body's round cap).
  */
 export type ArrowFreeEnd = {
   /**
-   * The percentage of the way along the x-axis of the
+   * The fraction of the way along the width of the
    * bounding box at which this ArrowFreeEnd is located.
+   * Not constrained to [0, 1].
    */
-  xPercentage: number;
+  xFraction: number;
 
   /**
-   * The percentage of the way along the y-axis of the
+   * The fraction of the way along the height of the
    * bounding box at which this ArrowFreeEnd is located.
+   * Not constrained to [0, 1].
    */
-  yPercentage: number;
+  yFraction: number;
 };
 
-/** One end of an Arrow, defined using scalable ratios. */
+/**
+ * One end of an Arrow.
+ *
+ * Every ArrowEnd defines a location, which is the Point at which the body of
+ * its parent Arrow ends (assuming that Arrow has no corresponding end marker).
+ *
+ * Every ArrowEnd also has a connection point, which is the Point at which
+ * it is algorithmically joined to the other ArrowEnd in its parent Arrow.
+ *
+ * The connection point of an ArrowFreeEnd is always coincident with
+ * its location, so it connects to its partner ArrowEnd directly. However,
+ * the connection point of an ArrowAnchor is the far end of its extension
+ * (see the documentation for ArrowAnchor), so it connects to its partner
+ * ArrowEnd only after running `depth` ems directly away from its side.
+ */
 export type ArrowEnd = ArrowAnchor | ArrowFreeEnd;
 
 /**
@@ -86,14 +121,16 @@ export type PathMarker = {
   shape: PathMarkerShape;
 
   /**
-   * The percentage of the way along the body of the Arrow
-   * to which this PathMarker belongs at which it is located.
+   * The fraction of the way along the *trimmed* (i.e., after any end markers
+   * have been placed) body of the Arrow to which this PathMarker belongs at
+   * which it is located. Expected to be within [0, 1] and sufficiently distant
+   * from all other markers to avoid causing overlap.
    */
-  percentageAlongPath: number;
+  fractionAlongPath: number;
 };
 
 /**
- * A single Arrow in an ArrowAnimation, defined by its two ArrowEnds.
+ * A single Arrow in a DiagramAnimation, defined by its two ArrowEnds.
  */
 export type Arrow = {
   /**
@@ -102,7 +139,11 @@ export type Arrow = {
   from: ArrowEnd;
 
   /**
-   * The ArrowEnd at which this arrow terminates. Rendered with an arrowhead.
+   * The ArrowEnd at which this Arrow terminates. Rendered with an arrowhead.
+   *
+   * Note that the connection point of this ArrowEnd is subject
+   * to adjustment during rasterization due to snapping
+   * (see the documentation for snapDistance).
    */
   to: ArrowEnd;
 
@@ -111,16 +152,16 @@ export type Arrow = {
    * If the `from` ArrowEnd is an ArrowFreeEnd, the marker is centered on it.
    * Otherwise, the marker is positioned such that its outer edge aligns with
    * the Point at which the `from` end of this Arrow would be located without
-   * the marker.
+   * the marker (after accounting for the round cap on the Arrow's body).
    */
   fromMarker?: MarkerShape;
 
   /**
    * The shape of the marker, if any, to which this Arrow points.
    * If the `to` ArrowEnd is an ArrowFreeEnd, the marker is centered on it.
-   * Otherwise, the marker is placed such that its outer edge aligns with the
-   * Point at which the `to` end of this Arrow would be located without
-   * the marker.
+   * Otherwise, the marker is positioned such that its outer edge aligns with
+   * the Point at which the `to` end of this Arrow would be located without
+   * the marker (after accounting for the round cap on the Arrow's body).
    */
   toMarker?: MarkerShape;
 
@@ -131,22 +172,20 @@ export type Arrow = {
 };
 
 /**
- * An ArrowEnd for which all values have been converted to pixels.
- * Note that the x and y coordinates DO NOT account for depth.
+ * An ArrowEnd for which the location and
+ * connection point have been converted to pixels.
  */
-export type RasterizedArrowEnd = Point & {
+export type RasterizedArrowEnd = {
   /**
-   * The side of the bounding box of the display text in the
-   * DiagramAnimation relative to which this RasterizedArrowEnd is defined.
+   * The location of this RasterizedArrowEnd, in pixels.
    */
-  side: Side;
+  location: Point;
 
   /**
-   * The number of pixels away from the side relative to which this
-   * RasterizedArrowEnd is defined at which this RasterizedArrowEnd
-   * is located.
+   * The connection point of this RasterizedArrowEnd, in pixels.
+   * Coincident with its location if rasterized from an ArrowFreeEnd.
    */
-  depth: number;
+  connectionPoint: Point;
 };
 
 /**
@@ -176,52 +215,57 @@ export type RasterizedArrow = {
 
 /**
  * Creates a new ArrowAnchor for a DiagramAnimation.
- * @param side the side of the bounding box of the display text
- *             in the DiagramAnimation relative to which the new
- *             ArrowAnchor should be defined
- * @param percent the percentage of the way along the specified side
- *                at which the new ArrowAnchor should be located
- * @param depth the number of ems away from the specified side at
- *              which the new ArrowAnchor should be located
+ * @param side the side of the bounding box of the display text in the
+ *             DiagramAnimation along which the new ArrowAnchor should be
+ *             located and directly away from which its extension should run
+ * @param fraction the fraction of the way along the specified side
+ *                 at which the new ArrowAnchor should be located;
+ *                 not constrained to [0, 1]
+ * @param depth the length, in ems, of the new ArrowAnchor's extension
  * @returns the new ArrowAnchor
  */
 export const anchor = (
   side: Side,
-  percent: number,
+  fraction: number,
   depth: number,
 ): ArrowAnchor => ({
   side,
-  percentageAlongSide: percent,
+  fractionAlongSide: fraction,
   depth,
 });
 
 /**
  * Creates a new ArrowFreeEnd for a DiagramAnimation.
- * @param xPercentage the percentage of the way along the x-axis
- *                    of the display text's bounding box at which
- *                    the new ArrowFreeEnd should be located
- * @param yPercentage the percentage of the way along the y-axis
- *                    of the display text's bounding box at which
- *                    the new ArrowFreeEnd should be located
+ * @param xFraction the fraction of the way along the width
+ *                  of the display text's bounding box at which
+ *                  the new ArrowFreeEnd should be located;
+ *                  not constrained to [0, 1]
+ * @param yFraction the fraction of the way along the height
+ *                  of the display text's bounding box at which
+ *                  the new ArrowFreeEnd should be located;
+ *                  not constrained to [0, 1]
  * @returns the new ArrowFreeEnd
  */
-export const free = (
-  xPercentage: number,
-  yPercentage: number,
-): ArrowFreeEnd => ({
-  xPercentage,
-  yPercentage,
+export const free = (xFraction: number, yFraction: number): ArrowFreeEnd => ({
+  xFraction: xFraction,
+  yFraction: yFraction,
 });
 
 /**
  * Creates a new PathMarker for a DiagramAnimation.
  * @param shape the shape of the new PathMarker
- * @param percent the percentage of the way along the path of the Arrow
- *                to which the new PathMarker belongs at which the new
- *                PathMarker should be located
+ * @param fraction the fraction of the way along the *trimmed*
+ *                 (i.e., after any end markers have been placed)
+ *                 body of the Arrow to which the new PathMarker belongs
+ *                 at which the new PathMarker should be located; expected
+ *                 to be within [0, 1] and sufficiently distant from all
+ *                 other markers to avoid causing overlap
  * @returns the new PathMarker
  */
-export const along = (shape: PathMarkerShape, percent: number): PathMarker => ({
+export const along = (
+  shape: PathMarkerShape,
+  fraction: number,
+): PathMarker => ({
   shape,
-  percentageAlongPath: percent,
+  fractionAlongPath: fraction,
 });

@@ -1,5 +1,8 @@
-/* Hides every extra element (one marked with data-extra) until the root is
-   expanded, then fades each one in as it reappears */
+/* 
+ * Hides every data-extra element until
+ * the root is expanded, then fades them in
+ */
+
 .root:not([data-expanded]) [data-extra] {
   display: none;
 }

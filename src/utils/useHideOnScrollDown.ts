@@ -19,7 +19,6 @@ const getClampedScrollY = () => {
  * Tracks whether the HTMLElement assigned to the specified ref should be
  * hidden, which is the case after the user scrolls down past its height.
  * Scrolling up by any meaningful amount reveals it again.
- *
  * @param ref a RefObject for the HTMLElement to hide
  * @returns true if the HTMLElement should be hidden, false otherwise
  */

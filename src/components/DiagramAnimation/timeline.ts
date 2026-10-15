@@ -8,9 +8,8 @@ import { type MarkerShape, type RasterizedArrow } from "./types";
 gsap.registerPlugin(DrawSVGPlugin, MotionPathPlugin);
 
 /**
- * Adds the animations for the specified arrow Element
- * (which includes both the arrow itself and any markers that belong to it)
- * to the specified Timeline.
+ * Adds the animations for the specified arrow Element (including
+ * its body, arrowhead, and any markers) to the specified Timeline.
  * @param arrow the Element containing the SVG for the arrow to be animated
  * @param timeline the GSAP Timeline to which the animations should be added
  * @param animationOptions the animation options for
@@ -22,8 +21,8 @@ const animateArrow = (
   animationOptions: DiagramAnimationOptions["animation"],
 ) => {
   const body = arrow.querySelector<SVGPathElement>("[data-body]")!;
-  const tip = arrow.querySelector("[data-tip]")!; // carrier for the head
-  const head = arrow.querySelector("[data-head]")!;
+  const carrier = arrow.querySelector("[data-carrier]")!;
+  const arrowhead = arrow.querySelector("[data-arrowhead]")!;
 
   timeline
     // Fade the entire arrow in
@@ -33,27 +32,31 @@ const animateArrow = (
       { autoAlpha: 1, duration: animationOptions.fadeInDuration, ease: "none" },
       0,
     )
-    // Draw the main polyline from tail to tip
+    // Draw the body from tail to tip
     .fromTo(body, { drawSVG: "0%" }, { drawSVG: "100%" }, 0)
-    // Move the arrowhead along the main polyline. The tip shares the body's
-    // coordinate space and the arrowhead's tip is at the origin, so the path
-    // can be followed as-is; aligning would force costly layout measurements
+    // Move the arrowhead along the body; note that the path can be followed
+    // as-is because the carrier exists within the same coordinate space as
+    // the body, so there's no need for the "align" option
     .fromTo(
-      tip,
-      // Set origin from the start so the tip pivots around itself
+      carrier,
+      // Override GSAP's default origin (the top-left corner of the bounding
+      // box, not the origin in the SVG's own coordinate space) from the start
+      // so the arrowhead rotates around its tip
       { svgOrigin: "0 0" },
       { motionPath: { path: body, autoRotate: true } },
       0,
     )
     // Scale the arrowhead up from nothing
     .fromTo(
-      head,
-      // Set origin from the start so GSAP doesn't offset the head to keep it
-      // in place, which would knock its tip off of the path
+      arrowhead,
+      // Set origin from the start so GSAP doesn't offset the
+      // arrowhead to keep it in place and knock its tip off the path
       { scale: 0, transformOrigin: "100% 50%" }, // grow out from arrowhead tip
       {
         scale: 1,
-        duration: animationOptions.forwardDuration * animationOptions.headGrow,
+        duration:
+          animationOptions.forwardDuration *
+          animationOptions.headGrowthDuration,
         ease: "power2.in",
       },
       0,
@@ -63,7 +66,7 @@ const animateArrow = (
   for (const marker of arrow.querySelectorAll("[data-marker]")) {
     timeline.fromTo(
       marker,
-      // Set origin from the start so GSAP doesn't touch it
+      // Set origin from the start so GSAP doesn't offset the marker
       { scale: 0, transformOrigin: "50% 50%" }, // grow out from center
       { scale: 1 },
       0,
@@ -71,16 +74,27 @@ const animateArrow = (
   }
 };
 
+/**
+ * The controls returned by useDiagramAnimationTimeline.
+ */
 export type DiagramAnimationTimelineControls = {
+  /**
+   * Plays the animation forward (if the specified value is true) or
+   * in reverse (if the specified value is false). Snaps immediately
+   * to the appropriate end state if the user `prefers-reduced-motion`.
+   */
   setActive: (value: boolean) => void;
+
+  /**
+   * Calls setActive with the opposite of the most recently specified value.
+   */
   toggleActive: () => void;
 };
 
 /**
  * Animates the diagram elements within the specified SVG.
- * Rebuilds the animation whenever the
- * specified paths or animation options change.
- * Progress is preserved across builds so that
+ * Rebuilds the animation whenever the specified paths or animation
+ * options change. Progress is preserved across builds so that
  * mid-animation interruptions do not cause jumps.
  * @param svgRef a RefObject for the SVG Element to be animated
  * @param arrowheadPath the arrowhead path rendered in the SVG;
@@ -104,8 +118,9 @@ export const useDiagramAnimationTimeline = (
   const active = useRef(false); // active ? animate in : animate out
   const savedProgress = useRef(0); // Used only when rebuilding
 
-  // Memoized so that the layout effect below can depend on it
+  // Extracted so that the memo below doesn't depend on other animationOptions
   const { backwardSpeedup } = animationOptions;
+  // Memoized so that the layout effect below can depend on it
   const setActive = useCallback(
     (isActive: boolean) => {
       active.current = isActive;
@@ -113,7 +128,7 @@ export const useDiagramAnimationTimeline = (
       if (!tl) return;
 
       if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        tl.pause().progress(isActive ? 1 : 0); // skip to the final result
+        tl.pause().progress(isActive ? 1 : 0); // skip the animation
       } else if (isActive) {
         tl.timeScale(1).play();
       } else {
@@ -153,7 +168,7 @@ export const useDiagramAnimationTimeline = (
     setActive(active.current);
 
     return () => {
-      // When it's time to rebuild...
+      // When it's time to rebuild (or unmount)...
       savedProgress.current = timeline.current?.progress() ?? 0;
       timeline.current = null;
       gsapContext.revert(); // reset the SVG to baseline

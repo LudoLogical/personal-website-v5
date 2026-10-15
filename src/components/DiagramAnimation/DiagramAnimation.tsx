@@ -22,7 +22,8 @@ export type DiagramAnimationProps = {
 
   /**
    * Classes for the container `<div>` of this DiagramAnimation.
-   * Inherited by both the text and the diagram elements.
+   * Color is inherited by both the text (which also inherits font)
+   * and the diagram elements.
    */
   className?: string;
 
@@ -32,15 +33,21 @@ export type DiagramAnimationProps = {
    */
   options?: {
     /**
-     * Optional settings that control how the diagram elements are constructed.
+     * Optional settings that control the
+     * size and shape of the diagram elements.
      */
-    construction?: {
+    appearance?: {
       /**
-       * The amount of space, in ems, between the text at the center
-       * of this DiagramAnimation and the baseline positions for any
-       * indirectly positioned diagram elements that surround it.
+       * The amount of space, in ems, between the bounding box
+       * of the text at the center of this DiagramAnimation and
+       * the locations of any ArrowAnchors that surround it.
        */
       diagramPadding?: number;
+
+      /**
+       * The width, in ems, of the lines in this DiagramAnimation.
+       */
+      strokeWidth?: number;
 
       /**
        * The radius, in ems, of the corners
@@ -49,41 +56,10 @@ export type DiagramAnimationProps = {
       cornerRadius?: number;
 
       /**
-       * The distance, in ems, between two like-dimension coordinates at or
-       * below which those coordinates should be made to perfectly align with
-       * each other.
-       *
-       * Exists to prevent rounding errors that would cause
-       * orthogonal-path-finding to introduce tiny imperfections in the paths
-       * that it creates.
-       */
-      snapDistance?: number;
-
-      /**
-       * The number of decimal places to which path values
-       * should be approximated when applying rounded corners.
-       */
-      pathPrecision?: number;
-
-      /**
-       * The distance, in ems, between the edge of a marker at the end of an
-       * Arrow in this DiagramAnimation and the end of the body of that Arrow.
-       */
-      markerGap?: number;
-    };
-
-    /**
-     * Optional settings that control how the diagram elements are rasterized.
-     */
-    appearance?: {
-      /**
-       * The width, in ems, of the lines in this DiagramAnimation.
-       */
-      strokeWidth?: number;
-
-      /**
-       * The distance, in ems, between (a) the tips of the arms that form the heads
-       * of the Arrows in this DiagramAnimation and (b) the bodies of those Arrows.
+       * The distance, in ems, between the tips of the arrowheads in this
+       * DiagramAnimation and the tips of the arms of those arrowheads,
+       * measured parallel to the ends of the bodies of the Arrows to
+       * which they correspond.
        */
       headLength?: number;
 
@@ -95,9 +71,45 @@ export type DiagramAnimationProps = {
       headSpread?: number;
 
       /**
-       * The diameter, in ems, of the markers in this DiagramAnimation.
+       * The side length, in ems, of the bounding box according to
+       * which the markers in this DiagramAnimation should be sized.
        */
       markerSize?: number;
+
+      /**
+       * The visible distance, in ems, between an end of the body of an Arrow
+       * in this DiagramAnimation and the nearest part of a marker located at
+       * that end. Identical for every MarkerShape.
+       *
+       * "Visible distance" means that things like stroke width and rounded
+       * line caps are accounted for.
+       */
+      markerGap?: number;
+    };
+
+    /**
+     * Optional settings that control the numerical tolerances
+     * used when constructing SVG paths for the diagram elements.
+     */
+    precision?: {
+      /**
+       * The distance, in ems, between two like-dimension coordinates of
+       * the connection points of the `from` and `to` ArrowEnds of an Arrow
+       * below which those coordinates should be made to perfectly align
+       * with each other. If snapping occurs, only the `to` ArrowEnd is
+       * actually moved.
+       *
+       * Exists to circumvent rounding errors that would otherwise cause
+       * orthogonal-path-finding to introduce tiny imperfections
+       * in the paths that it creates.
+       */
+      snapDistance?: number;
+
+      /**
+       * The number of decimal places to which path values
+       * should be approximated when applying rounded corners.
+       */
+      pathPrecision?: number;
     };
 
     /**
@@ -111,22 +123,22 @@ export type DiagramAnimationProps = {
       forwardDuration?: number;
 
       /**
-       * The number of times faster at which the elements
-       * of this DiagramAnimation should disappear.
+       * The number of times faster than the forwardDuration at which
+       * the elements in this DiagramAnimation should disappear.
        */
       backwardSpeedup?: number;
 
       /**
-       * The duration, in seconds, over which the elements
-       * of this DiagramAnimation should fade into view.
+       * The fraction of the forwardDuration over which the arrowheads
+       * in this DiagramAnimation should grow into view.
        */
-      fadeInDuration?: number;
+      headGrowthDuration?: number;
 
       /**
-       * The fraction of the overall duration of this DiagramAnimation
-       * over which its arrowheads should grow into view.
+       * The duration, in seconds, over which the elements
+       * in this DiagramAnimation should fade into view.
        */
-      headGrow?: number;
+      fadeInDuration?: number;
     };
   };
 };
@@ -150,31 +162,31 @@ export type DiagramAnimationOptions = {
  * The values used for any settings that are omitted from the options prop.
  */
 export const DEFAULT_OPTIONS: DiagramAnimationOptions = {
-  construction: {
-    diagramPadding: 0.18,
-    cornerRadius: 0.3,
-    snapDistance: 0.05,
-    pathPrecision: 2,
-    markerGap: 0.18,
-  },
   appearance: {
+    diagramPadding: 0.18,
     strokeWidth: 0.085, // matches ConnectingDotsText
+    cornerRadius: 0.3,
     headLength: 0.22,
     headSpread: 0.7,
     markerSize: 0.4,
+    markerGap: 0.18,
+  },
+  precision: {
+    snapDistance: 0.05,
+    pathPrecision: 2,
   },
   animation: {
     forwardDuration: 0.5,
     backwardSpeedup: 1.8,
+    headGrowthDuration: 0.5,
     fadeInDuration: 0.05,
-    headGrow: 0.5,
   },
 };
 
 /**
  * Renders the specified display text and adds an animation which causes
  * that display text to become surrounded by diagram elements that "draw"
- * themselves into view.
+ * themselves into view. Motionless if the user `prefers-reduced-motion`.
  *
  * The animation triggers on hover, except on touch screens, for which it
  * toggles on tap and can be dismissed by tapping anywhere.
@@ -196,13 +208,13 @@ const DiagramAnimation = ({
   const resolvedOptions = useMemo(() => {
     const deserializedOptions = JSON.parse(serializedOptions);
     return {
-      construction: {
-        ...DEFAULT_OPTIONS.construction,
-        ...deserializedOptions?.construction,
-      },
       appearance: {
         ...DEFAULT_OPTIONS.appearance,
         ...deserializedOptions?.appearance,
+      },
+      precision: {
+        ...DEFAULT_OPTIONS.precision,
+        ...deserializedOptions?.precision,
       },
       animation: {
         ...DEFAULT_OPTIONS.animation,
@@ -213,7 +225,7 @@ const DiagramAnimation = ({
 
   const textDimensions = useTextDimensions(textRef);
 
-  const arrowhead = useMemo(
+  const arrowheadPath = useMemo(
     () =>
       textDimensions &&
       getArrowheadPath(textDimensions.em, resolvedOptions.appearance),
@@ -232,27 +244,27 @@ const DiagramAnimation = ({
         rasterizeArrow(
           arrow,
           textDimensions,
-          resolvedOptions.construction,
           resolvedOptions.appearance,
+          resolvedOptions.precision,
         ),
       ),
     [
       arrows,
       textDimensions,
-      resolvedOptions.construction,
       resolvedOptions.appearance,
+      resolvedOptions.precision,
     ],
   );
 
   const animation = useDiagramAnimationTimeline(
     svgRef,
-    arrowhead,
+    arrowheadPath,
     rasterizedArrows,
     markerPaths,
     resolvedOptions.animation,
   );
 
-  // Mirrors the timeline's state so it can be exposed via data-active
+  // Mirrors the state of the timeline; exposed through data-active
   const [active, setActive] = useState(false);
   const activate = (value: boolean) => {
     setActive(value);
@@ -270,7 +282,7 @@ const DiagramAnimation = ({
       data-active={active || undefined}
       className={twMerge("relative", className)}
     >
-      {/* Applying leading-none brings bounding box closer to the letters;
+      {/* Applying leading-none brings the bounding box closer to the letters;
           doing so here prevents the class from being overridden via twMerge() */}
       <h1
         ref={textRef}
@@ -297,13 +309,14 @@ const DiagramAnimation = ({
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        {arrowhead &&
+        {arrowheadPath &&
           markerPaths &&
           rasterizedArrows?.map(({ body, markers }, i) => (
             <g key={i} data-arrow opacity={0}>
               <path data-body d={body} />
               {markers.map(({ x, y, shape }, j) => (
-                // Positioned here, scaled during path creation
+                // Translated using a wrapper so that the GSAP scale
+                // transform on the path below doesn't override it
                 <g key={j} transform={`translate(${x} ${y})`}>
                   <path
                     data-marker
@@ -315,8 +328,10 @@ const DiagramAnimation = ({
                   />
                 </g>
               ))}
-              <g data-tip>
-                <path data-head d={arrowhead} />
+              {/* Wrapper exists to keep the GSAP motion-path
+                  transform separate from the arrowhead scaling */}
+              <g data-carrier>
+                <path data-arrowhead d={arrowheadPath} />
               </g>
             </g>
           ))}

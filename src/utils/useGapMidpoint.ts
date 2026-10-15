@@ -8,7 +8,6 @@ import { useEffect, useState, type RefObject } from "react";
  *
  * Updates whenever the size of either HTMLElement or any of their
  * siblings changes.
- *
  * @param upperRef a RefObject for the HTMLElement above the gap
  * @param lowerRef a RefObject for the HTMLElement below the gap
  * @returns the vertical position, in pixels from the top of the

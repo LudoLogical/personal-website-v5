@@ -11,7 +11,7 @@ export type AnimatedLogoProps = Omit<LogoProps, "ref">;
  * Renders the Logo such that, while its parent is hovered (or, on touch
  * screens, every time that its parent is tapped), the arrow strikes the D,
  * causing it to teeter, recoil, and then settle back into place.
- * The animation does not play if the user `prefers-reduced-motion`.
+ * Motionless if the user `prefers-reduced-motion`.
  * Like Logo, this component is hidden from ATs; its parent
  * is responsible for supplying a label if one is necessary.
  */

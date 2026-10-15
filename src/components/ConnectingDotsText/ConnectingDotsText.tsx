@@ -164,6 +164,7 @@ export const DEFAULT_OPTIONS: ConnectingDotsTextOptions = {
  * to fade partially out of view, at which point a series of dots (one for
  * each non-whitespace character in the text) grow into view and become
  * connected by a line that draws itself into view shortly after.
+ * Motionless if the user `prefers-reduced-motion`.
  *
  * The animation triggers on hover, except on touch screens, for which it
  * toggles on tap and can be dismissed by tapping anywhere.

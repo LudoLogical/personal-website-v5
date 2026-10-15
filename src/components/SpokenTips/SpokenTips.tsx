@@ -72,6 +72,7 @@ const randomDistinctInteger = (
  * Renders the specified children and adds an animation which causes those
  * children to swell slightly and a vertically centered speech bubble
  * containing a randomly chosen tip to grow into view on its right side.
+ * Motionless if the user `prefers-reduced-motion`.
  *
  * The animation triggers on hover, except on touch screens, for which it
  * toggles on tap and can be dismissed by tapping anywhere.
