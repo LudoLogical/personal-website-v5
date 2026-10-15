@@ -56,9 +56,10 @@ export const DEFAULT_OPTIONS: CharCodeTextOptions = {
 
 /**
  * Renders the specified display text such that, when any one of its
- * non-whitespace) characters is hovered, that character is elevated,
+ * (non-whitespace) characters is hovered, that character is elevated,
  * changes color, and reveals a tooltip containing the decimal,
  * hexadecimal, and binary representations of its codepoint.
+ * Motionless if the user `prefers-reduced-motion`.
  *
  * Animated with CSS hover states alone and thus valid as a server component.
  */
@@ -107,7 +108,7 @@ const CharCodeText = ({ text, className, options }: CharCodeTextProps) => {
             // over any content that might exist below it.
             // base-hover: (rather than hover:) so that the lift and color
             // follow the tooltip on touch screens too
-            className="tooltip cursor-default leading-none transition-[translate,color] duration-(--lift-duration) ease-out base-hover:z-10 base-hover:-translate-y-(--lift-height) base-hover:text-primary"
+            className="tooltip cursor-default leading-none transition-[translate,color] duration-(--lift-duration) ease-out motion-reduce:transition-none base-hover:z-10 base-hover:-translate-y-(--lift-height) base-hover:text-primary"
           >
             <span className="tooltip-content flex flex-col items-center font-mono text-xs leading-normal shadow-lg xs:text-sm">
               <span className="font-bold">{decimal}</span>

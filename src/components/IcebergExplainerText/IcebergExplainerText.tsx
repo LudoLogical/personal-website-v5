@@ -235,7 +235,7 @@ const SCRUB_CURVE = "cubic-bezier(.2,.7,.2,1)";
  * the card to "descend" through the specified Levels, each of which takes up
  * the full card when displayed. A single low-poly iceberg SVG spans the
  * backgrounds of all four Levels, the backgrounds of which get progressively
- * darker from top to bottom.
+ * darker from top to bottom. Motionless if the user `prefers-reduced-motion`.
  *
  * On touch screens, tapping a region of the text displays the corresponding
  * Level, dragging horizontally across the text scrubs through the Levels,
@@ -347,7 +347,7 @@ const IcebergExplainerText = ({
       <span
         aria-hidden
         className={twMerge(
-          "absolute -bottom-0.5 rounded-full bg-primary",
+          "absolute -bottom-0.5 rounded-full bg-primary motion-reduce:transition-none!",
           childClassNames?.scrub,
         )}
         style={{
@@ -368,7 +368,7 @@ const IcebergExplainerText = ({
         ref={cardRef}
         aria-hidden
         className={twMerge(
-          "pointer-events-none absolute left-1/2 flex w-82.5 overflow-hidden rounded-lg border border-base-300 bg-base-200 text-base font-normal shadow-lg",
+          "pointer-events-none absolute left-1/2 flex w-82.5 overflow-hidden rounded-lg border border-base-300 bg-base-200 text-base font-normal shadow-lg motion-reduce:transition-none!",
           childClassNames?.card,
         )}
         style={{
@@ -391,7 +391,7 @@ const IcebergExplainerText = ({
           {/* Marker */}
           <span
             className={twMerge(
-              "absolute left-1/2 -translate-x-1/2 rounded-full bg-primary",
+              "absolute left-1/2 -translate-x-1/2 rounded-full bg-primary motion-reduce:transition-none!",
               childClassNames?.marker,
             )}
             style={{
@@ -411,7 +411,7 @@ const IcebergExplainerText = ({
           {/* auto-rows-fr makes every panel as tall as the tallest one */}
           <span
             ref={stripRef}
-            className="relative grid auto-rows-fr"
+            className="relative grid auto-rows-fr motion-reduce:transition-none!"
             style={{
               transform: `translateY(${(-(level ?? 0) * 100) / NUM_LEVELS}%)`,
               transition: `transform ${scrollTransition}`,
