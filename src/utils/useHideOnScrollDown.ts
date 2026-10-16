@@ -1,14 +1,16 @@
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useState } from "react";
 
 /**
- * The minimum distance, in pixels, that the page must scroll in one
- * direction before the hidden state is reevaluated. Prevents jitter.
+ * The minimum distance, in pixels, by which the page must be scrolled
+ * in one direction before the useHideOnScrollDown state is changed.
+ * Exists to prevent jitter.
  */
 const SCROLL_THRESHOLD = 8;
 
 /**
- * Gets the current vertical scroll position, clamped to the scrollable range
- * so that overscroll bounces (e.g., on iOS) are not mistaken for scrolling.
+ * Computes the current vertical scroll position and clamps it to the
+ * scrollable range so that overscroll bounces (e.g., on iOS) are not
+ * mistaken for scrolling.
  */
 const getClampedScrollY = () => {
   const maxScrollY = document.documentElement.scrollHeight - window.innerHeight;
@@ -16,45 +18,43 @@ const getClampedScrollY = () => {
 };
 
 /**
- * Tracks whether the HTMLElement assigned to the specified ref should be
- * hidden, which is the case after the user scrolls down past its height.
+ * Tracks whether an element that hides on scroll should be hidden,
+ * which is the case after the user scrolls down by any meaningful amount.
  * Scrolling up by any meaningful amount reveals it again.
- * @param ref a RefObject for the HTMLElement to hide
- * @returns true if the HTMLElement should be hidden, false otherwise
+ * @returns true if the element should be hidden, false otherwise
  */
-export const useHideOnScrollDown = (
-  ref: RefObject<HTMLElement | null>,
-): boolean => {
+export const useHideOnScrollDown = (): boolean => {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     let lastScrollY = getClampedScrollY();
-    let frame = 0;
+    let pendingFrameRequestID = 0;
 
-    const update = () => {
-      frame = 0;
+    const handleScroll = () => {
+      pendingFrameRequestID = 0;
       const scrollY = getClampedScrollY();
       const delta = scrollY - lastScrollY;
 
-      // Let small movements accumulate until they cross the threshold
+      // Let small movements accumulate until they surpass SCROLL_THRESHOLD
       if (Math.abs(delta) < SCROLL_THRESHOLD) return;
 
-      const height = ref.current?.offsetHeight ?? 0;
-      setHidden(delta > 0 && scrollY > height);
+      setHidden(delta > 0);
       lastScrollY = scrollY;
     };
 
-    // Throttled to one update per frame
+    // Throttle to one handleScroll invocation per frame
     const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
+      if (!pendingFrameRequestID) {
+        pendingFrameRequestID = requestAnimationFrame(handleScroll);
+      }
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(frame);
+      cancelAnimationFrame(pendingFrameRequestID);
     };
-  }, [ref]);
+  }, []);
 
   return hidden;
 };

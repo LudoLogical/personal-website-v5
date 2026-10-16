@@ -31,7 +31,7 @@ const NAV_ITEMS = [
 const PrimaryNav = () => {
   const headerRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
-  const hidden = useHideOnScrollDown(headerRef);
+  const hidden = useHideOnScrollDown();
   const pathname = usePathname();
 
   // Publishes the header's height for the module to expose as the inset,

@@ -1,13 +1,14 @@
 import { useEffect, useEffectEvent, type RefObject } from "react";
 
 /**
- * While enabled, calls the specified callback whenever the user taps (on a
- * touch screen) anywhere outside of the Element assigned to the specified
- * ref. Gestures that scroll the page end in a pointercancel rather than a
- * pointerup and so are ignored.
- * @param ref a RefObject for the Element to tap outside of
- * @param enabled whether taps should currently be listened for
- * @param onTapOutside the callback to call upon each tap outside
+ * While enabled, invokes the specified callback whenever the user taps
+ * (on a touch screen) anywhere outside of the Element assigned to the
+ * specified ref. Touch gestures that scroll the page are ignored.
+ * @param ref a RefObject for the Element outside
+ *            of which taps must be observed
+ * @param enabled true if useTapOutside should currently
+ *                be listening for taps, false otherwise
+ * @param onTapOutside the callback be invoked on each appropriate tap
  */
 export const useTapOutside = (
   ref: RefObject<Element | null>,
@@ -19,6 +20,7 @@ export const useTapOutside = (
   useEffect(() => {
     if (!enabled) return;
 
+    // Scrolling is ignored because it ends in a pointercancel, not a pointerup
     const onPointerUp = (e: PointerEvent) => {
       if (e.pointerType !== "touch") return;
       if (ref.current?.contains(e.target as Node)) return;
