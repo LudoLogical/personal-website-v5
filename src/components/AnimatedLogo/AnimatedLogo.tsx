@@ -12,8 +12,9 @@ export type AnimatedLogoProps = Omit<LogoProps, "ref">;
  * screens, every time that its parent is tapped), the arrow strikes the D,
  * causing it to teeter, recoil, and then settle back into place.
  * Motionless if the user `prefers-reduced-motion`.
- * Like Logo, this component is hidden from ATs; its parent
- * is responsible for supplying a label if one is necessary.
+ *
+ * Note: Like Logo, this component is hidden from ATs, so its parent is
+ * responsible for supplying a label if one is necessary.
  */
 const AnimatedLogo = ({ className, ...props }: AnimatedLogoProps) => {
   const svgRef = useRef<SVGSVGElement>(null);

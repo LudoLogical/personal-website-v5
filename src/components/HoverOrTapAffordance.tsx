@@ -10,129 +10,124 @@ import {
 import { twMerge } from "tailwind-merge";
 import { useTapOutside } from "@/utils/useTapOutside";
 
-/**
- * The shapes that a HoverOrTapAffordance's dashed line can take.
- */
-export type HoverOrTapAffordanceShape = "underline" | "circle";
-
 export type HoverOrTapAffordanceProps = {
   /**
-   * The content to be underlined or circled.
+   * The content for which this HoverOrTapAffordance should afford interaction.
    */
   children: ReactNode;
 
   /**
-   * Whether the dashed line should underline the content or circle it.
-   * A circle assumes that the root element is square (e.g., because it is
-   * filled by a circular avatar) and surrounds it with a small gap.
+   * The shape of the affordance in this HoverOrTapAffordance.
    * Defaults to `"underline"`.
    */
-  shape?: HoverOrTapAffordanceShape;
+  shape?: "underline" | "circle";
 
   /**
    * Classes for the root element of this HoverOrTapAffordance.
-   * The children are wrapped in a `z-10` stacking context, so if any of them
-   * must overlap later siblings (e.g., a popover), set a z-index above `z-10`
-   * here (e.g., `z-20`).
+   *
+   * Note: the children (i.e., content) are wrapped in a `z-10` stacking
+   * context, so if any of them must overlap subsequent siblings of this
+   * HoverOrTapAffordance's root element, a z-inded above `z-10` must be
+   * set here.
    */
   className?: string;
 
   /**
-   * Classes for the dashed line. For an underline, the line is the top border
-   * of a zero-height element, so set its thickness with top-only classes
-   * (e.g., `border-t-3`) rather than ones that apply to every side
-   * (e.g., `border-3`). Defaults to `border-t-2` (2px). For a circle, the
-   * line is the border of a rounded element that extends past the root
-   * element on every side, so set its thickness with classes that apply to
-   * every side (e.g., `border-3`) and its gap with negative inset classes
-   * (e.g., `-inset-2`). Defaults to `border-2` (2px) and `-inset-1` (4px).
+   * Classes for the affordance (i.e.,
+   * dashed line) in this HoverOrTapAffordance.
+   *
+   * The underline variant is rendered as the top border of a zero-height
+   * element, so its thickness should be set using top-only classes.
+   *
+   * The circle variant is rendered as the border of a `rounded-full`
+   * element that extends past the root element on all sides, so its
+   * thickness should be set using classes that apply to every side
+   * and the gap between it and the content should be set with negative
+   * inset classes.
    */
-  lineClassName?: string;
+  affordanceClassName?: string;
 
   /**
-   * The duration, in seconds, over which the line
-   * should fade out when hovered or tapped (and back in).
+   * The delay, in seconds, after which the affordance in this
+   * HoverOrTapAffordance should start to fade back in once it is no longer
+   * hovered (or, on touch screens, when appropriate based on the values of
+   * fadeInOnTapOutside and fadeInOnTapInside). Defaults to 0.
    */
-  fadeDuration?: number | undefined;
+  fadeInDelay?: number;
 
   /**
-   * The delay, in seconds, after which the line should
-   * start to fade back in once no longer hovered or tapped.
-   */
-  fadeInDelay?: number | undefined;
-
-  /**
-   * Whether the root element should be a span (so that this
-   * HoverOrTapAffordance can exist inside of a p, h1, a, etc.)
-   * rather than a div (so that it can contain block-level content).
+   * True if the root element of this HoverOrTapAffordance should be a span
+   * (so that it can exist inside of a p, h1, etc.), false (or omitted) if
+   * it should be a div (so that it can contain block-level content).
+   * Defaults to false.
    */
   inline?: boolean;
 
   /**
-   * Whether the line should also fade back in, for touch screen users, when
-   * the user taps anywhere outside of the content. Set this when the content
-   * itself is dismissed by such taps so that the two stay in sync.
-   * Defaults to `false`.
+   * True if, while the affordance in this HoverOrTapAffordance is faded out,
+   * tapping anywhere *outside* of the content to which it corresponds should
+   * cause it to fade back in; false otherwise (and by default).
    */
-  dismissOnTapOutside?: boolean;
+  fadeInOnTapOutside?: boolean;
 
   /**
-   * Whether tapping the content should toggle the line (for touch screen
-   * users) rather than only fading it out. Set this to false (along with
-   * dismissOnTapOutside) when the content follows :hover directly, since
-   * touch screens keep the content :hover between taps on it.
-   * Defaults to `true`.
+   * True if, while the affordance in this HoverOrTapAffordance is faded out,
+   * tapping anywhere *inside* of the content to which it corresponds should
+   * cause it to fade back in; false otherwise. Defaults to true.
+   *
+   * Note: this prop should always be set to false (and fadeInOnTapOutside set
+   * to true instead) when the content follows `:hover` directly because touch
+   * screens preserve an element's `:hover` state across repeated taps on it.
    */
-  toggleOnTap?: boolean;
+  fadeInOnTapInside?: boolean;
 };
 
 /**
- * The duration, in milliseconds, for which a mouse
- * user must hover before the affordance counts as visited.
+ * The minimum duration, in milliseconds, for which a single hover
+ * must last before a HoverOrTapAffordance is marked as visited.
  */
 const VISIT_DWELL_TIME = 500;
 
 /**
- * The default classes that position and size the line for each shape.
+ * The duration, in seconds, over which the affordance in a
+ * HoverOrTapAffordance fades out when hovered or tapped and
+ * fades back in when no longer hovered or tapped again.
  */
-const shapeClassNames: Record<HoverOrTapAffordanceShape, string> = {
-  underline: "inset-x-0 top-full border-t-2",
-  circle: "-inset-1 rounded-full border-2",
-};
+const FADE_DURATION = 0.25;
 
 /**
- * Renders the specified content above a dashed underline (or within a dashed
- * circle) that fades out while the content is hovered and fades back in (after
- * a delay) once it isn't.
- * Once the content has been hovered for long enough, the line is dimmed
- * for the rest of the session (that is, until this component unmounts) to
- * indicate that it has been visited. The interaction triggers on hover for
- * mouse users and toggles on tap for touch screen users, for whom the first
- * tap counts as a visit.
+ * Renders the specified content above a dashed underline (or within a
+ * dashed circle) that fades out of view while the content is hovered and
+ * fades back into view (after a delay) once the content is no longer hovered.
+ *
+ * If a single hover lasts for at least half a second, the line
+ * (or circle) is dimmed until this component unmounts to indicate
+ * that it has been visited.
+ *
+ * On touch screens, visibility of the line (or circle)
+ * toggles on tap and the first tap always counts as a visit.
  */
 const HoverOrTapAffordance = ({
   children,
   shape = "underline",
   className,
-  lineClassName,
-  fadeDuration = 0.25,
+  affordanceClassName,
   fadeInDelay = 0,
   inline = false,
-  dismissOnTapOutside = false,
-  toggleOnTap = true,
+  fadeInOnTapOutside = false,
+  fadeInOnTapInside = true,
 }: HoverOrTapAffordanceProps) => {
-  // Typed to fit either a div or a span (see inline)
   const rootRef = useRef<HTMLDivElement & HTMLSpanElement>(null);
   const [active, setActive] = useState(false);
   const [visited, setVisited] = useState(false);
+
   const dwellTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
-
   const clearDwellTimeout = () => clearTimeout(dwellTimeout.current);
-
-  // Don't let a pending timeout outlive the component
+  // Ensures that an active dwellTimeout does not
+  // outlive the component instance that created it
   useEffect(() => clearDwellTimeout, []);
 
-  useTapOutside(rootRef, dismissOnTapOutside && active, () => setActive(false));
+  useTapOutside(rootRef, fadeInOnTapOutside && active, () => setActive(false));
 
   const isTouchEvent = (e: PointerEvent) => e.pointerType === "touch";
 
@@ -159,26 +154,27 @@ const HoverOrTapAffordance = ({
       }}
       onPointerUp={(e) => {
         if (!isTouchEvent(e)) return;
-        setActive(toggleOnTap ? !active : true);
+        setActive(fadeInOnTapInside ? !active : true);
         setVisited(true);
       }}
     >
-      {/* Raised above the underline so that descenders cross over it.
-          Traps the children's z-indices in its stacking context */}
+      {/* Raised above the underline so that text descenders cross over it.
+          This traps the children's z-indices in its stacking context(!) */}
       <Root className="relative z-10 block">{children}</Root>
-      {/* A separate element (rather than a text decoration or border on the
-          root) so that it can fade without affecting the children. Fades out
-          right away, but only fades back in after the delay */}
+      {/* Using a separate element for the affordance
+          allows it to fade without affecting the children. */}
       <span
         aria-hidden
         className={twMerge(
           "pointer-events-none absolute border-dashed border-secondary transition-opacity",
-          shapeClassNames[shape],
-          lineClassName,
+          shape === "circle"
+            ? "-inset-1 rounded-full border-2"
+            : "inset-x-0 top-full border-t-2",
+          affordanceClassName,
           active ? "opacity-0" : visited ? "opacity-50" : "opacity-100",
         )}
         style={{
-          transitionDuration: `${fadeDuration}s`,
+          transitionDuration: `${FADE_DURATION}s`,
           transitionDelay: active ? "0s" : `${fadeInDelay}s`,
         }}
       />

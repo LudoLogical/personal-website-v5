@@ -1,17 +1,10 @@
 import type { CSSProperties } from "react";
-import { twMerge } from "tailwind-merge";
 
 export type CharCodeTextProps = {
   /**
-   * The text in this CharCodeText.
-   * Subject to whitespace-pre.
+   * The text in this CharCodeText. Subject to whitespace-pre.
    */
   text: string;
-
-  /**
-   * Classes for the root element of this CharCodeText.
-   */
-  className?: string;
 
   /**
    * Optional settings for this CharCodeText.
@@ -63,7 +56,7 @@ export const DEFAULT_OPTIONS: CharCodeTextOptions = {
  *
  * Animated with CSS hover states alone and thus valid as a server component.
  */
-const CharCodeText = ({ text, className, options }: CharCodeTextProps) => {
+const CharCodeText = ({ text, options }: CharCodeTextProps) => {
   const { liftHeight, liftDuration, minBinaryDigits } = {
     ...DEFAULT_OPTIONS,
     ...options,
@@ -76,12 +69,9 @@ const CharCodeText = ({ text, className, options }: CharCodeTextProps) => {
   } as CSSProperties;
 
   return (
-    <span
-      className={twMerge("flex whitespace-pre", className)}
-      style={liftVariables}
-    >
-      {/* Screen readers ignore aria-label on generic elements like spans, so
-          the full text is exposed this way instead of character by character */}
+    <span className="flex whitespace-pre" style={liftVariables}>
+      {/* Screen readers ignore aria-label on generic elements
+          like spans, sothe full text is exposed this way instead */}
       <span className="sr-only">{text}</span>
       {/* Spreading iterates by code point, so "astral"
           characters like emoji aren't split up! */}
@@ -104,10 +94,10 @@ const CharCodeText = ({ text, className, options }: CharCodeTextProps) => {
           <span
             key={i}
             aria-hidden
-            // Apply z-10 on hover to the tooltip floats
-            // over any content that might exist below it.
-            // base-hover: (rather than hover:) so that the lift and color
-            // follow the tooltip on touch screens too
+            // Apply z-10 on hover so the tooltip floats
+            // over any content that might exist below it;
+            // use base-hover: instead of hover: so that the lift
+            // and color follow the tooltip on touch screens too
             className="tooltip cursor-default leading-none transition-[translate,color] duration-(--lift-duration) ease-out motion-reduce:transition-none base-hover:z-10 base-hover:-translate-y-(--lift-height) base-hover:text-primary"
           >
             <span className="tooltip-content flex flex-col items-center font-mono text-xs leading-normal shadow-lg xs:text-sm">

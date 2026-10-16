@@ -161,8 +161,8 @@ export default function Home() {
               <HoverOrTapAffordance
                 shape="circle"
                 className="block"
-                lineClassName="sm:border-3 -inset-1.5 md:-inset-2 xl:-inset-3"
-                dismissOnTapOutside
+                affordanceClassName="sm:border-3 -inset-1.5 md:-inset-2 xl:-inset-3"
+                fadeInOnTapOutside
               >
                 <Image
                   src="/avatar.png"
@@ -194,8 +194,8 @@ export default function Home() {
                     stretch across the whole column */}
                 <HoverOrTapAffordance
                   className="w-fit"
-                  lineClassName={affordanceLineClassName}
-                  dismissOnTapOutside
+                  affordanceClassName={affordanceLineClassName}
+                  fadeInOnTapOutside
                 >
                   <DiagramAnimation
                     text='Daniel "Ludo" DeAnda.'
@@ -217,9 +217,9 @@ export default function Home() {
                     <span className="opacity-50">I&apos;m a&nbsp;</span>
                     <HoverOrTapAffordance
                       inline
-                      lineClassName={affordanceLineClassName}
-                      toggleOnTap={false}
-                      dismissOnTapOutside
+                      affordanceClassName={affordanceLineClassName}
+                      fadeInOnTapInside={false}
+                      fadeInOnTapOutside
                     >
                       <CharCodeText text="Software Engineer" />
                     </HoverOrTapAffordance>
@@ -231,9 +231,9 @@ export default function Home() {
                     <HoverOrTapAffordance
                       inline
                       className="z-20"
-                      lineClassName={affordanceLineClassName}
-                      toggleOnTap={false}
-                      dismissOnTapOutside
+                      affordanceClassName={affordanceLineClassName}
+                      fadeInOnTapInside={false}
+                      fadeInOnTapOutside
                     >
                       <IcebergExplainerText
                         text="Systems Thinker"
@@ -259,9 +259,9 @@ export default function Home() {
                       // + (last dot starts shrinking)
                       // + (shrinking duration)
                       // + (buffer before text starts fading in)
-                      lineClassName={affordanceLineClassName}
+                      affordanceClassName={affordanceLineClassName}
                       fadeInDelay={0.15 + 0.25 + 0.18 + 0.07}
-                      dismissOnTapOutside
+                      fadeInOnTapOutside
                     >
                       <ConnectingDotsText
                         text="Sense-Maker"

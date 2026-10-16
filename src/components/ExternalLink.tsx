@@ -4,17 +4,16 @@ import { twMerge } from "tailwind-merge";
 
 export type ExternalLinkProps = Omit<ComponentProps<"a">, "target" | "rel"> & {
   /**
-   * Classes for the outbound-arrow icon that follows the link's children.
+   * Classes for the ArrowUpRight icon that
+   * follows the children of this ExternalLink.
    */
   iconClassName?: string;
 };
 
 /**
  * Renders a link to a page outside of this website that opens in a new tab.
- *
- * Convention: every external link on this website should be rendered via
- * this component so that it is consistently annotated with an outbound-arrow
- * icon (and an equivalent note for screen reader users).
+ * The link is annotated with an ArrowUpRight icon and an explanatory note
+ * for screen readers.
  */
 const ExternalLink = ({
   children,
