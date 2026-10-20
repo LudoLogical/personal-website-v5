@@ -9,8 +9,7 @@ import { LEVEL_CLASS_NAMES, NUM_LEVELS, type Levels } from "./levels";
 
 export type IcebergExplainerTextProps = {
   /**
-   * The hoverable text in this IcebergExplainerText.
-   * Subject to leading-none.
+   * The hoverable text in this IcebergExplainerText. Subject to leading-none.
    */
   text: string;
 

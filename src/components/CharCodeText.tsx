@@ -54,7 +54,7 @@ export const DEFAULT_OPTIONS: CharCodeTextOptions = {
  * hexadecimal, and binary representations of its codepoint.
  * Motionless if the user `prefers-reduced-motion`.
  *
- * Animated with CSS hover states alone and thus valid as a server component.
+ * Animated using CSS alone and thus valid as a server component.
  */
 const CharCodeText = ({ text, options }: CharCodeTextProps) => {
   const { liftHeight, liftDuration, minBinaryDigits } = {
@@ -71,7 +71,7 @@ const CharCodeText = ({ text, options }: CharCodeTextProps) => {
   return (
     <span className="flex whitespace-pre" style={liftVariables}>
       {/* Screen readers ignore aria-label on generic elements
-          like spans, sothe full text is exposed this way instead */}
+          like spans, so the text is exposed this way instead */}
       <span className="sr-only">{text}</span>
       {/* Spreading iterates by code point, so "astral"
           characters like emoji aren't split up! */}

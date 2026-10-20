@@ -229,8 +229,8 @@ const ConnectingDotsText = ({
       }}
       className="relative inline-block cursor-default"
     >
-      {/* Screen readers ignore aria-label on generic elements like spans,
-          so the text is exposed this way instead of character by character */}
+      {/* Screen readers ignore aria-label on generic elements
+          like spans, so the text is exposed this way instead */}
       <span className="sr-only">{text}</span>
       <span
         aria-hidden="true"
