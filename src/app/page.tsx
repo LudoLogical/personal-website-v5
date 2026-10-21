@@ -5,162 +5,39 @@ import { tips } from "@/components/SpokenTips";
 import SpokenTips from "@/components/SpokenTips";
 import CharCodeText from "@/components/CharCodeText";
 import ConnectingDotsText from "@/components/ConnectingDotsText";
-import DiagramAnimation, {
-  MarkerShape,
-  Side,
-  along,
-  anchor,
-  free,
-  type Arrow,
-} from "@/components/DiagramAnimation";
+import DiagramAnimation from "@/components/DiagramAnimation";
 import HoverOrTapAffordance from "@/components/HoverOrTapAffordance";
-import IcebergExplainerText, {
-  type Levels,
-} from "@/components/IcebergExplainerText";
+import IcebergExplainerText from "@/components/IcebergExplainerText";
 import WaveText from "@/components/WaveText";
-
-// General order: highest -> lowest, leftmost -> rightmost
-const arrows: Arrow[] = [
-  // (Left) -> (Top)
-  {
-    from: free(-0.2, 0.5),
-    to: free(0.15, -2.2),
-    fromMarker: MarkerShape.OutlinedCircle,
-  },
-  // (Top) -> (Top)
-  {
-    from: free(0.25, -2.2),
-    to: free(0.75, -2.2),
-    fromMarker: MarkerShape.OutlinedCircle,
-    pathMarkers: [
-      along(MarkerShape.FilledCircle, 0.3),
-      along(MarkerShape.FilledCircle, 0.65),
-    ],
-  },
-  // DeAnda -> (Up, Right, Down)
-  {
-    from: anchor(Side.Top, 0.85, 2),
-    to: anchor(Side.Top, 1.2, 0),
-    toMarker: MarkerShape.FilledCircle,
-  },
-  // Daniel -> Daniel
-  {
-    from: anchor(Side.Left, 0.35, 0.9),
-    to: anchor(Side.Top, 0.25, 0.9),
-    fromMarker: MarkerShape.X,
-    pathMarkers: [along(MarkerShape.FilledCircle, 0.575)],
-  },
-  // DeAnda -> (Up, Left)
-  {
-    from: anchor(Side.Top, 0.7, 0.9),
-    to: free(0.375, -1.1),
-    toMarker: MarkerShape.OutlinedCircle,
-  },
-  // DeAnda -> (Up, Right)
-  {
-    from: anchor(Side.Top, 0.95, 0.9),
-    to: free(1.1, -1.1),
-    toMarker: MarkerShape.X,
-  },
-  // Daniel -> (Down, Left)
-  {
-    from: anchor(Side.Bottom, 0.05, 0.9),
-    to: free(-0.1, 2.1),
-    toMarker: MarkerShape.FilledCircle,
-  },
-  // DeAnda -> "Ludo"
-  {
-    from: anchor(Side.Bottom, 0.85, 0.9),
-    to: anchor(Side.Bottom, 0.45, 0.9),
-    pathMarkers: [along(MarkerShape.X, 0.5)],
-  },
-  // (Bottom Right) -> DeAnda
-  {
-    from: free(1.1, 2.1),
-    to: anchor(Side.Bottom, 0.95, 0.9),
-    fromMarker: MarkerShape.OutlinedCircle,
-  },
-  // Daniel -> (Down, Left, Up)
-  {
-    from: anchor(Side.Bottom, 0.2, 2),
-    to: anchor(Side.Bottom, -0.2, 2),
-  },
-  // "Ludo" -> (Bottom)
-  {
-    from: anchor(Side.Bottom, 0.325, 2),
-    to: free(0.65, 3.2),
-    toMarker: MarkerShape.OutlinedCircle,
-    pathMarkers: [along(MarkerShape.FilledCircle, 0.65)],
-  },
-  // DeAnda -> (Right, Down, Left)
-  {
-    from: anchor(Side.Right, 0.7, 2),
-    to: free(0.75, 3.2),
-    fromMarker: MarkerShape.FilledCircle,
-    pathMarkers: [along(MarkerShape.FilledCircle, 0.75)],
-  },
-];
-
-// Ordered from the surface to the deepest level
-const levels: Levels = [
-  {
-    name: "Events",
-    question: "What happened?",
-    concepts: ["confused users", "site crashes", "dev slowdowns"],
-    depth: "0 m",
-  },
-  {
-    name: "Patterns",
-    question: "Why do those events keep happening?",
-    concepts: ["unwieldy UI", "traffic spikes", "technical debt"],
-    depth: "-30 m",
-  },
-  {
-    name: "Structures",
-    question: "What bolsters those patterns?",
-    concepts: ["design systems", "tech stacks", "policies", "practices"],
-    depth: "-90 m",
-  },
-  {
-    name: "Mental Models",
-    question: "Why are those structures in place?",
-    concepts: ["assumptions", "values", "heuristics", "instincts"],
-    depth: "-200 m",
-  },
-];
-
-// Hand-tuned so that the dots zig-zag across "Sense-Maker"
-const dotPositions = [30, 12, 36, 18, 28, 40, 8, 24, 14, 34, 20].map(
-  (y) => y / 48,
-);
-
-// Shared by every interactive element in the intro so that they match
-const affordanceLineClassName = "sm:border-t-3";
-
-// Applied to everything in the intro but the name itself
-const fadeWhileDiagramActive =
-  "transition-opacity duration-300 group-has-data-active/intro:pointer-events-none group-has-data-active/intro:opacity-15";
+import { arrows, levels, dotPositions } from "./content";
 
 export default function Home() {
+  // Shared by every HoverOrTapAffordance in the hero section
+  const affordanceLineClassName = "sm:border-t-3";
+
+  // Applied to everything in the hero section except DiagramAnimation
+  const fadeWhileDiagramActive =
+    "transition-opacity duration-300 group-has-data-active/hero:opacity-15";
+
   return (
     <main className="flex flex-1 flex-col overflow-hidden">
-      {/* Fills the viewport (plus the page's rounded bottom corners) so that
-          everything below starts out of view; the extra bottom padding offsets
-          the corners to keep the lockup centered with respect to the viewport */}
+      {/* Fills the viewport and adds the page's rounded bottom corners
+          just out of view; the extra pb accounts for the radius of those
+          corners to keep the lockup centered */}
       <section className="flex min-h-[calc(100svh+var(--radius-paper))] items-center justify-center px-6 pt-24 pb-[calc(--spacing(24)+var(--radius-paper))]">
-        {/* Everything but the name fades out while its diagram is active.
-            The avatar and intro text grow in steps at each breakpoint, sized
-            so that everything (including the diagram, which extends past the
-            text while active) fits within the narrowest viewport of each */}
-        <div className="group/intro flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-14 lg:gap-16 xl:gap-20">
-          <div className={twMerge("shrink-0", fadeWhileDiagramActive)}>
+        <div className="group/hero flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-14 lg:gap-16 xl:gap-20">
+          <div className="shrink-0">
             <SpokenTips tips={tips}>
-              {/* Inside the tips so that the circle swells with the avatar and
-                  the speech bubble isn't trapped in its stacking context.
-                  Displayed as a block so that no line box pads its bottom */}
+              {/* Placed inside SpokenTips so that the affordance swells with
+                  the avatar and the speech bubble isn't trapped inside of the
+                  HoverOrTapAffordance stacking context; displayed as block so
+                  it doesn't get a line box (which would pad its bottom) */}
+              {/* Dimmed here because reducing opacity on SpokenTips would
+                  create a stacking context on it and thus trap the speech
+                  bubble below the z-10 text on the right side */}
               <HoverOrTapAffordance
                 shape="circle"
-                className="block"
+                className={twMerge("block", fadeWhileDiagramActive)}
                 affordanceClassName="sm:border-3 -inset-1.5 md:-inset-2 xl:-inset-3"
                 fadeInOnTapOutside
               >
@@ -190,8 +67,7 @@ export default function Home() {
                 />
               </p>
               <div className="my-1 flex flex-col gap-2">
-                {/* Sized to fit the name so that the underline doesn't
-                    stretch across the whole column */}
+                {/* w-fit so the underline doesn't fill the row */}
                 <HoverOrTapAffordance
                   className="w-fit"
                   affordanceClassName={affordanceLineClassName}
@@ -203,13 +79,9 @@ export default function Home() {
                     className="w-fit text-primary"
                   />
                 </HoverOrTapAffordance>
-                {/* Its opacity makes it a stacking context while fading, so
-                    it's raised above the name for tooltips to overlap it, but
-                    lowered while the diagram is active for arrows to overlap
-                    it in turn */}
                 <div
                   className={twMerge(
-                    "relative z-10 flex flex-col gap-2 group-has-data-active/intro:z-0",
+                    "relative z-10 flex flex-col gap-2",
                     fadeWhileDiagramActive,
                   )}
                 >
@@ -226,8 +98,8 @@ export default function Home() {
                     <span className="opacity-50">,</span>
                   </div>
                   <div className="flex flex-nowrap">
-                    {/* Raised so that the explainer card
-                        overlaps the "Sense-Maker" row below */}
+                    {/* Raised so that the explainer card appears above
+                        the content that follows the IcebergExplainerText */}
                     <HoverOrTapAffordance
                       inline
                       className="z-20"
@@ -273,7 +145,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            {/* Kept separate from the button so that its transitions remain */}
+            {/* Kept separate from the button to preserve both transitions */}
             <div className={fadeWhileDiagramActive}>
               <a
                 href="#wonderful"

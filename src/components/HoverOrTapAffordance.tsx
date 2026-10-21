@@ -110,10 +110,10 @@ const FADE_DURATION = 0.25;
 const HoverOrTapAffordance = ({
   children,
   shape = "underline",
+  inline = false,
   className,
   affordanceClassName,
   fadeInDelay = 0,
-  inline = false,
   fadeInOnTapOutside = false,
   fadeInOnTapInside = true,
 }: HoverOrTapAffordanceProps) => {
