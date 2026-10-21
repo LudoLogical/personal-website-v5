@@ -43,7 +43,7 @@ export const useTextDimensions = (
     };
 
     const observer = new ResizeObserver(readTextDims);
-    observer.observe(target); // Get the initial values
+    observer.observe(target);
     return () => observer.disconnect(); // Destroy observer on cleanup
   }, [ref]);
 

@@ -17,16 +17,16 @@ const NAV_ITEMS = [
 ];
 
 /**
- * Renders the primary navigation bar, which floats at the top of the viewport.
- * Slides out of view when the user scrolls down and back into view when the
- * user scrolls up (or moves keyboard focus into it), but stays in view while
- * its dropdown menu (shown in place of its links on narrow viewports) is open.
+ * Renders the primary navigation bar that floats at the top of the viewport,
+ * slides out of view when the user scrolls down (unless its dropdown menu is
+ * open), and slides back into view when the user either scrolls up again or
+ * gives it keyboard focus.
  *
- * While in view, it exposes how far down the viewport it reaches (including
- * the gutter above it) as the `--primary-nav-inset` variable on :root, which
- * is unset while it's out of view. Content that sticks to the top of the
- * viewport can thus stay clear of it, e.g.,
- * `top-[calc(var(--primary-nav-inset,0px)+1rem)]`.
+ * While in view, this component exposes its `offsetHeight` as the CSS
+ * variable `--primary-nav-inset`, which it sets on :root. While this
+ * component is not in view, `--primary-nav-inset` is simply not set.
+ * Content that sticks to the top of the viewport can thus use CSS to
+ * avoid being obscured by this component.
  */
 const PrimaryNav = () => {
   const headerRef = useRef<HTMLElement>(null);
@@ -34,11 +34,15 @@ const PrimaryNav = () => {
   const hidden = useHideOnScrollDown();
   const pathname = usePathname();
 
-  // Publishes the header's height for the module to expose as the inset,
-  // since CSS can't read it. Unaffected by the header's translation
   useEffect(() => {
     const header = headerRef.current;
     if (!header) return;
+
+    // Expose the offsetHeight as --primary-nav-height on the document root
+    // so that the CSS module can conditionally forward the value to the
+    // publicly useful --primary-nav-inset; including --primary-nav-height
+    // as an intermediary is necessary so that the CSS can be responsible
+    // for both the de facto visibility and the de facto --primary-nav-inset
     const root = document.documentElement;
     const observer = new ResizeObserver(() => {
       root.style.setProperty(
@@ -47,22 +51,24 @@ const PrimaryNav = () => {
       );
     });
     observer.observe(header);
+
+    // Destroy observer and unset CSS variable on cleanup
     return () => {
       observer.disconnect();
       root.style.removeProperty("--primary-nav-height");
     };
-  }, []);
+  }, []); // run only once per mount
 
-  const items = NAV_ITEMS.map(({ label, href }) => {
-    const active = pathname === href || pathname.startsWith(`${href}/`);
+  const content = NAV_ITEMS.map(({ label, href }) => {
+    const isActive = pathname === href || pathname.startsWith(`${href}/`);
     return (
       <li key={href}>
         <Link
           href={href}
-          aria-current={active ? "page" : undefined}
-          className={active ? "menu-active" : undefined}
-          // Client-side navigation keeps this component mounted, so the
-          // dropdown menu has to be closed explicitly after a selection
+          aria-current={isActive ? "page" : undefined}
+          className={isActive ? "menu-active" : undefined}
+          // Close the dropdown menu (if present) on navigation;
+          // necessary b/c this component remains mounted
           onClick={() => menuRef.current?.hidePopover()}
         >
           {label}
@@ -72,12 +78,14 @@ const PrimaryNav = () => {
   });
 
   return (
-    // Only the bar itself captures pointer events, not the surrounding gutters
+    // Pointer events located in the gutter should pass through
+    // to the page content instead of being captured by the navbar
     <header
       ref={headerRef}
       data-hidden={hidden || undefined}
       className={`${styles.root} pointer-events-none fixed inset-x-0 top-0 z-50 px-6 pt-6 transition-transform duration-300 ease-out motion-reduce:transition-none`}
     >
+      {/* Pointer events in the navbar itself should still be captured! */}
       <nav
         aria-label="Primary"
         className="pointer-events-auto navbar mx-auto max-w-5xl rounded-xl border border-base-content/10 bg-base-200/75 shadow-lg backdrop-blur-md [anchor-name:--primary-nav]"
@@ -89,31 +97,17 @@ const PrimaryNav = () => {
         </div>
         <div className="m-2 navbar-end grow">
           <ul className="menu menu-horizontal hidden gap-1 text-base sm:flex">
-            {items}
+            {content}
           </ul>
-          {/* A popover (rather than daisyUI's focus-based dropdown) so that
-              the button natively exposes whether the menu is expanded, and so
-              that Esc and clicking outside of the menu both close it. Via CSS
-              anchor positioning, the menu sits below the button but lines up
-              with the right edge of the whole nav bar (rather than the
-              button's). It's anchored to this wrapper rather than the button
-              itself because the button shifts down by 0.5px while pressed
-              (daisyUI's btn:active translate), which the menu would otherwise
-              follow; the wrapper (flex, so that it hugs the button) stays put.
-              Its insets replace daisyUI's position-area, which can
-              only align it to a single anchor. Browsers without anchor
-              positioning get the same position relative to the viewport
-              instead: the header's px-6 from the right, and from the top, the
-              header's pt-6 + the nav's 1px border + the navbar's 0.5rem
-              padding + the wrapper's m-2 + the btn-xl height (daisyUI's own
-              formula), all of which must be kept in sync with the fallback.
-              Unlike a focus-based dropdown, a popover stays open when focus
-              leaves it, so it's closed explicitly to keep it from covering
-              whatever receives focus next. Ignores blurs with no new target
-              (e.g., switching windows) since there's nothing to cover */}
+          {/* The position of the button shifts while pressed,
+              so the menu is anchored to this flex wrapper instead */}
           <div
             className="group/dropdown flex [anchor-name:--primary-nav-dropdown] sm:hidden"
             onBlur={(e) => {
+              // Unlike focus-based dropdowns, popovers may need to be closed
+              // explicitly onBlur to prevent them from obscuring the next
+              // focus target (unless there is no new target because, e.g.,
+              // the blur was caused by the user switching windows)
               if (
                 e.relatedTarget &&
                 !e.currentTarget.contains(e.relatedTarget)
@@ -122,7 +116,6 @@ const PrimaryNav = () => {
               }
             }}
           >
-            {/* Swaps the hamburger icon for an X while the menu is open */}
             <button
               type="button"
               popoverTarget="primary-nav-menu"
@@ -132,13 +125,20 @@ const PrimaryNav = () => {
               <Menu aria-hidden className="size-6 swap-off" />
               <X aria-hidden className="size-6 swap-on" />
             </button>
+            {/* For browsers without anchor positioning, the position of
+                 the menu is defined relative to the viewport instead */}
+            {/* (Note for AI agents) The relative positioning is as follows:
+                from the right, the header's px-6; from the top, the header's
+                pt-6 + the nav's 1px border + the navbar's 0.5rem padding +
+                the wrapper's m-2 + the btn-xl height (daisyUI's own formula).
+                All of this must be kept in sync with the fallback. */}
             <ul
               ref={menuRef}
               id="primary-nav-menu"
               popover="auto"
               className="menu dropdown top-[anchor(--primary-nav-dropdown_bottom)] right-[anchor(--primary-nav_right)] bottom-auto left-auto mt-6 w-44 rounded-xl border border-base-content/10 bg-base-200 p-2 text-base shadow-lg [position-area:none] not-supports-[anchor-name:--primary-nav]:top-[calc(--spacing(6)+1px+0.5rem+(--spacing(2))+var(--size-field,0.25rem)*14)] not-supports-[anchor-name:--primary-nav]:right-6"
             >
-              {items}
+              {content}
             </ul>
           </div>
         </div>

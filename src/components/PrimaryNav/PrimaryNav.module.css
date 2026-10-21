@@ -1,14 +1,18 @@
-/* Whether the header is out of view is decided here alone. These two rules
-   cover complementary states, so keep their conditions in sync */
-
-/* Slides out of view after the user scrolls down, unless keyboard focus is
-   inside it or its menu is open */
+/*
+ * IF useHideOnScrollDown says the PrimaryNav should be hidden...
+ * AND PrimaryNav does not have keyboard focus...
+ * AND the dropdown menu is not open...
+ * THEN hide the PrimaryNav
+ */
 .root[data-hidden]:not(:has(:focus-visible, :popover-open)) {
   translate: 0 calc(-100% - 1rem);
 }
 
-/* Otherwise, tells the page how far down the viewport it reaches. Written with
-   descendant selectors since :has() can't be nested inside of :has() */
+/*
+ * IF (the exact opposite of the above)...
+ * THEN expose the offsetHeight as --primary-nav-inset on the document root;
+ * descendent selectors are used b/c :has() cannot be nested
+ */
 :root:has(.root:not([data-hidden]), .root :focus-visible, .root :popover-open) {
   --primary-nav-inset: var(--primary-nav-height);
 }
