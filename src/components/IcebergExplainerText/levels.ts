@@ -22,7 +22,7 @@ export type Level = {
   concepts: string[];
 
   /**
-   * A label for the metaphorical depth of this Level (e.g., "-30 m").
+   * A label for the metaphorical depth of this Level.
    * Displayed in a small monospace font above the name.
    */
   depth: string;

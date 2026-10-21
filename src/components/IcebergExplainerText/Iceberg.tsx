@@ -2,7 +2,6 @@ import { useId } from "react";
 import { NUM_LEVELS } from "./levels";
 
 /*
- * IMPORTANT:
  * The iceberg is drawn on an SVG canvas with fixed, non-pixel units.
  * It is stretched over the entire sliding strip prior to rasterization,
  * meaning that its aspect ratio is NOT preserved.

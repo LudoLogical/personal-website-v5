@@ -96,25 +96,25 @@ export const levels: Levels = [
     name: "Events",
     question: "What happened?",
     concepts: ["confused users", "site crashes", "dev slowdowns"],
-    depth: "0 m",
+    depth: "Lv. 1",
   },
   {
     name: "Patterns",
     question: "Why do those events keep happening?",
     concepts: ["unwieldy UI", "traffic spikes", "technical debt"],
-    depth: "-30 m",
+    depth: "Lv. 2",
   },
   {
     name: "Structures",
     question: "What bolsters those patterns?",
     concepts: ["design systems", "tech stacks", "policies", "practices"],
-    depth: "-90 m",
+    depth: "Lv. 3",
   },
   {
     name: "Mental Models",
     question: "Why are those structures in place?",
     concepts: ["assumptions", "values", "heuristics", "instincts"],
-    depth: "-200 m",
+    depth: "Lv. 4",
   },
 ];
 
