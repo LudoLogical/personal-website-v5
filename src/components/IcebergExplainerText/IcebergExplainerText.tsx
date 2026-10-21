@@ -19,64 +19,58 @@ export type IcebergExplainerTextProps = {
   levels: Levels;
 
   /**
-   * Classes for the container `<span>` of this IcebergExplainerText.
-   * Inherited by the text and the scrub indicator.
-   */
-  className?: string;
-
-  /**
    * Classes for the child elements of this IcebergExplainerText.
-   * Each is applied after (and so takes precedence over) the element's own.
+   * Applied after (and thus take precedence over) internal defaults.
    */
   childClassNames?: {
     /**
      * Classes for the scrub indicator that appears beneath the hoverable text
-     * and marks the bounds of the region that causes the active Level to be
-     * displayed.
+     * and marks the bounds of the hovered region that causes the active Level
+     * to be displayed.
      */
     scrub?: string;
 
     /**
      * Classes for the explainer card in which the Levels are displayed.
-     * Inherited by the text in every Level panel. Sets the card's width,
-     * which defaults to `w-82.5` (330px).
+     * Inherited by the text in every Level panel. May be used to set the
+     * width of the card (defaults to 330px).
      */
     card?: string;
 
     /**
-     * Classes for the depth marker that slides along the depth
-     * rail to indicate which Level is currently displayed.
+     * Classes for the depth marker that slides along the rail
+     * on the left side of the explainer card to indicate which
+     * Level is currently being displayed.
      */
     marker?: string;
 
     /**
      * Classes for each of the Level panels.
-     * Applied after the panel's background classes. The card is exactly as
-     * tall as a single panel, so vertical padding here sets its height.
+     * Vertical padding here changes the height of the explainer card.
      */
     panel?: string;
 
     /**
-     * Classes for the text in each of the Level panels.
+     * Classes for the text in each of the Levels.
      */
     text?: {
       /**
-       * Classes for the depth text in each of the Level panels.
+       * Classes for the depth text in each of the Levels.
        */
       depth?: string;
 
       /**
-       * Classes for the name text in each of the Level panels.
+       * Classes for the name text in each of the Levels.
        */
       name?: string;
 
       /**
-       * Classes for the question text in each of the Level panels.
+       * Classes for the question text in each of the Levels.
        */
       question?: string;
 
       /**
-       * Classes for the concepts text in each of the Level panels.
+       * Classes for the concepts text in each of the Levels.
        */
       concepts?: string;
     };
@@ -130,7 +124,7 @@ export type IcebergExplainerTextProps = {
       indicatorSlideDuration?: number;
 
       /**
-       * The duration, in seconds, over which the panels and the depth
+       * The duration, in seconds, over which the Level panels and the depth
        * marker should scroll to their respective positions corresponding
        * to the active Level.
        */
@@ -177,30 +171,32 @@ export const DEFAULT_OPTIONS: IcebergExplainerTextOptions = {
 const CARD_RISE_DISTANCE = 6;
 
 /**
- * The minimum distance, in pixels, that the explainer card
- * keeps from either edge of the viewport whenever it fits.
+ * The minimum distance, in pixels, that should be maintained between
+ * the explainer card and both edges of the viewport whenever possible.
  */
 const CARD_VIEWPORT_MARGIN = 16;
 
 /**
- * Determines how far the explainer card must be shifted horizontally from its
- * default position (centered beneath the hoverable text) so that it stays
- * CARD_VIEWPORT_MARGIN away from both edges of the viewport. If the viewport
- * is too narrow for that, the card is centered within the viewport instead.
+ * Calculates the distance by which the explainer card must be shifted
+ * horizontally from its default position (centered beneath the hoverable text)
+ * to ensure that it remains at least CARD_VIEWPORT_MARGIN pixels away from
+ * both edges of the viewport. If the viewport is too narrow to support that
+ * margin, the horizontal shift centers the card within the viewport instead.
  * @param textRect the bounding rectangle of the hoverable text
  * @param cardWidth the width, in pixels, of the explainer card
  * @returns the horizontal shift, in pixels
  */
 const getCardShift = (textRect: DOMRect, cardWidth: number) => {
   const viewportWidth = document.documentElement.clientWidth;
+  // The default position of the left edge of the explainer card
   const centeredLeft = textRect.left + (textRect.width - cardWidth) / 2;
   const minLeft = CARD_VIEWPORT_MARGIN;
   const maxLeft = viewportWidth - CARD_VIEWPORT_MARGIN - cardWidth;
-  const left =
+  const clampedLeft =
     minLeft <= maxLeft
       ? Math.min(Math.max(centeredLeft, minLeft), maxLeft)
       : (viewportWidth - cardWidth) / 2;
-  return left - centeredLeft;
+  return clampedLeft - centeredLeft;
 };
 
 /**
@@ -235,14 +231,13 @@ const SCRUB_CURVE = "cubic-bezier(.2,.7,.2,1)";
  * backgrounds of all four Levels, which get progressively darker from top
  * to bottom. Motionless if the user `prefers-reduced-motion`.
  *
- * On touch screens, tapping a region of the text displays the corresponding
- * Level, dragging horizontally across the text scrubs through the Levels,
- * and tapping anywhere else dismisses the card.
+ * On touch screens, tapping a region of the text displays the card and the
+ * corresponding Level, dragging horizontally across the text scrubs through
+ * the Levels, and tapping anywhere else dismisses the card.
  */
 const IcebergExplainerText = ({
   text,
   levels,
-  className,
   childClassNames,
   options,
 }: IcebergExplainerTextProps) => {
@@ -281,8 +276,9 @@ const IcebergExplainerText = ({
       Math.min(0.999, Math.max(0, xFraction)) * NUM_LEVELS,
     );
     if (targetLevel === currentLevel) return;
-    // Measured as the card appears to keep it from hanging off the viewport
     if (currentLevel === null) {
+      // It's okay to getCardShift only when the card appears because the
+      // viewport almost certainly won't be resized while the card is visible
       setCardShift(getCardShift(rect, cardRef.current?.offsetWidth ?? 0));
     }
     setCurrentLevel(targetLevel);
@@ -291,7 +287,7 @@ const IcebergExplainerText = ({
   const scrollTransition = `${animation.scrollDuration}s ${SCROLL_CURVE}`;
 
   // The top edge of depth marker belongs markerTopPercent of the way down
-  // the depth rail, plus markerTopOffset, so we use CSS `calc()` later
+  // the depth rail *plus* markerTopOffset, so we use CSS `calc()` later
   const markerProgress = (currentLevel ?? 0) / (NUM_LEVELS - 1);
   const markerTopPercent = markerProgress * 100;
   const markerTopOffset =
@@ -299,9 +295,6 @@ const IcebergExplainerText = ({
     markerProgress * (2 * DEPTH_RAIL_INSET + DEPTH_MARKER_SIZE);
 
   // Using spans allows this component to exist inside of an h1, p, a, etc.
-  // touch-pan-y lets horizontal drags scrub (rather than pan) on touch
-  // screens. Touch pointers are captured by the text, so drags that stray
-  // off of it keep scrubbing (clamped) and don't count as taps outside of it
   return (
     <span
       ref={rootRef}
@@ -309,14 +302,12 @@ const IcebergExplainerText = ({
       onPointerUp={(e) => {
         if (isTouchEvent(e)) scrubTo(e);
       }}
-      // Touch pointers leave once lifted, which shouldn't dismiss the card
       onPointerLeave={(e) => {
+        // Merely finishing a tap shouldn't dismiss the card
         if (!isTouchEvent(e)) setCurrentLevel(null);
       }}
-      className={twMerge(
-        "relative z-20 inline-block cursor-default touch-pan-y",
-        className,
-      )}
+      // touch-pan-y so touch screen users can scrub by dragging horizontally
+      className="relative z-20 inline-block cursor-default touch-pan-y"
     >
       <span className="block leading-none">{text}</span>
 
@@ -332,9 +323,9 @@ const IcebergExplainerText = ({
           height: `${appearance.indicatorThickness}em`,
           left: `${((currentLevel ?? 0) * 100) / NUM_LEVELS}%`,
           opacity: currentLevel === null ? 0 : 1,
-          // Fades in step with the card
           transition: [
             `left ${animation.indicatorSlideDuration}s ${SCRUB_CURVE}`,
+            // Fades in step with the explainer card
             `opacity ${animation.cardFadeDuration}s ease`,
           ].join(", "),
         }}

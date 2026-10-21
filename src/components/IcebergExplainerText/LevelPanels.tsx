@@ -103,7 +103,7 @@ const LevelPanels = ({
             key={i}
             className={twMerge(
               // *:relative lets the children go above the iceberg
-              "flex flex-col gap-1 px-4 py-3 whitespace-nowrap *:relative",
+              "flex flex-col gap-1 px-4 pt-3 pb-4 whitespace-nowrap *:relative",
               LEVEL_CLASS_NAMES[i],
               panelClassName,
             )}

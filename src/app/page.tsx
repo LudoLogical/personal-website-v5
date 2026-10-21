@@ -113,7 +113,6 @@ export default function Home() {
                         childClassNames={{
                           scrub: "xs:-bottom-1",
                           card: "xs:w-91",
-                          panel: "pb-4.75 xs:pb-4.5",
                           text: {
                             depth: "xs:text-xs",
                             question: "xs:text-sm",

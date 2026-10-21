@@ -104,7 +104,7 @@ const FADE_DURATION = 0.25;
  * (or circle) is dimmed until this component unmounts to indicate
  * that it has been visited.
  *
- * On touch screens, visibility of the line (or circle)
+ * On touch screens, the visibility of the line (or circle)
  * toggles on tap and the first tap always counts as a visit.
  */
 const HoverOrTapAffordance = ({
