@@ -33,8 +33,7 @@ import {
 
 export const metadata: Metadata = {
   title: 'Resume | Daniel "Ludo" DeAnda',
-  description:
-    'The resume of Daniel "Ludo" DeAnda: Software Engineer, Systems Thinker, and Sense-Maker',
+  // description: '', TODO
 };
 
 /**
