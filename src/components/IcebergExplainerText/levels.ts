@@ -39,14 +39,3 @@ export type Levels = [Level, Level, Level, Level];
  * The number of Levels in an IcebergExplainerText.
  */
 export const NUM_LEVELS: Levels["length"] = 4;
-
-/**
- * The background and text color classes for each Level's panel,
- * in order from top (the surface) to bottom (the deepest level).
- */
-export const LEVEL_CLASS_NAMES: [string, string, string, string] = [
-  "bg-blue-200 text-blue-950",
-  "bg-blue-400 text-blue-950",
-  "bg-blue-700 text-blue-50",
-  "bg-blue-950 text-blue-100",
-];

@@ -176,8 +176,8 @@ type IcebergProps = {
   height: number;
 
   /**
-   * The position, in pixels from the top of the sliding strip, of the
-   * surface of the water. Used to shift the vertical position of the entire
+   * The position, in pixels from the top of the sliding strip, of the surface
+   * of the water. Also used to shift the vertical position of the entire
    * iceberg so that it aligns with the waterline as it was originally drawn
    * to do. If null, the original positioning is used without any shifting.
    */

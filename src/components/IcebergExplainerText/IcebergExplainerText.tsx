@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
-import { useGapMidpoint } from "@/utils/useGapMidpoint";
 import { useTapOutside } from "@/utils/useTapOutside";
-import Iceberg from "./Iceberg";
-import { LEVEL_CLASS_NAMES, NUM_LEVELS, type Levels } from "./levels";
+import LevelPanels from "./LevelPanels";
+import { NUM_LEVELS, type Levels } from "./levels";
 
 export type IcebergExplainerTextProps = {
   /**
@@ -233,8 +232,8 @@ const SCRUB_CURVE = "cubic-bezier(.2,.7,.2,1)";
  * an "iceberg" model. Scrubbing horizontally across the display text causes
  * the card to "descend" through the specified Levels, each of which takes up
  * the full card when displayed. A single low-poly iceberg SVG spans the
- * backgrounds of all four Levels, the backgrounds of which get progressively
- * darker from top to bottom. Motionless if the user `prefers-reduced-motion`.
+ * backgrounds of all four Levels, which get progressively darker from top
+ * to bottom. Motionless if the user `prefers-reduced-motion`.
  *
  * On touch screens, tapping a region of the text displays the corresponding
  * Level, dragging horizontally across the text scrubs through the Levels,
@@ -265,32 +264,11 @@ const IcebergExplainerText = ({
 
   const rootRef = useRef<HTMLSpanElement>(null);
   const cardRef = useRef<HTMLSpanElement>(null);
-  const stripRef = useRef<HTMLSpanElement>(null);
 
-  const [level, setLevel] = useState<number | null>(null);
+  const [currentLevel, setCurrentLevel] = useState<number | null>(null);
   const [cardShift, setCardShift] = useState(0);
 
-  // Position the waterline exactly halfway between the question and concepts
-  const questionRef = useRef<HTMLSpanElement>(null);
-  const conceptsRef = useRef<HTMLSpanElement>(null);
-  const waterline = useGapMidpoint(questionRef, conceptsRef);
-
-  // The strip's height follows from the panels' natural heights, so the card
-  // can be sized to show exactly one panel. Unaffected by the strip's
-  // translation, and the card's size never feeds back into the strip's
-  const [stripHeight, setStripHeight] = useState<number | null>(null);
-  useEffect(() => {
-    const strip = stripRef.current;
-    if (!strip) return;
-    const observer = new ResizeObserver(() =>
-      setStripHeight(strip.offsetHeight),
-    );
-    observer.observe(strip);
-    return () => observer.disconnect();
-  }, []);
-  const panelHeight = stripHeight === null ? null : stripHeight / NUM_LEVELS;
-
-  useTapOutside(rootRef, level !== null, () => setLevel(null));
+  useTapOutside(rootRef, currentLevel !== null, () => setCurrentLevel(null));
 
   const isTouchEvent = (e: PointerEvent) => e.pointerType === "touch";
 
@@ -299,22 +277,22 @@ const IcebergExplainerText = ({
     // The width of the hoverable text is divided evenly among the Levels
     const xFraction = (event.clientX - rect.left) / rect.width;
     const targetLevel = Math.floor(
-      // Clamp xFraction within [0, 1) so that right edge maps to 3 and not 4
+      // Clamp xFraction to [0, 1) so that right edge maps to 3 and not 4
       Math.min(0.999, Math.max(0, xFraction)) * NUM_LEVELS,
     );
-    if (targetLevel === level) return;
+    if (targetLevel === currentLevel) return;
     // Measured as the card appears to keep it from hanging off the viewport
-    if (level === null) {
+    if (currentLevel === null) {
       setCardShift(getCardShift(rect, cardRef.current?.offsetWidth ?? 0));
     }
-    setLevel(targetLevel);
+    setCurrentLevel(targetLevel);
   };
 
   const scrollTransition = `${animation.scrollDuration}s ${SCROLL_CURVE}`;
 
   // The top edge of depth marker belongs markerTopPercent of the way down
   // the depth rail, plus markerTopOffset, so we use CSS `calc()` later
-  const markerProgress = (level ?? 0) / (NUM_LEVELS - 1);
+  const markerProgress = (currentLevel ?? 0) / (NUM_LEVELS - 1);
   const markerTopPercent = markerProgress * 100;
   const markerTopOffset =
     DEPTH_RAIL_INSET -
@@ -333,7 +311,7 @@ const IcebergExplainerText = ({
       }}
       // Touch pointers leave once lifted, which shouldn't dismiss the card
       onPointerLeave={(e) => {
-        if (!isTouchEvent(e)) setLevel(null);
+        if (!isTouchEvent(e)) setCurrentLevel(null);
       }}
       className={twMerge(
         "relative z-20 inline-block cursor-default touch-pan-y",
@@ -352,8 +330,8 @@ const IcebergExplainerText = ({
         style={{
           width: `${100 / NUM_LEVELS}%`,
           height: `${appearance.indicatorThickness}em`,
-          left: `${((level ?? 0) * 100) / NUM_LEVELS}%`,
-          opacity: level === null ? 0 : 1,
+          left: `${((currentLevel ?? 0) * 100) / NUM_LEVELS}%`,
+          opacity: currentLevel === null ? 0 : 1,
           // Fades in step with the card
           transition: [
             `left ${animation.indicatorSlideDuration}s ${SCRUB_CURVE}`,
@@ -372,8 +350,8 @@ const IcebergExplainerText = ({
         )}
         style={{
           top: `calc(100% + ${appearance.cardGap}px)`,
-          opacity: level === null ? 0 : 1,
-          transform: `translate(calc(-50% + ${cardShift}px), ${level === null ? -CARD_RISE_DISTANCE : 0}px)`,
+          opacity: currentLevel === null ? 0 : 1,
+          transform: `translate(calc(-50% + ${cardShift}px), ${currentLevel === null ? -CARD_RISE_DISTANCE : 0}px)`,
           transition: [
             `opacity ${animation.cardFadeDuration}s ease`,
             `transform ${animation.cardRiseDuration}s ease`,
@@ -387,6 +365,7 @@ const IcebergExplainerText = ({
             className="absolute left-1/2 w-0.5 -translate-x-1/2 bg-base-content/20"
             style={{ top: DEPTH_RAIL_INSET, bottom: DEPTH_RAIL_INSET }}
           />
+
           {/* Marker */}
           <span
             className={twMerge(
@@ -402,72 +381,13 @@ const IcebergExplainerText = ({
           />
         </span>
 
-        {/* Sliding strip of Level panels, shown one panel at a time */}
-        <span
-          className="flex-1 overflow-hidden"
-          style={{ height: panelHeight ?? undefined }}
-        >
-          {/* auto-rows-fr makes every panel as tall as the tallest one */}
-          <span
-            ref={stripRef}
-            className="relative grid auto-rows-fr motion-reduce:transition-none!"
-            style={{
-              transform: `translateY(${(-(level ?? 0) * 100) / NUM_LEVELS}%)`,
-              transition: `transform ${scrollTransition}`,
-            }}
-          >
-            {stripHeight !== null && (
-              <Iceberg height={stripHeight} waterline={waterline} />
-            )}
-            {levels.map(({ depth, name, question, concepts }, i) => (
-              <span
-                key={i}
-                className={twMerge(
-                  // *:relative lets children go above the iceberg
-                  "flex flex-col gap-1 px-4 py-3 whitespace-nowrap *:relative",
-                  LEVEL_CLASS_NAMES[i],
-                  childClassNames?.panel,
-                )}
-              >
-                <span
-                  className={twMerge(
-                    "font-mono text-[10px]",
-                    childClassNames?.text?.depth,
-                  )}
-                >
-                  {depth}
-                </span>
-                <span
-                  className={twMerge(
-                    "text-lg font-bold",
-                    childClassNames?.text?.name,
-                  )}
-                >
-                  {name}
-                </span>
-                {/* Refs go on the first panel only */}
-                <span
-                  ref={i === 0 ? questionRef : undefined}
-                  className={twMerge(
-                    "text-xs italic",
-                    childClassNames?.text?.question,
-                  )}
-                >
-                  {question}
-                </span>
-                <span
-                  ref={i === 0 ? conceptsRef : undefined}
-                  className={twMerge(
-                    "text-xs",
-                    childClassNames?.text?.concepts,
-                  )}
-                >
-                  {concepts.join(" · ")}
-                </span>
-              </span>
-            ))}
-          </span>
-        </span>
+        <LevelPanels
+          levels={levels}
+          currentLevel={currentLevel ?? 0}
+          scrollTransition={scrollTransition}
+          panelClassName={childClassNames?.panel}
+          textClassNames={childClassNames?.text}
+        />
       </span>
     </span>
   );

@@ -44,7 +44,7 @@ export const useTextDimensions = (
 
     const observer = new ResizeObserver(readTextDims);
     observer.observe(target);
-    return () => observer.disconnect(); // Destroy observer on cleanup
+    return () => observer.disconnect(); // destroy observer on cleanup
   }, [ref]);
 
   return textDims;

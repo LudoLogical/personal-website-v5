@@ -43,7 +43,7 @@ export const useGapMidpoint = (
     ]);
 
     for (const element of siblings) observer.observe(element);
-    return () => observer.disconnect(); // Destroy observer on cleanup
+    return () => observer.disconnect(); // destroy observer on cleanup
   }, [upperRef, lowerRef]);
 
   return midpoint;
