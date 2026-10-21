@@ -33,6 +33,10 @@
   /* Rounds the bottom corners of the page where it meets the footer */
   --radius-paper: 2rem;
 
+  /* Casts a deep shadow from the bottom of the page onto the footer to
+     suggest that the page lies on top of it */
+  --shadow-paper: 0 24px 48px -8px rgb(0 0 0 / 0.85);
+
   /* Gently bobs an element up and down by 15% of its own height */
   --animate-bob: bob 1.6s ease-in-out infinite;
 
