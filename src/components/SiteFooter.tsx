@@ -65,9 +65,6 @@ const LINK_GROUPS: FooterLinkGroup[] = [
   },
 ];
 
-const linkClassName =
-  "inline-flex items-center gap-2 transition-colors hover:text-base-content/85";
-
 /**
  * Renders the site-wide footer. Sticks to the bottom of the viewport so that
  * it is revealed as the page above it scrolls away to suggest that the footer
@@ -99,7 +96,7 @@ const SiteFooter = () => (
         <h2 className="footer-title">{title}</h2>
         {links.map(({ label, href, icon: Icon }) => {
           return (
-            <ExternalLink key={label} href={href} className={linkClassName}>
+            <ExternalLink key={label} kind="highlight" href={href}>
               <Icon aria-hidden className="size-4" />
               {label}
             </ExternalLink>

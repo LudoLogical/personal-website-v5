@@ -31,7 +31,7 @@ import {
   SiReact,
   SiTypescript,
 } from "react-icons/si";
-import InlineExternalLink from "./InlineExternalLink";
+import ExternalLink from "@/components/ExternalLink";
 
 // The content of the resume page, which mirrors (and should be kept in sync
 // with) public/resume-daniel-ludo-deanda.pdf. Every list is displayed in the
@@ -328,9 +328,12 @@ export const experience: Experience[] = [
       logo: "/logos/nsr.png",
     },
     context: (
-      <InlineExternalLink href="https://hcii.cmu.edu/academics/mhci/capstone">
+      <ExternalLink
+        kind="underline"
+        href="https://hcii.cmu.edu/academics/mhci/capstone"
+      >
         MHCI Capstone
-      </InlineExternalLink>
+      </ExternalLink>
     ),
     location: "Pittsburgh, Pennsylvania",
     start: "2026-01",
@@ -525,13 +528,19 @@ export const education: Education[] = [
     notes: (
       <>
         Graduated <em>summa cum laude</em> w/ additional major (
-        <InlineExternalLink href="https://cs.utdallas.edu/education/computing-scholars-honors-program/">
+        <ExternalLink
+          kind="underline"
+          href="https://cs.utdallas.edu/education/computing-scholars-honors-program/"
+        >
           CS²
-        </InlineExternalLink>
+        </ExternalLink>
         ) and university (
-        <InlineExternalLink href="https://honors.utdallas.edu/collegium-v/">
+        <ExternalLink
+          kind="underline"
+          href="https://honors.utdallas.edu/collegium-v/"
+        >
           Collegium V
-        </InlineExternalLink>
+        </ExternalLink>
         ) honors
       </>
     ),

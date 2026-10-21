@@ -80,7 +80,7 @@ const randomDistinctInteger = (
  * While active, the root element carries a `data-speaking`
  * attribute so that surrounding content can react.
  */
-const SpokenTips = ({ children, tips }: SpokenTipsProps) => {
+const SpokenTips = ({ tips, children }: SpokenTipsProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
 

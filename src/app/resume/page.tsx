@@ -15,7 +15,6 @@ import type { ComponentType, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import Expandable from "@/components/Expandable";
 import ExternalLink from "@/components/ExternalLink";
-import InlineExternalLink from "./InlineExternalLink";
 import {
   type CaseStudyLink,
   type Education,
@@ -128,7 +127,13 @@ const OrgName = ({
 }: {
   organization: Organization;
 }) =>
-  href ? <InlineExternalLink href={href}>{name}</InlineExternalLink> : name;
+  href ? (
+    <ExternalLink kind="underline" href={href}>
+      {name}
+    </ExternalLink>
+  ) : (
+    name
+  );
 
 /**
  * The classes that every rendition of a skill shares so that highlighted
@@ -250,7 +255,7 @@ const WorkLinks = ({
       ))}
       {links.map(({ label, href }) => (
         <li key={href}>
-          <ExternalLink href={href} className="btn btn-soft text-sm btn-sm">
+          <ExternalLink kind="button" href={href}>
             {label}
           </ExternalLink>
         </li>
@@ -446,7 +451,9 @@ const EducationEntry = ({
     <EntryHeader
       title={
         href ? (
-          <InlineExternalLink href={href}>{degree}</InlineExternalLink>
+          <ExternalLink kind="underline" href={href}>
+            {degree}
+          </ExternalLink>
         ) : (
           degree
         )
@@ -472,7 +479,9 @@ const RecognitionList = ({ items }: { items: Recognition[] }) => (
         <div className="flex min-w-0 flex-col gap-0.5 text-sm text-base-content/70">
           <h3 className="text-base leading-snug font-bold text-base-content">
             {href ? (
-              <InlineExternalLink href={href}>{title}</InlineExternalLink>
+              <ExternalLink kind="underline" href={href}>
+                {title}
+              </ExternalLink>
             ) : (
               title
             )}

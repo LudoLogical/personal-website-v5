@@ -108,7 +108,6 @@ const FADE_DURATION = 0.25;
  * toggles on tap and the first tap always counts as a visit.
  */
 const HoverOrTapAffordance = ({
-  children,
   shape = "underline",
   inline = false,
   className,
@@ -116,6 +115,7 @@ const HoverOrTapAffordance = ({
   fadeInDelay = 0,
   fadeInOnTapOutside = false,
   fadeInOnTapInside = true,
+  children,
 }: HoverOrTapAffordanceProps) => {
   const rootRef = useRef<HTMLDivElement & HTMLSpanElement>(null);
   const [active, setActive] = useState(false);

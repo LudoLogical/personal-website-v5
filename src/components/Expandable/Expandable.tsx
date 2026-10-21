@@ -51,7 +51,7 @@ export type ExpandableProps = {
  * Because `data-extra` elements are hidden through CSS,
  * their content can be rendered by server compnonents.
  */
-const Expandable = ({ children, labels, className }: ExpandableProps) => {
+const Expandable = ({ labels, className, children }: ExpandableProps) => {
   const [expanded, setExpanded] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const contentId = useId();
