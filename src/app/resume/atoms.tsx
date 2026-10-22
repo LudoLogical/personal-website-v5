@@ -3,18 +3,27 @@ import { twMerge } from "tailwind-merge";
 import ExternalLink from "@/components/ExternalLink";
 import type { Organization, Skill } from "./types";
 
+export type OrgLogoProps = {
+  /**
+   * The Organization whose logo is to be rendered in this OrgLogo.
+   */
+  organization: Organization;
+
+  /**
+   * Classes for the container `<div>` of this OrgLogo. Used to set its size.
+   */
+  className?: string;
+};
+
 /**
- * Renders an organization's logo (or initials, if it has no logo) masked to
- * a squircle. Hidden from assistive technology since the organization's name
- * is always displayed alongside it.
+ * Renders the logo (or initials, if no logo exists) of the specified
+ * Organization in a squircle. Hidden from ATs because the name of the
+ * Organization should always be displayed alongside it.
  */
 export const OrgLogo = ({
   organization: { name, logo },
   className,
-}: {
-  organization: Organization;
-  className?: string;
-}) => (
+}: OrgLogoProps) => (
   <div
     aria-hidden
     className={twMerge(
@@ -42,14 +51,18 @@ export const OrgLogo = ({
   </div>
 );
 
-/**
- * Renders an organization's name, linked to its website if it has one.
- */
-export const OrgName = ({
-  organization: { name, href },
-}: {
+export type OrgNameProps = {
+  /**
+   * The Organization whose name is to be rendered in this OrgName.
+   */
   organization: Organization;
-}) =>
+};
+
+/**
+ * Renders the name of the specified Organization,
+ * linked to its website if it has one.
+ */
+export const OrgName = ({ organization: { name, href } }: OrgNameProps) =>
   href ? (
     <ExternalLink kind="underline" href={href}>
       {name}
@@ -58,40 +71,53 @@ export const OrgName = ({
     name
   );
 
-/**
- * Renders a span of time as on the PDF (e.g., "2025-08 to Present").
- */
-export const DateRange = ({
-  start,
-  end,
-}: {
+export type DateRangeProps = {
+  /**
+   * The date/month on/during which this DateRange should start.
+   */
   start: string;
+
+  /**
+   * The date/month on/during which this DateRange should end.
+   * Defaults to "Present" if omitted.
+   */
   end?: string;
-  className?: string;
-}) => (
+};
+
+/**
+ * Renders the duration defined by the specified start and end dates/months.
+ */
+export const DateRange = ({ start, end }: DateRangeProps) => (
   <span className="text-sm whitespace-nowrap text-base-content/60 tabular-nums">
     <time dateTime={start}>{start}</time> to{" "}
     {end ? <time dateTime={end}>{end}</time> : "Present"}
   </span>
 );
 
-/**
- * Renders a skill as a static chip.
- */
-export const SkillChip = ({
-  skill,
-  className,
-}: {
+export type SkillChipProps = {
+  /**
+   * The Skill to be rendered by this SkillChip.
+   */
   skill: Skill;
-  className?: string;
-}) => {
+
+  /**
+   * True if this SkillChip should be rendered as `badge-lg`,
+   * false otherwise (and by default).
+   */
+  large?: boolean;
+};
+
+/**
+ * Renders the specified Skill as a chip.
+ */
+export const SkillChip = ({ skill, large }: SkillChipProps) => {
   const Icon = skill.icon;
   return (
     <span
       className={twMerge(
         "badge gap-1.5 badge-soft",
         skill.highlighted && "badge-primary",
-        className,
+        large && "badge-lg",
       )}
     >
       <Icon aria-hidden className="size-[1.1em] shrink-0" />

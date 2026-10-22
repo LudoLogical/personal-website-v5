@@ -8,8 +8,8 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import type { ComponentType, ReactNode } from "react";
-import Expandable from "@/components/Expandable";
 import ExternalLink from "@/components/ExternalLink";
+import LabeledExpandable from "@/components/LabeledExpandable";
 import { OrgLogo, OrgName, SkillChip } from "./atoms";
 import {
   type SkillID,
@@ -33,26 +33,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Builds the labels for an Expandable's toggle button,
- * which is omitted if there's nothing extra to show.
- * @param extraCount the number of extra items
- * @param singular the noun for one item (e.g., "role")
- * @param plural the noun for several items (e.g., "roles")
- */
-const expandableLabels = (
-  extraCount: number,
-  singular: string,
-  plural: string,
-) =>
-  extraCount > 0
-    ? {
-        expand: `Show ${extraCount} more ${extraCount === 1 ? singular : plural}`,
-        collapse: `Show fewer ${plural}`,
-      }
-    : undefined;
-
-/**
- * Renders certifications or honors as a grid of compact entries.
+ * Renders the specified Recognitions in a grid.
  */
 const RecognitionList = ({ items }: { items: Recognition[] }) => (
   <ul className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
@@ -83,8 +64,9 @@ const RecognitionList = ({ items }: { items: Recognition[] }) => (
 );
 
 /**
- * Renders a section of the resume. On wide viewports, its heading sits in a
- * column to the left of its content and sticks below the navigation bar.
+ * Renders a section of the resume. On wide viewports, its heading is located
+ * in a column to the left of its content and sticks to the top of the viewport
+ * (but respects the PrimaryNav).
  */
 const Section = ({
   id,
@@ -97,7 +79,6 @@ const Section = ({
   icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
   children: ReactNode;
 }) => (
-  // Scrolled into view with enough room above for the navigation bar
   <section
     id={id}
     aria-labelledby={`${id}-heading`}
@@ -114,7 +95,7 @@ const Section = ({
   </section>
 );
 
-const extraExperienceCount = experience.filter(
+const numExtraExperiences = experience.filter(
   ({ featured }) => !featured,
 ).length;
 
@@ -122,15 +103,14 @@ const lastFeaturedExperienceIndex = experience.findLastIndex(
   ({ featured }) => featured,
 );
 
-// Each group's skills, in order, along with their IDs
 const skillEntries = Object.entries(skills) as [SkillID, Skill][];
 const skillsByGroup = skillGroups.map((group) => ({
   group,
   entries: skillEntries.filter(([, skill]) => skill.group === group),
-}));
+})); // as { group: SkillGroup, entries: [SkillID, Skill][] }[]
 
 const extraSkillCount = skillEntries.filter(
-  ([, { featured }]) => !featured,
+  ([, { featured }]) => !featured, // i.e., [_, { featured }]
 ).length;
 
 export default function Resume() {
@@ -151,9 +131,6 @@ export default function Resume() {
             Systems Thinker, Sense-Maker
           </p>
         </div>
-        {/* A convenience rather than a call to action (since this page already
-            has everything the PDF does), so it's styled like the page's other
-            utility buttons */}
         <a
           href="/resume-daniel-ludo-deanda.pdf"
           download
@@ -165,8 +142,10 @@ export default function Resume() {
       </header>
 
       <Section id="experience" title="Experience" icon={Briefcase}>
-        <Expandable
-          labels={expandableLabels(extraExperienceCount, "role", "roles")}
+        <LabeledExpandable
+          numExtras={numExtraExperiences}
+          singleItemName="role"
+          pluralItemName="roles"
           className="gap-6"
         >
           <Timeline>
@@ -182,7 +161,7 @@ export default function Resume() {
               </TimelineItem>
             ))}
           </Timeline>
-        </Expandable>
+        </LabeledExpandable>
       </Section>
 
       <Section id="education" title="Education" icon={GraduationCap}>
@@ -200,15 +179,17 @@ export default function Resume() {
       </Section>
 
       <Section id="skills" title="Skills" icon={Wrench}>
-        <Expandable
-          labels={expandableLabels(extraSkillCount, "skill", "skills")}
+        <LabeledExpandable
+          numExtras={extraSkillCount}
+          singleItemName="skill"
+          pluralItemName="skills"
           className="gap-8"
         >
           <div className="grid gap-x-10 gap-y-8 md:grid-cols-2">
             {skillsByGroup.map(
               ({ group, entries }) =>
                 entries.length > 0 && (
-                  // A group with no featured skills is extra in its entirety
+                  // If no entries are featured, the whole group is extra
                   <div
                     key={group}
                     data-extra={
@@ -221,7 +202,7 @@ export default function Resume() {
                     <ul className="flex flex-wrap gap-2">
                       {entries.map(([id, skill]) => (
                         <li key={id} data-extra={!skill.featured || undefined}>
-                          <SkillChip skill={skill} className="badge-lg" />
+                          <SkillChip skill={skill} large />
                         </li>
                       ))}
                     </ul>
@@ -229,7 +210,7 @@ export default function Resume() {
                 ),
             )}
           </div>
-        </Expandable>
+        </LabeledExpandable>
       </Section>
 
       <Section id="certifications" title="Certifications" icon={BadgeCheck}>

@@ -36,6 +36,11 @@ export const skillGroups = [
 ] as const;
 
 /**
+ * A group into which Skills can be sorted.
+ */
+export type SkillGroup = (typeof skillGroups)[number];
+
+/**
  * A competency that may or may not be associated with one or more Experiences.
  */
 export type Skill = {
@@ -52,7 +57,7 @@ export type Skill = {
   /**
    * The group to which this Skill belongs and under which it will appear.
    */
-  group: (typeof skillGroups)[number];
+  group: SkillGroup;
 
   /**
    * True if this Skill should always be visible in the "Skills" section of

@@ -8,17 +8,6 @@ import styles from "./Expandable.module.css";
 
 export type ExpandableProps = {
   /**
-   * The content of this Expandable. Any descendant bearing the `data-extra`
-   * attribute stays hidden until this Expandable is expanded, so `data-extra`
-   * and always-visible content can be interwoven (e.g., to keep a list in
-   * chronological order).
-   *
-   * Note: `data-extra` elements use their `transition` property to fade into
-   * view, so avoid overriding that property by wrapping them if necessary.
-   */
-  children: ReactNode;
-
-  /**
    * The labels for the toggle button in this Expandable, or undefined
    * if the toggle button should be omitted (e.g., because there is no
    * extra content to show).
@@ -42,6 +31,17 @@ export type ExpandableProps = {
    * Classes for the root element of this Expandable.
    */
   className?: string;
+
+  /**
+   * The content of this Expandable. Any descendant bearing the `data-extra`
+   * attribute stays hidden until this Expandable is expanded, so `data-extra`
+   * and always-visible content can be interwoven (e.g., to keep a list in
+   * chronological order).
+   *
+   * Note: `data-extra` elements use their `transition` property to fade into
+   * view, so avoid overriding that property by wrapping them if necessary.
+   */
+  children: ReactNode;
 };
 
 /**

@@ -33,8 +33,6 @@ import {
 import ExternalLink from "@/components/ExternalLink";
 import type { Education, Experience, Recognition, Skill } from "./types";
 
-// Every skill, keyed by the ID with which experiences refer to it.
-// Each group lists its skills in the order in which they're written here
 const skillsById = {
   // Engineering
   react: {
@@ -149,10 +147,13 @@ const skillsById = {
   uiUxDesign: { name: "UI/UX Design", icon: PenTool, group: "Design" },
   userResearch: { name: "User Research", icon: ScanSearch, group: "Design" },
 } satisfies Record<string, Skill>;
+// Not `const skillsByID: Record<string, Skill>` because, unlike this approach,
+// that would cause `keyof typeof skillsByID` below to just be `string` instead
+// of the desired union of all the IDs
 
 export type SkillID = keyof typeof skillsById;
 
-// Widened so that every skill can be read as a Skill (with all optional keys)
+// Export the full Record *after* the new type annotation
 export const skills: Record<SkillID, Skill> = skillsById;
 
 export const experience: Experience[] = [
@@ -389,6 +390,7 @@ export const education: Education[] = [
           kind="underline"
           href="https://cs.utdallas.edu/education/computing-scholars-honors-program/"
         >
+          {/* Not <sup> b/c ExternalLink demands a string here */}
           CS²
         </ExternalLink>
         ) and university (

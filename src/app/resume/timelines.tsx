@@ -6,8 +6,8 @@ import { skills } from "./content";
 import type { Education, Experience, Organization } from "./types";
 
 /**
- * Renders a heading row with a title on the left and a span of time on the
- * right (or below, on narrow viewports), like each entry on the PDF.
+ * Renders the specified title to the left of
+ * (or, on narrow viewports, above) the specified time span.
  */
 const EntryHeader = ({
   title,
@@ -24,6 +24,16 @@ const EntryHeader = ({
   </div>
 );
 
+export type ExperienceEntryProps = {
+  /**
+   * The Experience to be rendered in this ExperienceEntry.
+   */
+  entry: Experience;
+};
+
+/**
+ * Renders the specified Experience as the body of a TimelineItem.
+ */
 export const ExperienceEntry = ({
   entry: {
     role,
@@ -38,9 +48,7 @@ export const ExperienceEntry = ({
     links,
     skillIDs,
   },
-}: {
-  entry: Experience;
-}) => (
+}: ExperienceEntryProps) => (
   <article className="flex flex-col gap-4">
     <header>
       <EntryHeader
@@ -58,6 +66,7 @@ export const ExperienceEntry = ({
         <MapPin aria-hidden className="size-3.5 shrink-0" />
         {isRemote ? `Remote (${location})` : location}
       </p>
+
       {formerRoles && (
         <ul className="mt-3 flex flex-col gap-1 border-s-2 border-base-content/10 ps-3 text-sm">
           {formerRoles.map((formerRole) => (
@@ -75,11 +84,13 @@ export const ExperienceEntry = ({
         </ul>
       )}
     </header>
+
     <ul className="flex list-disc flex-col gap-1.5 ps-5 text-base-content/85 marker:text-base-content/30">
       {description.map((highlight, i) => (
         <li key={i}>{highlight}</li>
       ))}
     </ul>
+
     {links && links.length > 0 && (
       <ul
         aria-label="Case studies and work products"
@@ -104,6 +115,7 @@ export const ExperienceEntry = ({
         ))}
       </ul>
     )}
+
     {skillIDs && (
       <ul aria-label="Relevant skills" className="flex flex-wrap gap-1.5">
         {skillIDs.map((id) => (
@@ -116,11 +128,19 @@ export const ExperienceEntry = ({
   </article>
 );
 
+export type EducationEntryProps = {
+  /**
+   * The Education to be rendered in this EducationEntry.
+   */
+  entry: Education;
+};
+
+/**
+ * Renders the specified Education as the body of a TimelineItem.
+ */
 export const EducationEntry = ({
   entry: { degree, href, institution, start, end, description },
-}: {
-  entry: Education;
-}) => (
+}: EducationEntryProps) => (
   <article>
     <EntryHeader
       title={
@@ -142,13 +162,41 @@ export const EducationEntry = ({
   </article>
 );
 
+export type TimelineItemProps = {
+  /**
+   * The Organization whose logo marks this TimelineItem.
+   */
+  organization: Organization;
+
+  /**
+   * True if this TimelineItem should only appear when the Expandable
+   * containing it is expanded (i.e., if it should bear the `data-extra`
+   * attribute), false otherwise (and by default).
+   */
+  extra?: boolean;
+
+  /**
+   * True if this is the last TimelineItem in its parent Timeline that is not
+   * extra (i.e., visible while the Expandable containing it is collapsed),
+   * false otherwise (and by default).
+   */
+  lastFeatured?: boolean;
+
+  /**
+   * True if this is the last TimelineItem in its parent Timeline,
+   * false otherwise (and by default).
+   */
+  last?: boolean;
+
+  /**
+   * The content of this TimelineItem
+   * (currently either an ExperienceEntry or an EducationEntry).
+   */
+  children: ReactNode;
+};
+
 /**
- * Renders an item of a Timeline. Its logo lines up with the top of its
- * content, and the line beneath the logo runs across the Timeline's gap to
- * the next visible item's logo (so the last item gets no line). If extra, the
- * item is hidden until its Expandable is expanded. If it's the last featured
- * item (i.e., every item after it is extra), its line is extra too, so that
- * the line always ends at the last visible item.
+ * Renders a single item in a Timeline.
  */
 export const TimelineItem = ({
   organization,
@@ -156,13 +204,7 @@ export const TimelineItem = ({
   lastFeatured = false,
   last = false,
   children,
-}: {
-  organization: Organization;
-  extra?: boolean;
-  lastFeatured?: boolean;
-  last?: boolean;
-  children: ReactNode;
-}) => (
+}: TimelineItemProps) => (
   <li data-extra={extra || undefined} className="[--timeline-row-start:0]">
     <div className="timeline-middle">
       <OrgLogo organization={organization} className="size-10 sm:size-12" />
@@ -170,11 +212,12 @@ export const TimelineItem = ({
     <div className="timeline-end m-0 ms-4 self-start justify-self-stretch sm:ms-6">
       {children}
     </div>
-    {/* Extended by the Timeline's gap-10 to meet the next item, and aligned
-        to the top of its row so that the extension isn't split between its
-        top and bottom (since daisyUI centers each item's contents) */}
+    {/* Extended by Timeline's gap-10 (and aligned to the top of its flex row)
+        so that it reaches the logo of the next TimelineItem.*/}
     {!last && (
       <hr
+        // Need to hide the line if this is the last TimelineItem overall
+        // *or* the last one visible while collapsed (i.e., lastFeatured)
         data-extra={lastFeatured || undefined}
         className="h-[calc(100%+(--spacing(10)))] w-0.5 self-start bg-base-content/10"
       />
@@ -182,12 +225,19 @@ export const TimelineItem = ({
   </li>
 );
 
+export type TimelineProps = {
+  /**
+   * The TimelineItems that comprise this Timeline.
+   */
+  children: ReactNode;
+};
+
 /**
- * Renders a vertical timeline whose items are marked by organizations' logos.
- * Its items are spaced apart with a gap (rather than margins) so that hidden
- * items leave no space behind.
+ * Renders a vertical timeline consisting of
+ * TimelineItems marked by Organizations' logos.
  */
-export const Timeline = ({ children }: { children: ReactNode }) => (
+export const Timeline = ({ children }: TimelineProps) => (
+  // Use gap instead of margin so hidden TimelineItems don't create extra space
   <ol className="timeline timeline-vertical timeline-compact gap-10">
     {children}
   </ol>
