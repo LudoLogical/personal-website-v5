@@ -16,19 +16,21 @@ import { twMerge } from "tailwind-merge";
 import Expandable from "@/components/Expandable";
 import ExternalLink from "@/components/ExternalLink";
 import {
-  type Education,
-  type Experience,
-  type Organization,
-  type Recognition,
-  type Skill,
   type SkillId,
   certifications,
   education,
   experience,
   honors,
-  skillGroups,
   skills,
 } from "./content";
+import {
+  type Education,
+  type Experience,
+  type Organization,
+  type Recognition,
+  type Skill,
+  skillGroups,
+} from "./types";
 
 export const metadata: Metadata = {
   title: 'Resume | Daniel "Ludo" DeAnda',
