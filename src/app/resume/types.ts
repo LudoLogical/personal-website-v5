@@ -94,7 +94,11 @@ export type Experience = {
   highlights: ReactNode[];
 
   /**
-   * Publicly accessible work products (e.g., a live app or its source code).
+   * Publicly accessible work products (e.g., a live app or its source code)
+   * and case studies of the role in the Work section of this website, in the
+   * order to display. Case studies are linked by their paths (e.g.,
+   * "/work/vibrant-grants"), and everything else by its full URL.
+   * All links are shown in order of appearance.
    */
   links?: { label: string; href: string }[];
 
@@ -102,12 +106,6 @@ export type Experience = {
    * The skills that are most relevant to the role, in the order to display.
    */
   skills?: SkillId[];
-
-  /**
-   * Case studies of the role in the Work section of this website, each linked
-   * by its path (e.g., "/work/vibrant-grants").
-   */
-  caseStudies?: { title: string; href: string }[];
 
   /**
    * Whether the role is visible in the Experience
