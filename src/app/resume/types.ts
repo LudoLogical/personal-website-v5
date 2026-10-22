@@ -2,27 +2,31 @@ import type { ComponentType, ReactNode } from "react";
 import type { SkillId } from "./content";
 
 /**
- * A company, school, or other organization.
+ * A company, non-profit, institution, or other group with which
+ * an Experience, Education, or Recognition may be affiliated.
  */
 export type Organization = {
+  /**
+   * The name of this Oragnization.
+   */
   name: string;
 
   /**
-   * The organization's website.
+   * The website for this Organization.
    */
   href?: string;
 
   /**
-   * The path (within public/) to the organization's logo, which is masked to a
-   * squircle. For consistency, it should be a square image that's at least
-   * 96px wide and fills its whole area (with its own background color, rather
-   * than transparency). Displays the organization's initials if omitted.
+   * The path (within public/logos/) to the Logo for this Organization.
+   * Expected to be a square image with a filled (i.e., not transparent)
+   * background. If omitted, the initials of this Organization's name are
+   * used as a placeholder instead.
    */
   logo?: string;
 };
 
 /**
- * The groups into which the skills are sorted, in the order they appear.
+ * The groups into which Skills are sorted, listed in order of appearance.
  */
 export const skillGroups = [
   "Engineering",
@@ -31,31 +35,38 @@ export const skillGroups = [
   "Design",
 ] as const;
 
+/**
+ * A competency that may or may not be associated with one or more Experiences.
+ */
 export type Skill = {
+  /**
+   * The name of this Skill.
+   */
   name: string;
 
   /**
-   * An icon that represents the skill (e.g., its logo, for a technology).
+   * An icon that represents this Skill (e.g., the logo for a technology).
    */
   icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
 
   group: (typeof skillGroups)[number];
 
   /**
-   * Whether the skill is visible in the Skills section without expanding it.
+   * True if this Skill should always be visible in the "skills" section of
+   * /resume, false if it should only appear when that section is expanded.
    */
   featured?: boolean;
 
   /**
-   * Whether the skill is emphasized everywhere it appears (both in the Skills
-   * section and in the Experience section). Should only be set for skills
-   * that are also featured.
+   * True if this Skill should be visually emphasized emphasized everywhere
+   * it appears (i.e., in both the "skills" and "experience" sections).
+   * Highlighted Skills should always also be featured.
    */
   highlighted?: boolean;
 };
 
 /**
- * A role held at an organization.
+ * One or more roles held contiguously at or with a single Organization.
  */
 export type Experience = {
   role: string;
