@@ -16,7 +16,6 @@ import { twMerge } from "tailwind-merge";
 import Expandable from "@/components/Expandable";
 import ExternalLink from "@/components/ExternalLink";
 import {
-  type CaseStudyLink,
   type Education,
   type Experience,
   type Organization,
@@ -172,70 +171,13 @@ const SkillChip = ({
 );
 
 /**
- * Renders a skill as a chip that opens a menu of its case studies, which is
- * anchored below the chip (or, in browsers without CSS anchor positioning,
- * centered in the viewport). Built on the Popover API, so the menu closes
- * on Esc or a click outside of it, without any client-side JS.
- */
-const SkillCaseStudiesMenu = ({
-  id,
-  skill,
-  caseStudies,
-}: {
-  id: SkillId;
-  skill: Skill;
-  caseStudies: CaseStudyLink[];
-}) => {
-  const menuId = `skill-${id}-case-studies`;
-  const anchorName = `--skill-${id}`;
-  return (
-    <>
-      <button
-        type="button"
-        popoverTarget={menuId}
-        style={{ anchorName }}
-        className={twMerge(
-          skillChipClassName(skill),
-          "cursor-pointer badge-lg transition-[filter] hover:brightness-125",
-        )}
-      >
-        <SkillChipContent skill={skill} />
-        <span className="flex items-center gap-1 border-s border-current/25 ps-1.5 text-sm">
-          <BookOpen aria-hidden className="size-3.5" />
-          {caseStudies.length}
-          <span className="sr-only">
-            {caseStudies.length === 1 ? "case study" : "case studies"}
-          </span>
-        </span>
-      </button>
-      <ul
-        id={menuId}
-        popover="auto"
-        style={{ positionAnchor: anchorName }}
-        className="menu dropdown mt-2 w-64 rounded-box border border-base-content/10 bg-base-200 p-2 shadow-lg"
-      >
-        <li className="menu-title">Case studies</li>
-        {caseStudies.map(({ title, href }) => (
-          <li key={href}>
-            <Link href={href}>{title}</Link>
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-};
-
-/**
  * Renders links to case studies (on this website) and to other work products
  * (on other websites) as a row of buttons, with the case studies first.
  */
 const WorkLinks = ({
   caseStudies = [],
   links = [],
-}: {
-  caseStudies?: CaseStudyLink[];
-  links?: { label: string; href: string }[];
-}) =>
+}: Pick<Experience, "caseStudies" | "links">) =>
   caseStudies.length + links.length > 0 && (
     <ul
       aria-label="Case studies and work products"
@@ -605,15 +547,7 @@ export default function Resume() {
                     <ul className="flex flex-wrap gap-2">
                       {entries.map(([id, skill]) => (
                         <li key={id} data-extra={!skill.featured || undefined}>
-                          {skill.caseStudies?.length ? (
-                            <SkillCaseStudiesMenu
-                              id={id}
-                              skill={skill}
-                              caseStudies={skill.caseStudies}
-                            />
-                          ) : (
-                            <SkillChip skill={skill} className="badge-lg" />
-                          )}
+                          <SkillChip skill={skill} className="badge-lg" />
                         </li>
                       ))}
                     </ul>

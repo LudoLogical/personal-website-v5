@@ -60,18 +60,6 @@ export type Organization = {
 };
 
 /**
- * A link to a case study in the Work section of this website.
- */
-export type CaseStudyLink = {
-  title: string;
-
-  /**
-   * The path to the case study (e.g., "/work/vibrant-grants").
-   */
-  href: string;
-};
-
-/**
  * The groups into which the skills are sorted, in the order they appear.
  */
 export const skillGroups = [
@@ -102,12 +90,6 @@ export type Skill = {
    * that are also featured.
    */
   highlighted?: boolean;
-
-  /**
-   * Case studies that demonstrate the skill, which can be opened from the
-   * skill in the Skills section.
-   */
-  caseStudies?: CaseStudyLink[];
 };
 
 // Every skill, keyed by the ID with which experiences refer to it.
@@ -270,7 +252,11 @@ export type Experience = {
    */
   skills?: SkillId[];
 
-  caseStudies?: CaseStudyLink[];
+  /**
+   * Case studies of the role in the Work section of this website, each linked
+   * by its path (e.g., "/work/vibrant-grants").
+   */
+  caseStudies?: { title: string; href: string }[];
 
   /**
    * Whether the role is visible in the Experience
