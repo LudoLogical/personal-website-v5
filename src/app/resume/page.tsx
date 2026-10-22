@@ -12,7 +12,7 @@ import Expandable from "@/components/Expandable";
 import ExternalLink from "@/components/ExternalLink";
 import { OrgLogo, OrgName, SkillChip } from "./atoms";
 import {
-  type SkillId,
+  type SkillID,
   certifications,
   education,
   experience,
@@ -123,7 +123,7 @@ const lastFeaturedExperienceIndex = experience.findLastIndex(
 );
 
 // Each group's skills, in order, along with their IDs
-const skillEntries = Object.entries(skills) as [SkillId, Skill][];
+const skillEntries = Object.entries(skills) as [SkillID, Skill][];
 const skillsByGroup = skillGroups.map((group) => ({
   group,
   entries: skillEntries.filter(([, skill]) => skill.group === group),

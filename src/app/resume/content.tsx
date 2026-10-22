@@ -150,10 +150,10 @@ const skillsById = {
   userResearch: { name: "User Research", icon: ScanSearch, group: "Design" },
 } satisfies Record<string, Skill>;
 
-export type SkillId = keyof typeof skillsById;
+export type SkillID = keyof typeof skillsById;
 
 // Widened so that every skill can be read as a Skill (with all optional keys)
-export const skills: Record<SkillId, Skill> = skillsById;
+export const skills: Record<SkillID, Skill> = skillsById;
 
 export const experience: Experience[] = [
   {
@@ -163,7 +163,8 @@ export const experience: Experience[] = [
       href: "https://www.codeday.org",
       logo: "/logos/codeday.png",
     },
-    location: "Remote (Seattle, Washington)",
+    location: "Seattle, Washington",
+    isRemote: true,
     start: "2025-08",
     formerRoles: [
       {
@@ -177,7 +178,7 @@ export const experience: Experience[] = [
         end: "2024-12",
       },
     ],
-    highlights: [
+    description: [
       "Manage, train, and hire for a team of 6 consulting software engineers",
       "Design, deliver, and maintain kickoff presentations for an internship-style program that have dramatically improved interns’ awareness of resources",
       "Conduct novel, federally-backed research on program outcomes",
@@ -186,7 +187,7 @@ export const experience: Experience[] = [
       "Assisted interns with 100s of novel software engineering challenges by teaching them relevant skills",
     ],
     links: [{ label: "CodeDay Labs", href: "https://labs.codeday.org" }],
-    skills: [
+    skillIDs: [
       "teamLeadership",
       "mentorship",
       "publicSpeaking",
@@ -214,7 +215,7 @@ export const experience: Experience[] = [
     location: "Pittsburgh, Pennsylvania",
     start: "2026-01",
     end: "2026-07",
-    highlights: [
+    description: [
       "Implemented a novel, AI-powered ingestion mechanism for a web application that helps non-profits find and win grant opportunities",
       "Developed a formula for assessing grant relevance based on 13 heuristic factors and controlled by 21 hyperparameters",
       "Architected a comprehensive data type schema to ensure code extensibility",
@@ -235,7 +236,7 @@ export const experience: Experience[] = [
         href: "https://github.com/LudoLogical/capstone-project/blob/main/docs/RELEVANCE.md",
       },
     ],
-    skills: [
+    skillIDs: [
       "aiInteractionDesign",
       "react",
       "nextjs",
@@ -257,7 +258,7 @@ export const experience: Experience[] = [
     location: "Richardson, Texas",
     start: "2023-01",
     end: "2023-05",
-    highlights: [
+    description: [
       "Co-architected a novel account and identity access management system",
       "Designed UIs for two front-end microservices and implemented one of them",
     ],
@@ -271,7 +272,7 @@ export const experience: Experience[] = [
         href: "https://github.com/UTDNebula/platform",
       },
     ],
-    skills: ["react", "nextjs", "typescript", "uiUxDesign", "github"],
+    skillIDs: ["react", "nextjs", "typescript", "uiUxDesign", "github"],
     featured: true,
   },
   {
@@ -281,16 +282,17 @@ export const experience: Experience[] = [
       href: "https://www.cvent.com",
       logo: "/logos/cvent.png",
     },
-    location: "Remote (Dallas, Texas)",
+    location: "Dallas, Texas",
+    isRemote: true,
     start: "2022-06",
     end: "2022-08",
-    highlights: [
+    description: [
       "Wrote 3 novel REST API endpoints and deployed them to production",
       "Authored 20+ unit tests, integration tests, and automation tests",
       "Reduced technical debt by investigating issues with several existing integration tests and presenting findings",
       "Improved internal documentation by correcting outdated information and creating new diagrams and resources",
     ],
-    skills: ["restApis", "automatedTesting", "documentation", "diagramming"],
+    skillIDs: ["restApis", "automatedTesting", "documentation", "diagramming"],
     featured: true,
   },
   {
@@ -300,14 +302,15 @@ export const experience: Experience[] = [
       href: "https://onfleet.com",
       logo: "/logos/onfleet.png",
     },
-    location: "Remote (San Francisco, California)",
+    location: "San Francisco, California",
+    isRemote: true,
     start: "2021-05",
     end: "2021-08",
-    highlights: [
+    description: [
       "Fixed a bug in a software-as-a-service (SaaS) web application that caused phone numbers to be displayed incorrectly",
       "Migrated a complex Single-Page Application (SPA) from Angular.js to React and added dozens of unit tests",
     ],
-    skills: ["react", "angularjs", "javascript", "automatedTesting"],
+    skillIDs: ["react", "angularjs", "javascript", "automatedTesting"],
     featured: true,
   },
   {
@@ -320,7 +323,7 @@ export const experience: Experience[] = [
     location: "Richardson, Texas",
     start: "2020-05",
     end: "2020-09",
-    highlights: [
+    description: [
       "Analyzed a 3.7 million-edge network constructed from university enrollment data",
       "Investigated the effectiveness and disruptiveness of strategies for minimizing COVID-19 transmission rates",
       "Collaborated with 6 peers and an honors professor",
@@ -331,7 +334,7 @@ export const experience: Experience[] = [
         href: "https://www.alphaxiv.org/abs/2104.01261",
       },
     ],
-    skills: ["networkAnalysis"],
+    skillIDs: ["networkAnalysis"],
   },
   {
     role: "Early Website Designer",
@@ -343,7 +346,7 @@ export const experience: Experience[] = [
     location: "Milpitas, California",
     start: "2017-05",
     end: "2017-06",
-    highlights: [
+    description: [
       "Constructed a template for the company’s new website alongside a small team and under the direction of its founder",
     ],
     links: [
@@ -353,7 +356,7 @@ export const experience: Experience[] = [
       },
       { label: "Source code", href: "https://github.com/anke-hao/PeopleSV" },
     ],
-    skills: ["html", "css", "uiUxDesign"],
+    skillIDs: ["html", "css", "uiUxDesign"],
   },
 ];
 
@@ -379,7 +382,7 @@ export const education: Education[] = [
     },
     start: "2019-08",
     end: "2023-05",
-    notes: (
+    description: (
       <>
         Graduated <em>summa cum laude</em> w/ additional major (
         <ExternalLink

@@ -64,13 +64,12 @@ export const OrgName = ({
 export const DateRange = ({
   start,
   end,
-  className,
 }: {
   start: string;
   end?: string;
   className?: string;
 }) => (
-  <span className={twMerge("whitespace-nowrap tabular-nums", className)}>
+  <span className="text-sm whitespace-nowrap text-base-content/60 tabular-nums">
     <time dateTime={start}>{start}</time> to{" "}
     {end ? <time dateTime={end}>{end}</time> : "Present"}
   </span>

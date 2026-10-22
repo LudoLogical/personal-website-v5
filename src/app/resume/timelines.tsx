@@ -20,11 +20,7 @@ const EntryHeader = ({
 }) => (
   <div className="flex flex-col gap-x-6 gap-y-0.5 sm:flex-row sm:items-baseline sm:justify-between">
     <h3 className="text-lg leading-snug font-bold">{title}</h3>
-    <DateRange
-      start={start}
-      end={end}
-      className="text-sm text-base-content/60"
-    />
+    <DateRange start={start} end={end} />
   </div>
 );
 
@@ -34,12 +30,13 @@ export const ExperienceEntry = ({
     organization,
     context,
     location,
+    isRemote,
     start,
     end,
     formerRoles,
-    highlights,
+    description,
     links,
-    skills: skillIds,
+    skillIDs,
   },
 }: {
   entry: Experience;
@@ -59,7 +56,7 @@ export const ExperienceEntry = ({
       />
       <p className="mt-1 flex items-center gap-1.5 text-sm text-base-content/60">
         <MapPin aria-hidden className="size-3.5 shrink-0" />
-        {location}
+        {isRemote ? `Remote (${location})` : location}
       </p>
       {formerRoles && (
         <ul className="mt-3 flex flex-col gap-1 border-s-2 border-base-content/10 ps-3 text-sm">
@@ -72,18 +69,14 @@ export const ExperienceEntry = ({
                 <em className="text-base-content/60">formerly</em>{" "}
                 <span className="font-semibold">{formerRole.role}</span>
               </span>
-              <DateRange
-                start={formerRole.start}
-                end={formerRole.end}
-                className="text-base-content/60"
-              />
+              <DateRange start={formerRole.start} end={formerRole.end} />
             </li>
           ))}
         </ul>
       )}
     </header>
     <ul className="flex list-disc flex-col gap-1.5 ps-5 text-base-content/85 marker:text-base-content/30">
-      {highlights.map((highlight, i) => (
+      {description.map((highlight, i) => (
         <li key={i}>{highlight}</li>
       ))}
     </ul>
@@ -111,9 +104,9 @@ export const ExperienceEntry = ({
         ))}
       </ul>
     )}
-    {skillIds && (
+    {skillIDs && (
       <ul aria-label="Relevant skills" className="flex flex-wrap gap-1.5">
-        {skillIds.map((id) => (
+        {skillIDs.map((id) => (
           <li key={id}>
             <SkillChip skill={skills[id]} />
           </li>
@@ -124,7 +117,7 @@ export const ExperienceEntry = ({
 );
 
 export const EducationEntry = ({
-  entry: { degree, href, institution, start, end, notes },
+  entry: { degree, href, institution, start, end, description },
 }: {
   entry: Education;
 }) => (
@@ -145,7 +138,7 @@ export const EducationEntry = ({
     <p className="mt-1 text-base-content/70">
       <OrgName organization={institution} />
     </p>
-    {notes && <p className="mt-3 text-base-content/85">{notes}</p>}
+    {description && <p className="mt-3 text-base-content/85">{description}</p>}
   </article>
 );
 

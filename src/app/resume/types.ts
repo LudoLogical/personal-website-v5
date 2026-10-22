@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
-import type { SkillId } from "./content";
+import type { SkillID } from "./content";
 
 /**
  * A company, non-profit, institution, or other group with which
@@ -49,18 +49,21 @@ export type Skill = {
    */
   icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
 
+  /**
+   * The group to which this Skill belongs and under which it will appear.
+   */
   group: (typeof skillGroups)[number];
 
   /**
-   * True if this Skill should always be visible in the "skills" section of
+   * True if this Skill should always be visible in the "Skills" section of
    * /resume, false if it should only appear when that section is expanded.
    */
   featured?: boolean;
 
   /**
    * True if this Skill should be visually emphasized emphasized everywhere
-   * it appears (i.e., in both the "skills" and "experience" sections).
-   * Highlighted Skills should always also be featured.
+   * it appears (i.e., in both the "Skills" and "Experience" sections),
+   * false otherwise. Highlighted Skills should always also be featured.
    */
   highlighted?: boolean;
 };
@@ -69,85 +72,158 @@ export type Skill = {
  * One or more roles held contiguously at or with a single Organization.
  */
 export type Experience = {
+  /**
+   * The name of the most recently held role in this Experience.
+   */
   role: string;
+
+  /**
+   * The Organization with which this Experience is associated.
+   */
   organization: Organization;
 
   /**
-   * The nature of the role (e.g., "MHCI Capstone"), which
-   * appears in parentheses after the organization's name.
+   * Important contextual information about this Experience;
+   * appears in parentheses after the name of the Organization.
    */
   context?: ReactNode;
 
+  /**
+   * The city and state in which the Organization
+   * associated with this Experience is/was located.
+   */
   location: string;
+
+  /**
+   * True if this Experience was remote, false otherwise.
+   */
+  isRemote?: boolean;
+
+  /**
+   * The month, in YYYY-MM format, in which the most
+   * recently held role in this Experience began.
+   */
   start: string;
 
   /**
-   * Omitted if the role is ongoing.
+   * The month, in YYYY-MM format, in which the most recently held
+   * role in this Experience ended. Omitted if said role is ongoing.
    */
   end?: string;
 
   /**
-   * Roles previously held at the same organization, from most to least recent.
+   * The role(s) held prior to the most recently held role in
+   * this Experience (if any), in order from most to least recent.
    */
-  formerRoles?: { role: string; start: string; end: string }[];
+  formerRoles?: {
+    /**
+     * The name of this formerly held role.
+     */
+    role: string;
 
-  highlights: ReactNode[];
+    /**
+     * The month, in YYYY-MM format,
+     * in which this formerly held role began.
+     */
+    start: string;
+
+    /**
+     * The month, in YYYY-MM format,
+     * in which this formerly held role ended.
+     */
+    end: string;
+  }[];
 
   /**
-   * Publicly accessible work products (e.g., a live app or its source code)
-   * and case studies of the role in the Work section of this website, in the
-   * order to display. Case studies are linked by their paths (e.g.,
-   * "/work/vibrant-grants"), and everything else by its full URL.
-   * All links are shown in order of appearance.
+   * One or more bullet points that outline
+   * the work performed in this Experience.
+   */
+  description: ReactNode[];
+
+  /**
+   * Links to publicly accessible work products (e.g., a live app or
+   * its source code) and case studies (located in /work and linked by
+   * their relative paths) associated with this Experience, in the order
+   * in which they are to be displayed.
    */
   links?: { label: string; href: string }[];
 
   /**
-   * The skills that are most relevant to the role, in the order to display.
+   * The IDs of the Skills that are most relevant to the role,
+   * in the order in which they are to be displayed.
    */
-  skills?: SkillId[];
+  skillIDs?: SkillID[];
 
   /**
-   * Whether the role is visible in the Experience
-   * section without expanding it.
+   * True if this Experience should always be visible in the "Experience"
+   * section of /resume, false if it should only appear when that section
+   * is expanded.
    */
   featured?: boolean;
 };
 
 /**
- * A degree earned (or being earned) at a school.
+ * A degree earned (or currently being earned) at an academic institution.
  */
 export type Education = {
+  /**
+   * The name of the degree that is the subject of this Education.
+   */
   degree: string;
 
   /**
-   * The page for the degree program.
+   * The webpage of the degree program that is the subject of this Education.
    */
   href?: string;
 
+  /**
+   * The Organization at which this Education was (or is being) pursued.
+   */
   institution: Organization;
+
+  /**
+   * The month, in YYYY-MM format, in which this Education was initiated.
+   */
   start: string;
 
   /**
-   * Omitted if the degree is still in progress.
+   * The month, in YYYY-MM format, in which this Education was completed.
+   * Omitted if this Education is still in progress.
    */
   end?: string;
 
-  notes?: ReactNode;
+  /**
+   * Additional information about this Education.
+   */
+  description?: ReactNode;
 };
 
 /**
- * A certification or honor bestowed by an organization.
+ * A certification or honor bestowed by an Organization.
  */
 export type Recognition = {
+  /**
+   * The name of this Recognition.
+   */
   title: string;
 
   /**
-   * A page about the recognition itself (e.g., a credential's details).
+   * A webpage about this Recognition or containing proof of its receipt.
    */
   href?: string;
 
+  /**
+   * The Organization that bestowed this Recognition.
+   */
   organization: Organization;
+
+  /**
+   * The city and state in which this Recognition was bestowed, if relevant.
+   */
   location?: string;
+
+  /**
+   * The date, in YYYY-MM-DD format, on which this Recognition was bestowed.
+   */
   date: string;
 };
