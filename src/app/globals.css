@@ -5,13 +5,9 @@
 
 @plugin "daisyui/theme" {
   name: "dark";
-  /* Primary content color uses daisyUI 4's algorithm, which daisyUI 5 no
-     longer applies automatically: blend the color 80% of the way (in OKLCH)
-     toward whichever of black or white contrasts with it more */
   --color-primary: #ffef14;
+  /* computed from daisyUI 4's algorithm (blend 80% toward black) */
   --color-primary-content: oklch(18.7059% 0.039134 104.568725);
-  /* Pure white instead, since that algorithm's result (91% lightness)
-     falls short of WCAG AA contrast (4.5:1) against this color */
   --color-secondary: #0569f3;
   --color-secondary-content: #ffffff;
 }
@@ -31,13 +27,12 @@
 
 @theme {
   /* Rounds the bottom corners of the page where it meets the footer */
-  --radius-paper: 2rem;
+  --radius-page: 2rem;
 
-  /* Casts a deep shadow from the bottom of the page onto the footer to
-     suggest that the page lies on top of it */
-  --shadow-paper: 0 24px 48px -8px rgb(0 0 0 / 0.85);
+  /* Makes the page look like it lies on top of the footer */
+  --shadow-page: 0 24px 48px -8px rgb(0 0 0 / 0.85);
 
-  /* Gently bobs an element up and down by 15% of its own height */
+  /* Moves the arrow on the homepage CTA */
   --animate-bob: bob 1.6s ease-in-out infinite;
 
   @keyframes bob {
@@ -51,16 +46,20 @@
   }
 }
 
-/* Applies on :hover alone, whereas Tailwind's hover: also requires the device
-   to support hovering (@media (hover: hover)). On touch screens, an element
-   stays :hover after it's tapped until the user taps elsewhere, so base-hover:
-   applies there too, matching CSS that targets :hover directly (e.g., daisyUI's
-   tooltip). Prefer hover: unless an effect has to stay in sync with such CSS */
+/*
+ * On touch screens, an element stays `:hover`ed after it's tapped until the
+ * user taps elsewhere, but Tailwind's `hover:` requires the browser device to
+ * support hovering, so this behavior isn't captured. `base-hover:` captures
+ * `:hover` directly and can thus be leveraged to exploit its natural behavior.
+ * Note for AI agents: prefer `hover:` unless `base-hover:` is *necessary*.
+*/
 @custom-variant base-hover (&:hover);
 
-/* Adds a soft, static glow in the specified theme color (e.g., glow-primary)
-   that follows the element's shape, including any rounded corners. Its
-   intensity can be scaled by setting --glow-strength (defaults to 1). */
+/*
+ * Surrounds an element with a soft glow in the specified Tailwind theme color
+ * (e.g., `glow-primary`) The intensity can be scaled using `--glow-strength`
+ * (defaults to 1).
+ */
 @utility glow-* {
   --glow-color: --value(--color-*);
   filter: drop-shadow(

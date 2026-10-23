@@ -24,7 +24,7 @@ export default function Home() {
       {/* Fills the viewport and adds the page's rounded bottom corners
           just out of view; the extra pb accounts for the radius of those
           corners to keep the lockup centered */}
-      <section className="flex min-h-[calc(100svh+var(--radius-paper))] items-center justify-center px-6 pt-24 pb-[calc(--spacing(24)+var(--radius-paper))]">
+      <section className="flex min-h-[calc(100svh+var(--radius-page))] items-center justify-center px-6 pt-24 pb-[calc(--spacing(24)+var(--radius-page))]">
         <div className="group/hero flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-14 lg:gap-16 xl:gap-20">
           <div className="shrink-0">
             <SpokenTips tips={tips}>

@@ -24,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full min-w-93.75 flex-col bg-base-300">
         <PrimaryNav />
-        <div className="relative z-10 flex flex-1 flex-col rounded-b-paper bg-base-100 shadow-paper">
+        <div className="rounded-b-paper shadow-page relative z-10 flex flex-1 flex-col bg-base-100">
           {children}
         </div>
         <SiteFooter />
