@@ -1,4 +1,5 @@
-import { BookOpen, Link, MapPin } from "lucide-react";
+import { BookOpen, MapPin } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import type Expandable from "@/components/Expandable";
 import ExternalLink from "@/components/ExternalLink";
