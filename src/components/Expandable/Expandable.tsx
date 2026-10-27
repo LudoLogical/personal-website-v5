@@ -49,7 +49,7 @@ export type ExpandableProps = {
  * bearing a `data-extra` attribute (which are hidden by default) are visible.
  *
  * Because `data-extra` elements are hidden through CSS,
- * their content can be rendered by server compnonents.
+ * their content can be rendered by server components.
  */
 const Expandable = ({ labels, className, children }: ExpandableProps) => {
   const [expanded, setExpanded] = useState(false);
