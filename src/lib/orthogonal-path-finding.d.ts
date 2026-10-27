@@ -1,5 +1,5 @@
 /**
- * Relevant type declarations for the NPM package orthogonal-path-finding.
+ * Relevant type declarations for the NPM package `orthogonal-path-finding`.
  * Duplicated here because, at the time of writing, that package did not
  * expose its type declarations in its `package.json` `exports` object.
  */

@@ -1,12 +1,16 @@
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { orthogonalPathFinding } from "orthogonal-path-finding";
 import { roundCorners } from "svg-round-corners";
-import { type TextDimensions } from "@/utils/useTextDimensions";
-import { type DiagramAnimationOptions } from "./DiagramAnimation";
+import type { TextDimensions } from "@/utils/useTextDimensions";
+import type {
+  default as DiagramAnimation,
+  DiagramAnimationOptions,
+} from "./DiagramAnimation";
 import {
   MarkerShape,
   Side,
   type Arrow,
+  type ArrowAnchor,
   type ArrowEnd,
   type PathMarker,
   type Point,
@@ -24,15 +28,15 @@ const OUTWARD_UNIT_VECTORS: Record<Side, Point> = {
 };
 
 /**
- * Rasterizes the specified ArrowEnd by computing the
- * pixel values of its location and connection point.
- * @param end the ArrowEnd to be rasterized
- * @param textDimensions the TextDimensions of the display text against
- *                       which the specified ArrowEnd should be rasterized
- * @param padding the amount of padding, in ems, that should be
- *                applied to the location of the specified ArrowEnd
- *                iff it is an ArrowAnchor
- * @returns the RasterizedArrowEnd
+ * Rasterizes the specified {@link ArrowEnd} by computing
+ * the pixel values of its location and connection point.
+ * @param end the {@link ArrowEnd} to be rasterized
+ * @param textDimensions the {@link TextDimensions} of the display text against which
+ *                       the specified {@link ArrowEnd} should be rasterized
+ * @param padding the amount of padding, in ems, that should be applied to
+ *                the location of the specified {@link ArrowEnd} iff it is
+ *                an {@link ArrowAnchor}
+ * @returns the {@link RasterizedArrowEnd}
  */
 const rasterizeArrowEnd = (
   end: ArrowEnd,
@@ -40,7 +44,7 @@ const rasterizeArrowEnd = (
   padding: number,
 ): RasterizedArrowEnd => {
   if (!("side" in end)) {
-    // i.e., if it's an ArrowFreeEnd
+    // i.e., if it's an `ArrowFreeEnd`
     const x = textDimensions.width * end.xFraction;
     const y = textDimensions.height * end.yFraction;
     // Separate objects so each can be modified independently
@@ -71,16 +75,17 @@ const rasterizeArrowEnd = (
 };
 
 /**
- * Removes repeated and unnecessary co-linear Points from the specified path.
- * Exists to filter all non-corner vertices prior to calling roundCorners().
- * @param path the path whose constituent Points are to be pruned
+ * Removes repeated and unnecessary co-linear {@link Point}s from the
+ * specified `path`. Exists to filter all non-corner vertices prior to
+ * calling `roundCorners()`.
+ * @param path the path whose constituent {@link Point}s are to be pruned
  * @returns the pruned path
  */
 const simplifyPath = (path: Point[]) => {
   const uniquePoints = path.filter(
     (point, i) =>
-      i === 0 || // The first Point is trivially unique
-      // At least one coordinate must differ from the previous Point
+      i === 0 || // The first `Point` is trivially unique
+      // At least one coordinate must differ from the previous `Point`
       point.x !== path[i - 1].x ||
       point.y !== path[i - 1].y,
   );
@@ -88,10 +93,10 @@ const simplifyPath = (path: Point[]) => {
   const uniqueVertices = uniquePoints.filter((point, i) => {
     const prev = uniquePoints[i - 1];
     const next = uniquePoints[i + 1];
-    // The first and last Points are trivially vertices
+    // The first and last `Point`s are trivially vertices
     if (!prev || !next) return true;
-    // No Point can be horizontally or vertically
-    // co-linear with both of its adjacent Points
+    // No `Point` can be horizontally or vertically
+    // co-linear with both of its adjacent `Point`s
     return !(
       (prev.x === point.x && point.x === next.x) ||
       (prev.y === point.y && point.y === next.y)
@@ -102,17 +107,20 @@ const simplifyPath = (path: Point[]) => {
 };
 
 /**
- * Moves the specified Point toward the specified target Point
- * by the specified distance.
+ * Moves the specified {@link Point} toward the specified
+ * `target` {@link Point} by the specified `distance`.
  *
- * If the distance is large enough to cause the Point to move past the target,
- * it is snapped to the target instead. If the distance is negative, the Point
- * is moved directly *away* from the target Point instead.
- * @param point the Point to be moved
- * @param target the Point toward which the other Point should be moved
- * @param distance the distance, in pixels, by which
- *                 the first Point should be moved
- * @returns a new Point representing the result of the movement,
+ * If the distance is large enough to cause the {@link Point} to move past
+ * the target, it is snapped to the target instead. If the distance is
+ * negative the {@link Point} is moved directly *away* from the target
+ * {@link Point} instead.
+ *
+ * @param point the {@link Point} to be moved
+ * @param target the {@link Point} toward which the
+ *               other {@link Point} should be moved
+ * @param distance the distance, in pixels, by which the
+ *                 first {@link Point} should be moved
+ * @returns a new {@link Point} representing the result of the movement,
  *          or the original one if it is coincident with the target
  */
 const moveToward = (point: Point, target: Point, distance: number): Point => {
@@ -129,12 +137,12 @@ const moveToward = (point: Point, target: Point, distance: number): Point => {
  */
 type MarkerDimensions = {
   /**
-   * Half of the markerSize, in pixels.
+   * Half of the `options.appearance.markerSize`, in pixels.
    */
   halfSize: number;
 
   /**
-   * Half of the strokeWidth, in pixels.
+   * Half of the `options.appearance.strokeWidth`, in pixels.
    */
   halfStroke: number;
 
@@ -146,13 +154,13 @@ type MarkerDimensions = {
 };
 
 /**
- * Computes the MarkerDimensions for the
- * specified emSize and appearanceOptions.
+ * Computes the {@link MarkerDimensions} for the
+ * specified `emSize` and `appearanceOptions`.
  * @param emSize the size, in pixels, of a single em in the context
  *               relative to which the markers should be rasterized
- * @param appearanceOptions the appearance options for
- *                          the associated DiagramAnimation
- * @returns the (rasterized) MarkerDimensions
+ * @param appearanceOptions the `options.appearance` for the
+ *                          associated {@link DiagramAnimation}
+ * @returns the (rasterized) {@link MarkerDimensions}
  */
 const getMarkerDimensions = (
   emSize: number,
@@ -160,25 +168,26 @@ const getMarkerDimensions = (
 ): MarkerDimensions => {
   const halfSize = (appearanceOptions.markerSize * emSize) / 2;
   const halfStroke = (appearanceOptions.strokeWidth * emSize) / 2;
-  // The X's arms run diagonally from and to (+/- armReach, +/- armReach).
-  // Round caps extend those arms by halfStroke, so insetting by that amount
+  // The X's arms run diagonally from and to (+/- `armReach`, +/- `armReach`).
+  // Round caps extend those arms by `halfStroke`, so insetting by that amount
   // on both axes keeps the X exactly within the square.
   const armReach = halfSize - halfStroke;
   return { halfSize, halfStroke, armReach };
 };
 
 /**
- * Places the end marker(s) (if any) of the specified Arrow at the appropriate
- * end(s) of the specified path and then trims that path to create a visible
- * gap (the size of which is given by appearanceOptions.markerGap) between
- * it and each placed end marker.
- * @param arrow the Arrow whose end markers are to be placed
- * @param pathArray the Points of the rasterized path of the specified Arrow
+ * Places the end marker(s) (if any) of the specified {@link Arrow} at the
+ * appropriate end(s) of the specified `pathArray` and then trims that `pathArray` to create
+ * a visible gap (the size of which is given by `appearanceOptions.markerGap`)
+ * between it and each placed end marker.
+ * @param arrow the {@link Arrow} whose end markers are to be placed
+ * @param pathArray the {@link Point}s of the rasterized
+ *                  path of the specified {@link Arrow}
  * @param emSize the size, in pixels, of a single em in the context
  *               relative to which the end markers should be rasterized
- * @param appearanceOptions the appearance options for
- *                          the associated DiagramAnimation
- * @returns the RasterizedMarkers and trimmed pathArray
+ * @param appearanceOptions the `options.appearance` for the
+ *                          associated {@link DiagramAnimation}
+ * @returns the {@link RasterizedMarker}s and trimmed pathArray
  */
 const placeEndMarkers = (
   arrow: Arrow,
@@ -281,12 +290,12 @@ const placeEndMarkers = (
 };
 
 /**
- * Computes the positions of the specified PathMarkers along the specified
- * rasterized SVG path.
+ * Computes the positions of the specified {@link PathMarker}s
+ * along the specified rasterized SVG path.
  * @param body the rasterized SVG path along which
- *             the PathMarkers should be placed
- * @param pathMarkers the PathMarkers to be placed
- * @returns the resulting RasterizedMarkers
+ *             the {@link PathMarker}s should be placed
+ * @param pathMarkers the {@link PathMarker}s to be placed
+ * @returns the resulting {@link RasterizedMarker}s
  */
 const placePathMarkers = (
   body: string,
@@ -304,16 +313,16 @@ const placePathMarkers = (
 };
 
 /**
- * Converts the specified Arrow into a rasterized SVG path and computes
- * the positions of the centers of the markers that belong to it.
- * @param arrow the Arrow to be rasterized
- * @param textDimensions the TextDimensions of the display text against
- *                       which the specified Arrow should be rasterized
- * @param appearanceOptions the appearance options for
- *                          the associated DiagramAnimation
- * @param precisionOptions the precision options for
- *                         the associated DiagramAnimation
- * @returns the resulting RasterizedArrow
+ * Converts the specified {@link Arrow} into a rasterized SVG path and
+ * computes the positions of the centers of the markers that belong to it.
+ * @param arrow the {@link Arrow} to be rasterized
+ * @param textDimensions the {@link TextDimensions} of the display text against which
+ *                       the specified {@link Arrow} should be rasterized
+ * @param appearanceOptions the `options.appearance` for the
+ *                          associated {@link DiagramAnimation}
+ * @param precisionOptions the `options.precision` for the
+ *                         associated {@link DiagramAnimation}
+ * @returns the resulting {@link RasterizedArrow}
  */
 export const rasterizeArrow = (
   arrow: Arrow,
@@ -410,8 +419,8 @@ export const rasterizeArrow = (
  * in the positive x direction with its tip at the origin.
  * @param emSize the size, in pixels, of a single em in the context
  *               relative to which the arrowhead should be rasterized
- * @param appearanceOptions the appearance options for
- *                          the associated DiagramAnimation
+ * @param appearanceOptions the `options.appearance` for the
+ *                          associated {@link DiagramAnimation}
  * @returns the rasterized SVG path
  */
 export const getArrowheadPath = (
@@ -432,15 +441,16 @@ export const getArrowheadPath = (
 };
 
 /**
- * Creates the rasterized SVG paths for each MarkerShape.
- * Every path is centered on the origin and fits perfectly
- * within a square sized according to the specified emSize
- * and the markerSize in the specified appearanceOptions.
+ * Creates the rasterized SVG paths for each {@link MarkerShape}.
+ * Every path is centered on the origin and fits perfectly within
+ * a square sized according to the `emSize` and `markerSize` in the
+ * specified `appearanceOptions`.
  * @param emSize the size, in pixels, of a single em in the context
  *               relative to which the markers should be rasterized
- * @param appearanceOptions the appearance options for
- *                          the associated DiagramAnimation
- * @returns a Record keyed by MarkerShape containing the rasterized SVG paths
+ * @param appearanceOptions the `options.appearance` for the
+ *                          associated {@link DiagramAnimation}
+ * @returns a `Record` keyed by {@link MarkerShape}
+ *          containing the rasterized SVG paths
  */
 export const getMarkerPaths = (
   emSize: number,

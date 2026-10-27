@@ -12,10 +12,10 @@
  */
 
 .root {
-  /* Necessary b/c moving parts exceed the bounds of the SVG's viewBox */
+  /* Necessary b/c moving parts exceed the bounds of the SVG's `viewBox` */
   overflow: visible;
 
-  /* Apply transforms to the center of the Element, not the origin of the SVG */
+  /* Apply transforms to the center of the `Element`, not the origin of the SVG */
   & path {
     transform-box: fill-box;
     transform-origin: center;

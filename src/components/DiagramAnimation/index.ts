@@ -5,11 +5,11 @@ export {
   type DiagramAnimationProps,
 } from "./DiagramAnimation";
 export {
-  MarkerShape,
-  Side,
   along,
   anchor,
   free,
+  MarkerShape,
+  Side,
   type Arrow,
   type ArrowAnchor,
   type ArrowEnd,

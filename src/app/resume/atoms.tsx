@@ -5,20 +5,22 @@ import type { Organization, Skill } from "./types";
 
 export type OrgLogoProps = {
   /**
-   * The Organization whose logo is to be rendered in this OrgLogo.
+   * The {@link Organization} whose logo is
+   * to be rendered in this {@link OrgLogo}.
    */
   organization: Organization;
 
   /**
-   * Classes for the container `<div>` of this OrgLogo. Used to set its size.
+   * Classes for the container `<div>` of this {@link OrgLogo}.
+   * Used to set its size.
    */
   className?: string;
 };
 
 /**
  * Renders the logo (or initials, if no logo exists) of the specified
- * Organization in a squircle. Hidden from ATs because the name of the
- * Organization should always be displayed alongside it.
+ * {@link Organization} in a squircle. Hidden from ATs because the name
+ * of the {@link Organization} should always be displayed alongside it.
  */
 export const OrgLogo = ({
   organization: { name, logo },
@@ -53,13 +55,14 @@ export const OrgLogo = ({
 
 export type OrgNameProps = {
   /**
-   * The Organization whose name is to be rendered in this OrgName.
+   * The {@link Organization} whose name is
+   * to be rendered in this {@link OrgName}.
    */
   organization: Organization;
 };
 
 /**
- * Renders the name of the specified Organization,
+ * Renders the name of the specified {@link Organization},
  * linked to its website if it has one.
  */
 export const OrgName = ({ organization: { name, href } }: OrgNameProps) =>
@@ -73,19 +76,19 @@ export const OrgName = ({ organization: { name, href } }: OrgNameProps) =>
 
 export type DateRangeProps = {
   /**
-   * The date/month on/during which this DateRange should start.
+   * The date/month on/during which this {@link DateRange} should start.
    */
   start: string;
 
   /**
-   * The date/month on/during which this DateRange should end.
+   * The date/month on/during which this {@link DateRange} should end.
    * Defaults to "Present" if omitted.
    */
   end?: string;
 };
 
 /**
- * Renders the duration defined by the specified start and end dates/months.
+ * Renders the duration defined by the specified `start` and `end` dates/months.
  */
 export const DateRange = ({ start, end }: DateRangeProps) => (
   <span className="text-sm whitespace-nowrap text-base-content/60 tabular-nums">
@@ -96,19 +99,19 @@ export const DateRange = ({ start, end }: DateRangeProps) => (
 
 export type SkillChipProps = {
   /**
-   * The Skill to be rendered by this SkillChip.
+   * The {@link Skill} to be rendered by this {@link SkillChip}.
    */
   skill: Skill;
 
   /**
-   * True if this SkillChip should be rendered as `badge-lg`,
-   * false otherwise (and by default).
+   * `true` if this {@link SkillChip} should be rendered
+   * as `badge-lg`, `false` otherwise (and by default).
    */
   large?: boolean;
 };
 
 /**
- * Renders the specified Skill as a chip.
+ * Renders the specified {@link Skill} as a chip.
  */
 export const SkillChip = ({ skill, large }: SkillChipProps) => {
   const Icon = skill.icon;

@@ -2,19 +2,20 @@ import { useEffect, useState, type RefObject } from "react";
 
 /**
  * Tracks the vertical position of the midpoint of the gap between
- * the bottom of the HTMLElement assigned to the specified upperRef
- * and the top of the HTMLElement assigned to the specified lowerRef.
- * Both HTMLElements must share the same offsetParent.
+ * the bottom of the `HTMLElement` assigned to the specified `upperRef`
+ * and the top of the `HTMLElement` assigned to the specified `lowerRef`.
+ * Both `HTMLElement`s must share the same `offsetParent`.
  *
- * Updates whenever the size of either HTMLElement or any of their
+ * Updates whenever the size of either `HTMLElement` or any of their
  * siblings changes.
- * @param upperRef a RefObject for the HTMLElement above the gap
- * @param lowerRef a RefObject for the HTMLElement below the gap
+ *
+ * @param upperRef a `RefObject` for the `HTMLElement` above the gap
+ * @param lowerRef a `RefObject` for the `HTMLElement` below the gap
  * @returns the vertical position, in pixels from the top of the
- *          shared offsetParent, of the midpoint of the gap,
- *          or null if that position cannot be measured yet
+ *          shared `offsetParent`, of the midpoint of the gap,
+ *          or `null` if that position cannot be measured yet
  */
-export const useGapMidpoint = (
+const useGapMidpoint = (
   upperRef: RefObject<HTMLElement | null>,
   lowerRef: RefObject<HTMLElement | null>,
 ): number | null => {
@@ -43,8 +44,10 @@ export const useGapMidpoint = (
     ]);
 
     for (const element of siblings) observer.observe(element);
-    return () => observer.disconnect(); // destroy observer on cleanup
+    return () => observer.disconnect(); // destroy `observer` on cleanup
   }, [upperRef, lowerRef]);
 
   return midpoint;
 };
+
+export default useGapMidpoint;

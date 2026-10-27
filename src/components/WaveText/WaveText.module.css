@@ -1,13 +1,13 @@
 /*
- * --wave-height, --wave-period, and --wave-stagger are inherited from the
- * root <span>; their defaults are specified here as fallbacks to ensure that
+ * `--wave-height`, `--wave-period`, and `--wave-stagger` are inherited from the
+ * root `<span>`; their defaults are specified here as fallbacks to ensure that
  * class overrides don't have to compete with them.
  */
 .char {
   @media (prefers-reduced-motion: no-preference) {
     /* Must divide the period by 2 here b/c of the alternate keyword */
     animation: wave calc(var(--wave-period, 2s) / 2) ease-in-out
-      /* --wave-offset is an internal variable and unique for each .char */
+      /* `--wave-offset` is an internal variable and unique for each `.char` */
       calc(var(--wave-offset) * var(--wave-stagger, 0.1s)) infinite alternate;
   }
 }

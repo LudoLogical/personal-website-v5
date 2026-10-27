@@ -1,45 +1,44 @@
 import { ArrowDown } from "lucide-react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
-import { tips } from "@/components/SpokenTips";
-import SpokenTips from "@/components/SpokenTips";
 import CharCodeText from "@/components/CharCodeText";
 import ConnectingDotsText from "@/components/ConnectingDotsText";
 import DiagramAnimation from "@/components/DiagramAnimation";
 import HoverOrTapAffordance from "@/components/HoverOrTapAffordance";
 import IcebergExplainerText from "@/components/IcebergExplainerText";
+import SpokenTips from "@/components/SpokenTips";
 import WaveText from "@/components/WaveText";
-import { arrows, levels, dotPositions } from "./content";
+import { ARROWS, DOT_POSITIONS, LEVELS, TIPS } from "./content";
 
-export default function Home() {
-  // Shared by every HoverOrTapAffordance in the hero section
+const Home = () => {
+  // Shared by every `HoverOrTapAffordance` in the hero section
   const affordanceLineClassName = "sm:border-t-3";
 
-  // Applied to everything in the hero section except DiagramAnimation
+  // Applied to everything in the hero section except `DiagramAnimation`
   const fadeWhileDiagramActive =
     "transition-opacity duration-300 group-has-data-active/hero:opacity-15";
 
   return (
     <main className="flex flex-1 flex-col overflow-hidden">
       {/* Fills the viewport and adds the page's rounded bottom corners
-          just out of view; the extra pb accounts for the radius of those
+          just out of view; the extra bottom padding accounts for the radius of those
           corners to keep the lockup centered */}
       <section className="flex min-h-[calc(100svh+var(--radius-page))] items-center justify-center px-6 pt-24 pb-[calc(--spacing(24)+var(--radius-page))]">
         <div className="group/hero flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-14 lg:gap-16 xl:gap-20">
           <div className="shrink-0">
-            <SpokenTips tips={tips}>
-              {/* Placed inside SpokenTips so that the affordance swells with
+            <SpokenTips tips={TIPS}>
+              {/* Placed inside `SpokenTips` so that the affordance swells with
                   the avatar and the speech bubble isn't trapped inside of the
-                  HoverOrTapAffordance stacking context; displayed as block so
+                  `HoverOrTapAffordance` stacking context; `block` so
                   it doesn't get a line box (which would pad its bottom) */}
-              {/* Dimmed here because reducing opacity on SpokenTips would
+              {/* Dimmed here because reducing opacity on `SpokenTips` would
                   create a stacking context on it and thus trap the speech
-                  bubble below the z-10 text on the right side */}
+                  bubble below the `z-10` text on the right side */}
               <HoverOrTapAffordance
                 shape="circle"
+                fadeInOnTapOutside
                 className={twMerge("block", fadeWhileDiagramActive)}
                 affordanceClassName="sm:border-3 -inset-1.5 md:-inset-2 xl:-inset-3"
-                fadeInOnTapOutside
               >
                 <Image
                   src="/avatar.png"
@@ -67,15 +66,15 @@ export default function Home() {
                 />
               </p>
               <div className="my-1 flex flex-col gap-2">
-                {/* w-fit so the underline doesn't fill the row */}
+                {/* `w-fit` so the underline doesn't fill the row */}
                 <HoverOrTapAffordance
+                  fadeInOnTapOutside
                   className="w-fit"
                   affordanceClassName={affordanceLineClassName}
-                  fadeInOnTapOutside
                 >
                   <DiagramAnimation
                     text='Daniel "Ludo" DeAnda.'
-                    arrows={arrows}
+                    arrows={ARROWS}
                     className="w-fit text-primary"
                   />
                 </HoverOrTapAffordance>
@@ -88,10 +87,10 @@ export default function Home() {
                   <div className="flex flex-nowrap">
                     <span className="opacity-50">I&apos;m a&nbsp;</span>
                     <HoverOrTapAffordance
-                      inline
-                      affordanceClassName={affordanceLineClassName}
                       fadeInOnTapInside={false}
                       fadeInOnTapOutside
+                      inline
+                      affordanceClassName={affordanceLineClassName}
                     >
                       <CharCodeText text="Software Engineer" />
                     </HoverOrTapAffordance>
@@ -99,25 +98,25 @@ export default function Home() {
                   </div>
                   <div className="flex flex-nowrap">
                     {/* Raised so that the explainer card appears above
-                        the content that follows the IcebergExplainerText */}
+                        the content that follows the `IcebergExplainerText` */}
                     <HoverOrTapAffordance
+                      fadeInOnTapInside={false}
+                      fadeInOnTapOutside
                       inline
                       className="z-20"
                       affordanceClassName={affordanceLineClassName}
-                      fadeInOnTapInside={false}
-                      fadeInOnTapOutside
                     >
                       <IcebergExplainerText
                         text="Systems Thinker"
-                        levels={levels}
+                        levels={LEVELS}
                         childClassNames={{
-                          scrub: "xs:-bottom-1",
                           card: "xs:w-91",
                           text: {
                             depth: "xs:text-xs",
                             question: "xs:text-sm",
                             concepts: "xs:text-sm",
                           },
+                          scrub: "xs:-bottom-1",
                         }}
                       />
                     </HoverOrTapAffordance>
@@ -125,18 +124,18 @@ export default function Home() {
                   </div>
                   <div className="flex flex-nowrap">
                     <HoverOrTapAffordance
+                      fadeInDelay={0.15 + 0.25 + 0.18 + 0.07}
+                      fadeInOnTapOutside
                       inline
                       // (first dot starts shrinking)
                       // + (last dot starts shrinking)
                       // + (shrinking duration)
                       // + (buffer before text starts fading in)
                       affordanceClassName={affordanceLineClassName}
-                      fadeInDelay={0.15 + 0.25 + 0.18 + 0.07}
-                      fadeInOnTapOutside
                     >
                       <ConnectingDotsText
                         text="Sense-Maker"
-                        dotPositions={dotPositions}
+                        dotPositions={DOT_POSITIONS}
                       />
                     </HoverOrTapAffordance>
                     <span className="opacity-50">.</span>
@@ -164,4 +163,6 @@ export default function Home() {
       <div id="wonderful" />
     </main>
   );
-}
+};
+
+export default Home;

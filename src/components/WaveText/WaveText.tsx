@@ -4,12 +4,12 @@ import styles from "./WaveText.module.css";
 
 export type WaveTextProps = {
   /**
-   * The text in this WaveText. Subject to whitespace-pre.
+   * The text in this {@link WaveText}. Subject to `whitespace-pre`.
    */
   text: string;
 
   /**
-   * Classes for the root element of this WaveText,
+   * Classes for the container `<span>` of this {@link WaveText},
    * including the following CSS variables used to control its behavior:
    *
    * - `--wave-height`: the distance that each character travels between
@@ -25,15 +25,15 @@ export type WaveTextProps = {
 };
 
 /**
- * Renders the specified text such that its (non-whitespace) characters
+ * Renders the specified `text` such that its (non-whitespace) characters
  * gently move up and down in a continuous wave that appears to travel
- * from left to right. Motionless if the user prefers reduced motion.
+ * from left to right. Motionless if the user `prefers-reduced-motion`.
  *
  * Animated using CSS alone and thus valid as a server component.
  */
 const WaveText = ({ text, className }: WaveTextProps) => (
   <span className={twMerge("inline-flex whitespace-pre", className)}>
-    {/* Screen readers ignore aria-label on generic elements
+    {/* Screen readers ignore `aria-label` on generic elements
         like spans, so the text is exposed this way instead */}
     <span className="sr-only">{text}</span>
     {/* Spreading iterates by code point, so "astral"
@@ -53,7 +53,7 @@ const WaveText = ({ text, className }: WaveTextProps) => (
           key={i}
           aria-hidden
           className={twMerge("inline-block", styles.char)}
-          // Subracting chars.length keeps every animation-delay negative,
+          // Subracting `chars.length` keeps every `animation-delay` negative,
           // which ensures that none of the characters are motionless at first
           // (i.e., while they wait for the wave effect to "reach" them)
           style={{ "--wave-offset": i - chars.length } as CSSProperties}

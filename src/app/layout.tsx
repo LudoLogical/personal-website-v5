@@ -14,21 +14,21 @@ export const metadata: Metadata = {
   // description: '', TODO
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
-  return (
-    <html
-      lang="en"
-      data-theme="dark"
-      data-scroll-behavior="smooth"
-      className={`${mulish.variable} h-full font-sans antialiased motion-safe:scroll-smooth`}
-    >
-      <body className="flex min-h-full min-w-93.75 flex-col bg-base-300">
-        <PrimaryNav />
-        <div className="rounded-b-paper shadow-page relative z-10 flex flex-1 flex-col bg-base-100">
-          {children}
-        </div>
-        <SiteFooter />
-      </body>
-    </html>
-  );
-}
+const RootLayout = ({ children }: LayoutProps<"/">) => (
+  <html
+    lang="en"
+    data-theme="dark"
+    data-scroll-behavior="smooth"
+    className={`${mulish.variable} h-full font-sans antialiased motion-safe:scroll-smooth`}
+  >
+    <body className="flex min-h-full min-w-93.75 flex-col bg-base-300">
+      <PrimaryNav />
+      <div className="rounded-b-paper relative z-10 flex flex-1 flex-col bg-base-100 shadow-page">
+        {children}
+      </div>
+      <SiteFooter />
+    </body>
+  </html>
+);
+
+export default RootLayout;

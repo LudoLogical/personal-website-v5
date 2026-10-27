@@ -8,20 +8,20 @@ import styles from "./AnimatedLogo.module.css";
 export type AnimatedLogoProps = Omit<LogoProps, "ref">;
 
 /**
- * Renders the Logo such that, while its parent is hovered (or, on touch
- * screens, every time that its parent is tapped), the arrow strikes the D,
- * causing it to teeter, recoil, and then settle back into place.
+ * Renders the {@link Logo} such that, while its parent is hovered (or, on
+ * touch screens, every time that its parent is tapped), the arrow strikes
+ * the D, causing it to teeter, recoil, and then settle back into place.
  * Motionless if the user `prefers-reduced-motion`.
  *
- * Note: Like Logo, this component is hidden from ATs, so its parent is
- * responsible for supplying a label if one is necessary.
+ * Note: Like {@link Logo}, this component is hidden from ATs, so its parent
+ * is responsible for supplying a label if one is necessary.
  */
 const AnimatedLogo = ({ className, ...props }: AnimatedLogoProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   // On touch screens, the parent stays "hovered" after being tapped,
   // so tapping it again doesn't cause the CSS animations to play again.
-  // This useEffect() fixes that by restarting the animations manually.
+  // This `useEffect()` fixes that by restarting the animations manually.
   useEffect(() => {
     const svg = svgRef.current;
     const parent = svg?.parentElement;
@@ -38,9 +38,9 @@ const AnimatedLogo = ({ className, ...props }: AnimatedLogoProps) => {
 
   return (
     <Logo
-      {...props}
       ref={svgRef}
       className={twMerge(styles.root, "", className)}
+      {...props}
     />
   );
 };

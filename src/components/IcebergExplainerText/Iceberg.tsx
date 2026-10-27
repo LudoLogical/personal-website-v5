@@ -1,4 +1,5 @@
 import { useId } from "react";
+import type IcebergExplainerText from "./IcebergExplainerText";
 import { NUM_LEVELS } from "./levels";
 
 /*
@@ -10,7 +11,7 @@ import { NUM_LEVELS } from "./levels";
 /** The width of SVG canvas. */
 const CANVAS_W = 312;
 
-/** The height, in canvas units, of one IcebergExplainerText panel. */
+/** The height, in canvas units, of one {@link IcebergExplainerText} panel. */
 const PANEL_H = 120;
 
 /** The height of the entire SVG canvas. */
@@ -69,7 +70,7 @@ const POINTS: [number, number][] = [
 
 /**
  * The triangular facets of the iceberg SVG, written as triples of
- * indices in POINTS. Computed as the Delaunay triangulation of POINTS
+ * indices in `POINTS`. Computed as the Delaunay triangulation of `POINTS`
  * (excluding everything outside of the outline).
  */
 const FACETS: [number, number, number][] = [
@@ -143,13 +144,13 @@ type FacetShading = {
   brightness: number;
 
   /**
-   * The ratio between the y coordinate of the facet's centroid and CANVAS_H.
+   * The ratio between the y coordinate of the facet's centroid and `CANVAS_H`.
    */
   depth: number;
 };
 
 /**
- * FacetShading info is static, so it can be pre-computed for every facet.
+ * {@link FacetShading} info is static, so it can be pre-computed for every facet.
  *
  * Brightness values assume evenly-distributed lighting from the left side,
  * but include some noise to ensure that neighboring facets appear distinct.
@@ -169,7 +170,7 @@ const ALL_FACET_SHADING: FacetShading[] = FACETS.map((facet, i) => {
   };
 });
 
-type IcebergProps = {
+export type IcebergProps = {
   /**
    * The height, in pixels, of the entire sliding strip that the iceberg spans.
    */
@@ -179,34 +180,34 @@ type IcebergProps = {
    * The position, in pixels from the top of the sliding strip, of the surface
    * of the water. Also used to shift the vertical position of the entire
    * iceberg so that it aligns with the waterline as it was originally drawn
-   * to do. If null, the original positioning is used without any shifting.
+   * to do. If `null`, the original positioning is used without any shifting.
    */
   waterline: number | null;
 };
 
 /**
  * Renders an SVG of a low-poly iceberg that spans the entire sliding strip
- * of an IcebergExplainerText. The facets above the waterline are fully opaque,
+ * of an {@link IcebergExplainerText}. The facets above the waterline are fully opaque,
  * but those below it become more and more translucent (i.e., fade) with depth.
  */
 const Iceberg = ({ height, waterline }: IcebergProps) => {
-  // Necessary b/c there could be more than one Iceberg instance on a page
+  // Necessary b/c there could be more than one `Iceberg` instance on a page
   // and inline SVG IDs apply to the entire page on which they appear
   const id = useId();
 
-  // The specified waterline must be converted to canvas units
+  // The specified `waterline` must be converted to canvas units
   const waterlineY =
     waterline === null ? WATERLINE : (waterline / height) * CANVAS_H;
   const shift = waterlineY - WATERLINE;
 
-  // Renders the entire iceberg, but clips it to the specified region
+  // Renders the entire iceberg, but clips it to the specified `region`
   const renderFacets = (
     region: "surface" | "submerged",
-    fill: (facet: FacetShading) => string, // Formula varies by region
-    opacity: (facet: FacetShading) => number, // Formula varies by region
+    fill: (facet: FacetShading) => string, // Formula varies by `region`
+    opacity: (facet: FacetShading) => number, // Formula varies by `region`
   ) => (
     <g clipPath={`url(#${id}-${region})`}>
-      {/* Shifted separately so the clipPath doesn't move */}
+      {/* Shifted separately so the `clipPath` doesn't move */}
       <g transform={`translate(0 ${shift})`}>
         {ALL_FACET_SHADING.map((facet) => (
           <polygon
@@ -225,7 +226,7 @@ const Iceberg = ({ height, waterline }: IcebergProps) => {
     </g>
   );
 
-  // Shadowed facets above the water are tints of color-blue-300
+  // Shadowed facets above the water are tints of `color-blue-300`
   const surfaceFill = ({ brightness }: FacetShading) => {
     const percentBlue = Math.round((1 - brightness) * 40);
     return `color-mix(in oklch, var(--color-blue-300) ${percentBlue}%, white)`;

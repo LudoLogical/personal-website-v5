@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { useGapMidpoint } from "@/utils/useGapMidpoint";
+import useGapMidpoint from "@/utils/useGapMidpoint";
 import Iceberg from "./Iceberg";
 import type { IcebergExplainerTextProps } from "./IcebergExplainerText";
-import { NUM_LEVELS, type Levels } from "./levels";
+import { NUM_LEVELS, type Level, type Levels } from "./levels";
 
 /**
- * The background and text color classes for each Level's panel,
+ * The background and text color classes for each {@link Level}'s panel,
  * in order from top (the surface) to bottom (the deepest level).
  */
 const LEVEL_CLASS_NAMES: [string, string, string, string] = [
@@ -16,32 +16,32 @@ const LEVEL_CLASS_NAMES: [string, string, string, string] = [
   "bg-blue-950 text-blue-100",
 ];
 
-type LevelPanelsProps = {
+export type LevelPanelsProps = {
   /**
-   * The four Levels in this LevelPanels,
+   * The four {@link Level}s in this {@link LevelPanels},
    * in order from top (the surface) to bottom (the deepest level).
    */
   levels: Levels;
 
   /**
-   * The index of the Level whose panel this LevelPanels should display.
+   * The index of the {@link Level} whose panel this {@link LevelPanels} should display.
    */
   currentLevel: number;
 
   /**
-   * The duration and easing curve according to which this LevelPanels should
+   * The duration and easing curve according to which this {@link LevelPanels} should
    * scroll between panels, expressed as a partial CSS `transition` value.
    */
   scrollTransition: string;
 
   /**
-   * Classes for each of the Level panels.
+   * Classes for each of the {@link Level} panels.
    * Applied after the panel's background classes.
    */
   panelClassName?: string;
 
   /**
-   * Classes for the text in each of the Level panels.
+   * Classes for the text in each of the {@link Level} panels.
    */
   textClassNames?: NonNullable<
     IcebergExplainerTextProps["childClassNames"]
@@ -49,8 +49,8 @@ type LevelPanelsProps = {
 };
 
 /**
- * Renders a sliding strip of panels for each of four Levels, exactly one
- * of which is shown at a time. A single Iceberg spans the backgrounds of
+ * Renders a sliding strip of panels for each of four {@link Level}s, exactly one
+ * of which is shown at a time. A single `Iceberg` spans the backgrounds of
  * all four panels, which get progressively darker from top to bottom.
  */
 const LevelPanels = ({
@@ -77,7 +77,7 @@ const LevelPanels = ({
       setStripHeight(strip.offsetHeight),
     );
     observer.observe(strip);
-    return () => observer.disconnect(); // destroy observer on cleanup
+    return () => observer.disconnect(); // destroy `observer` on cleanup
   }, []); // run only once per mount
   const panelHeight = stripHeight === null ? null : stripHeight / NUM_LEVELS;
 
@@ -86,7 +86,7 @@ const LevelPanels = ({
       className="flex-1 overflow-hidden"
       style={{ height: panelHeight ?? undefined }}
     >
-      {/* auto-rows-fr makes every panel as tall as the tallest one */}
+      {/* `auto-rows-fr` makes every panel as tall as the tallest one */}
       <span
         ref={stripRef}
         className="relative grid auto-rows-fr motion-reduce:transition-none!"
@@ -102,7 +102,7 @@ const LevelPanels = ({
           <span
             key={i}
             className={twMerge(
-              // *:relative lets the children go above the iceberg
+              // `*:relative` lets the children go above the iceberg
               "flex flex-col gap-1 px-4 pt-3 pb-4 whitespace-nowrap *:relative",
               LEVEL_CLASS_NAMES[i],
               panelClassName,

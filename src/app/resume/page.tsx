@@ -10,16 +10,17 @@ import type { Metadata } from "next";
 import type { ComponentType, ReactNode } from "react";
 import ExternalLink from "@/components/ExternalLink";
 import LabeledExpandable from "@/components/LabeledExpandable";
+import type PrimaryNav from "@/components/PrimaryNav";
 import { OrgLogo, OrgName, SkillChip } from "./atoms";
 import {
+  CERTIFICATIONS,
+  EDUCATIONS,
+  EXPERIENCES,
+  HONORS,
+  SKILLS,
   type SkillID,
-  certifications,
-  education,
-  experience,
-  honors,
-  skills,
 } from "./content";
-import { type Recognition, type Skill, skillGroups } from "./types";
+import { SKILL_GROUPS, type Recognition, type Skill } from "./types";
 import {
   EducationEntry,
   ExperienceEntry,
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Renders the specified Recognitions in a grid.
+ * Renders the specified {@link Recognition}s in a grid.
  */
 const RecognitionList = ({ items }: { items: Recognition[] }) => (
   <ul className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
@@ -66,7 +67,7 @@ const RecognitionList = ({ items }: { items: Recognition[] }) => (
 /**
  * Renders a section of the resume. On wide viewports, its heading is located
  * in a column to the left of its content and sticks to the top of the viewport
- * (but respects the PrimaryNav).
+ * (but respects the {@link PrimaryNav}).
  */
 const Section = ({
   id,
@@ -95,16 +96,16 @@ const Section = ({
   </section>
 );
 
-const numExtraExperiences = experience.filter(
+const numExtraExperiences = EXPERIENCES.filter(
   ({ featured }) => !featured,
 ).length;
 
-const lastFeaturedExperienceIndex = experience.findLastIndex(
+const lastFeaturedExperienceIndex = EXPERIENCES.findLastIndex(
   ({ featured }) => featured,
 );
 
-const skillEntries = Object.entries(skills) as [SkillID, Skill][];
-const skillsByGroup = skillGroups.map((group) => ({
+const skillEntries = Object.entries(SKILLS) as [SkillID, Skill][];
+const skillsByGroup = SKILL_GROUPS.map((group) => ({
   group,
   entries: skillEntries.filter(([, skill]) => skill.group === group),
 })); // as { group: SkillGroup, entries: [SkillID, Skill][] }[]
@@ -113,7 +114,7 @@ const extraSkillCount = skillEntries.filter(
   ([, { featured }]) => !featured, // i.e., [_, { featured }]
 ).length;
 
-export default function Resume() {
+const Resume = () => {
   return (
     // Clears the navigation bar, which floats above the top of the page
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 pt-36 pb-12">
@@ -149,13 +150,13 @@ export default function Resume() {
           className="gap-6"
         >
           <Timeline>
-            {experience.map((entry, i) => (
+            {EXPERIENCES.map((entry, i) => (
               <TimelineItem
                 key={`${entry.organization.name} ${entry.start}`}
                 organization={entry.organization}
                 extra={!entry.featured}
                 lastFeatured={i === lastFeaturedExperienceIndex}
-                last={i === experience.length - 1}
+                last={i === EXPERIENCES.length - 1}
               >
                 <ExperienceEntry entry={entry} />
               </TimelineItem>
@@ -166,11 +167,11 @@ export default function Resume() {
 
       <Section id="education" title="Education" icon={GraduationCap}>
         <Timeline>
-          {education.map((entry, i) => (
+          {EDUCATIONS.map((entry, i) => (
             <TimelineItem
               key={`${entry.institution.name} ${entry.start}`}
               organization={entry.institution}
-              last={i === education.length - 1}
+              last={i === EDUCATIONS.length - 1}
             >
               <EducationEntry entry={entry} />
             </TimelineItem>
@@ -189,7 +190,7 @@ export default function Resume() {
             {skillsByGroup.map(
               ({ group, entries }) =>
                 entries.length > 0 && (
-                  // If no entries are featured, the whole group is extra
+                  // If no `entries` are `featured`, the whole group is extra
                   <div
                     key={group}
                     data-extra={
@@ -214,12 +215,14 @@ export default function Resume() {
       </Section>
 
       <Section id="certifications" title="Certifications" icon={BadgeCheck}>
-        <RecognitionList items={certifications} />
+        <RecognitionList items={CERTIFICATIONS} />
       </Section>
 
       <Section id="honors" title="Honors" icon={Trophy}>
-        <RecognitionList items={honors} />
+        <RecognitionList items={HONORS} />
       </Section>
     </main>
   );
-}
+};
+
+export default Resume;

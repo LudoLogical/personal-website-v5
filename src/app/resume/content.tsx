@@ -33,7 +33,7 @@ import {
 import ExternalLink from "@/components/ExternalLink";
 import type { Education, Experience, Recognition, Skill } from "./types";
 
-const skillsById = {
+const SKILLS_BY_ID = {
   // Engineering
   react: {
     name: "React",
@@ -151,12 +151,12 @@ const skillsById = {
 // that would cause `keyof typeof skillsByID` below to just be `string` instead
 // of the desired union of all the IDs
 
-export type SkillID = keyof typeof skillsById;
+export type SkillID = keyof typeof SKILLS_BY_ID;
 
-// Export the full Record *after* the new type annotation
-export const skills: Record<SkillID, Skill> = skillsById;
+// Export the full `Record` *after* the new type annotation
+export const SKILLS: Record<SkillID, Skill> = SKILLS_BY_ID;
 
-export const experience: Experience[] = [
+export const EXPERIENCES: Experience[] = [
   {
     role: "Director of Student Experience",
     organization: {
@@ -361,7 +361,7 @@ export const experience: Experience[] = [
   },
 ];
 
-export const education: Education[] = [
+export const EDUCATIONS: Education[] = [
   {
     degree: "Master of Human-Computer Interaction",
     href: "https://hcii.cmu.edu/academics/mhci",
@@ -390,7 +390,7 @@ export const education: Education[] = [
           kind="underline"
           href="https://cs.utdallas.edu/education/computing-scholars-honors-program/"
         >
-          {/* Not <sup> b/c ExternalLink demands a string here */}
+          {/* Not `<sup>` b/c `ExternalLink` demands a `string` here */}
           CS²
         </ExternalLink>
         ) and university (
@@ -406,7 +406,7 @@ export const education: Education[] = [
   },
 ];
 
-export const certifications: Recognition[] = [
+export const CERTIFICATIONS: Recognition[] = [
   {
     title: "AWS Cloud Solutions Architect",
     href: "https://www.coursera.org/professional-certificates/aws-cloud-solutions-architect",
@@ -429,7 +429,7 @@ export const certifications: Recognition[] = [
   },
 ];
 
-export const honors: Recognition[] = [
+export const HONORS: Recognition[] = [
   {
     title: "Valedictorian",
     organization: {

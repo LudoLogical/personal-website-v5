@@ -1,7 +1,7 @@
 import { useEffect, useState, type RefObject } from "react";
 
 /**
- * Information about the rasterized size of a text Element.
+ * Information about the rasterized size of a text `Element`.
  */
 export type TextDimensions = {
   /** The width, in pixels, of the rasterized text. */
@@ -18,13 +18,13 @@ export type TextDimensions = {
 };
 
 /**
- * Tracks the width, height, and font size of the HTMLElement assigned to the
- * specified targetRef. Updates whenever the dimensions of the HTMLElement
+ * Tracks the width, height, and font size of the `HTMLElement` assigned to the
+ * specified `targetRef`. Updates whenever the dimensions of the `HTMLElement`
  * change (which includes when web fonts finish loading).
- * @param ref a RefObject for the HTMLElement to be measured  
- * @returns the TextDimensions of the HTMLElement, or null if ref is null
+ * @param ref a `RefObject` for the `HTMLElement` to be measured  
+ * @returns the {@link TextDimensions} of the `HTMLElement`, or `null` if ref is `null`
  */
-export const useTextDimensions = (
+const useTextDimensions = (
   ref: RefObject<HTMLElement | null>,
 ): TextDimensions | null => {
   const [textDims, setTextDims] = useState<TextDimensions | null>(null);
@@ -44,8 +44,10 @@ export const useTextDimensions = (
 
     const observer = new ResizeObserver(readTextDims);
     observer.observe(target);
-    return () => observer.disconnect(); // destroy observer on cleanup
+    return () => observer.disconnect(); // destroy `observer` on cleanup
   }, [ref]);
 
   return textDims;
 };
+
+export default useTextDimensions;

@@ -1,29 +1,30 @@
 "use client";
 
 import { useMemo, useRef, useState, type PointerEvent } from "react";
-import { useTapOutside } from "@/utils/useTapOutside";
+import useTapOutside from "@/utils/useTapOutside";
 import { useDots } from "./dots";
 import { getTransitions } from "./timing";
 
 export type ConnectingDotsTextProps = {
   /**
-   * The text in this ConnectingDotsText.
-   * Subject to leading-none and whitespace-nowrap.
+   * The text in this {@link ConnectingDotsText}.
+   * Subject to `leading-none` and `whitespace-nowrap`.
    */
   text: string;
 
   /**
-   * The vertical positions, in ems from the top of the bounding box of this
-   * ConnectingDotsText, of the dots that will appear over each non-whitespace
-   * character in the specified text, in order from left to right.
+   * The vertical positions, in ems from the top of the bounding box of
+   * this {@link ConnectingDotsText}, of the dots that will appear over
+   * each non-whitespace character in the specified `text`, in order from
+   * left to right.
    *
-   * Because the text is subject to leading-none, it is exactly 1 em tall,
+   * Because the text is subject to `leading-none`, it is exactly 1 em tall,
    * so all values should be between 0 (top) and 1 (bottom), though values
    * close to either extreme should account for the dotSize to prevent them
-   * from sticking out of the bounding box of this ConnectingDotsText.
+   * from sticking out of the bounding box of this {@link ConnectingDotsText}.
    *
    * If there are fewer position values than there are non-whitespace
-   * characters in the specified text, then the supplied position values are
+   * characters in the specified `text`, then the supplied position values are
    * reused cyclically.
    *
    * If this prop is omitted or the array is empty,
@@ -32,19 +33,20 @@ export type ConnectingDotsTextProps = {
   dotPositions?: number[];
 
   /**
-   * Optional settings for this ConnectingDotsText.
-   * Unspecified values are set according to DEFAULT_OPTIONS.
+   * Optional settings for this {@link ConnectingDotsText}.
+   * Unspecified values are set according to {@link DEFAULT_OPTIONS}.
    */
   options?: {
     /**
      * Optional settings that control how the contents
-     * of this ConnectingDotsText are rendered.
+     * of this {@link ConnectingDotsText} are rendered.
      */
     appearance?: {
       /**
-       * The width, in ems, of the line that connects the dots.
+       * The color of both the dots and the line that connects them.
+       * Can be any CSS color value.
        */
-      strokeWidth?: number;
+      accentColor?: string;
 
       /**
        * The diameter, in ems, of the dots.
@@ -52,10 +54,9 @@ export type ConnectingDotsTextProps = {
       dotSize?: number;
 
       /**
-       * The color of both the dots and the line that connects them.
-       * Can be any CSS color value.
+       * The width, in ems, of the line that connects the dots.
        */
-      accentColor?: string;
+      strokeWidth?: number;
 
       /**
        * The fraction of its full opacity to which the text should be reduced
@@ -66,7 +67,7 @@ export type ConnectingDotsTextProps = {
 
     /**
      * Optional settings that control how the contents
-     * of this ConnectingDotsText are animated.
+     * of this {@link ConnectingDotsText} are animated.
      */
     animation?: {
       /**
@@ -123,13 +124,13 @@ export type ConnectingDotsTextProps = {
 };
 
 /**
- * The options prop as a non-optional type in which all groups are required.
+ * The `options` prop as a non-optional type in which all groups are required.
  * Exists as a helper type for the declaration that follows.
  */
 type Groups = Required<NonNullable<ConnectingDotsTextProps["options"]>>;
 
 /**
- * The options prop after all DEFAULT_OPTIONS have been applied.
+ * The `options` prop after all {@link DEFAULT_OPTIONS} have been applied.
  * Defined such that the prop itself, every group within it,
  * and every setting within every group are no longer optional.
  */
@@ -138,13 +139,13 @@ export type ConnectingDotsTextOptions = {
 };
 
 /**
- * The values used for any settings that are omitted from the options prop.
+ * The values used for any settings that are omitted from the `options` prop.
  */
 export const DEFAULT_OPTIONS: ConnectingDotsTextOptions = {
   appearance: {
-    strokeWidth: 0.085, // matches DiagramAnimation
-    dotSize: 0.24,
     accentColor: "var(--color-primary)",
+    dotSize: 0.24,
+    strokeWidth: 0.085, // matches `DiagramAnimation`
     fadedTextOpacity: 0.15,
   },
   animation: {
@@ -160,7 +161,7 @@ export const DEFAULT_OPTIONS: ConnectingDotsTextOptions = {
 };
 
 /**
- * Renders the specified text and adds an animation which causes that text
+ * Renders the specified `text` and adds an animation which causes that text
  * to fade partially out of view, at which point a series of dots (one for
  * each non-whitespace character in the text) grow into view and become
  * connected by a line that draws itself into view shortly after.
@@ -182,7 +183,7 @@ const ConnectingDotsText = ({
 
   // Keyed by value so receiving an identical copy won't re-run the memo
   const serializedOptions = JSON.stringify(options ?? {});
-  const { appearance, animation } = useMemo(() => {
+  const resolvedOptions = useMemo(() => {
     const deserializedOptions = JSON.parse(serializedOptions);
     return {
       appearance: {
@@ -204,7 +205,11 @@ const ConnectingDotsText = ({
 
   // Used to keep randomly generated dots (and the line that joins them,
   // if that line is thick enough) inside the text's bounding box
-  const dotMargin = Math.max(appearance.dotSize, appearance.strokeWidth) / 2;
+  const dotMargin =
+    Math.max(
+      resolvedOptions.appearance.dotSize,
+      resolvedOptions.appearance.strokeWidth,
+    ) / 2;
 
   const { characters, points, setLetterRef, textDimensions } = useDots(
     text,
@@ -213,7 +218,11 @@ const ConnectingDotsText = ({
     dotMargin,
   );
 
-  const transitions = getTransitions(active, points.length, animation);
+  const transitions = getTransitions(
+    active,
+    points.length,
+    resolvedOptions.animation,
+  );
 
   return (
     <span
@@ -229,7 +238,7 @@ const ConnectingDotsText = ({
       }}
       className="relative inline-block cursor-default"
     >
-      {/* Screen readers ignore aria-label on generic elements
+      {/* Screen readers ignore `aria-label` on generic elements
           like spans, so the text is exposed this way instead */}
       <span className="sr-only">{text}</span>
       <span
@@ -237,7 +246,7 @@ const ConnectingDotsText = ({
         className="block leading-none whitespace-nowrap motion-reduce:transition-none!"
         style={{
           color: "currentColor",
-          opacity: active ? appearance.fadedTextOpacity : 1,
+          opacity: active ? resolvedOptions.appearance.fadedTextOpacity : 1,
           transition: transitions.text,
         }}
       >
@@ -264,8 +273,10 @@ const ConnectingDotsText = ({
           points={points.map(({ x, y }) => `${x},${y}`).join(" ")}
           pathLength={1}
           fill="none"
-          stroke={appearance.accentColor}
-          strokeWidth={appearance.strokeWidth * (textDimensions?.em ?? 0)}
+          stroke={resolvedOptions.appearance.accentColor}
+          strokeWidth={
+            resolvedOptions.appearance.strokeWidth * (textDimensions?.em ?? 0)
+          }
           strokeLinejoin="round"
           strokeLinecap="round"
           strokeDasharray={1}
@@ -278,8 +289,11 @@ const ConnectingDotsText = ({
             key={i}
             cx={x}
             cy={y}
-            r={(appearance.dotSize / 2) * (textDimensions?.em ?? 0)}
-            fill={appearance.accentColor}
+            r={
+              (resolvedOptions.appearance.dotSize / 2) *
+              (textDimensions?.em ?? 0)
+            }
+            fill={resolvedOptions.appearance.accentColor}
             className="motion-reduce:transition-none!"
             style={{
               transformBox: "fill-box",

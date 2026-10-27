@@ -3,32 +3,34 @@ import type { SkillID } from "./content";
 
 /**
  * A company, non-profit, institution, or other group with which
- * an Experience, Education, or Recognition may be affiliated.
+ * an {@link Experience}, {@link Education}, or {@link Recognition}
+ * may be affiliated.
  */
 export type Organization = {
   /**
-   * The name of this Oragnization.
+   * The name of this {@link Organization}.
    */
   name: string;
 
   /**
-   * The website for this Organization.
+   * The website for this {@link Organization}.
    */
   href?: string;
 
   /**
-   * The path (within public/logos/) to the Logo for this Organization.
+   * The path (within `public/logos/`) to the logo for this {@link Organization}.
    * Expected to be a square image with a filled (i.e., not transparent)
-   * background. If omitted, the initials of this Organization's name are
-   * used as a placeholder instead.
+   * background. If omitted, the initials of this {@link Organization}'s name
+   * are used as a placeholder instead.
    */
   logo?: string;
 };
 
 /**
- * The groups into which Skills are sorted, listed in order of appearance.
+ * The groups into which {@link Skill}s
+ * are sorted, listed in order of appearance.
  */
-export const skillGroups = [
+export const SKILL_GROUPS = [
   "Engineering",
   "Tools",
   "Practices",
@@ -36,89 +38,94 @@ export const skillGroups = [
 ] as const;
 
 /**
- * A group into which Skills can be sorted.
+ * A group into which {@link Skill}s can be sorted.
  */
-export type SkillGroup = (typeof skillGroups)[number];
+export type SkillGroup = (typeof SKILL_GROUPS)[number];
 
 /**
- * A competency that may or may not be associated with one or more Experiences.
+ * A competency that may or may not be
+ * associated with one or more {@link Experience}s.
  */
 export type Skill = {
   /**
-   * The name of this Skill.
+   * The name of this {@link Skill}.
    */
   name: string;
 
   /**
-   * An icon that represents this Skill (e.g., the logo for a technology).
+   * An icon that represents this {@link Skill}
+   * (e.g., the logo for a technology).
    */
   icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
 
   /**
-   * The group to which this Skill belongs and under which it will appear.
+   * The group to which this {@link Skill}
+   * belongs and under which it will appear.
    */
   group: SkillGroup;
 
   /**
-   * True if this Skill should always be visible in the "Skills" section of
-   * /resume, false if it should only appear when that section is expanded.
+   * `true` if this {@link Skill} should always be visible in the "Skills"
+   * section of `/resume`, `false` if it should only appear when that section
+   * is expanded (and by default).
    */
   featured?: boolean;
 
   /**
-   * True if this Skill should be visually emphasized emphasized everywhere
-   * it appears (i.e., in both the "Skills" and "Experience" sections),
-   * false otherwise. Highlighted Skills should always also be featured.
+   * `true` if this {@link Skill} should be visually emphasized
+   * everywhere it appears (i.e., in both the "Skills" and "Experience"
+   * sections), `false` otherwise (and by default). A {@link Skill} that is `highlighted` should always also be `featured`.
    */
   highlighted?: boolean;
 };
 
 /**
- * One or more roles held contiguously at or with a single Organization.
+ * One or more roles held contiguously
+ * at or with a single {@link Organization}.
  */
 export type Experience = {
   /**
-   * The name of the most recently held role in this Experience.
+   * The name of the most recently held role in this {@link Experience}.
    */
   role: string;
 
   /**
-   * The Organization with which this Experience is associated.
+   * The {@link Organization} with which this {@link Experience} is associated.
    */
   organization: Organization;
 
   /**
-   * Important contextual information about this Experience;
-   * appears in parentheses after the name of the Organization.
+   * Important contextual information about this {@link Experience};
+   * appears in parentheses after the name of the {@link Organization}.
    */
   context?: ReactNode;
 
   /**
-   * The city and state in which the Organization
-   * associated with this Experience is/was located.
+   * The city and state in which the {@link Organization}
+   * associated with this {@link Experience} is/was located.
    */
   location: string;
 
   /**
-   * True if this Experience was remote, false otherwise.
+   * `true` if this {@link Experience} was remote, `false` otherwise (and by default).
    */
   isRemote?: boolean;
 
   /**
    * The month, in YYYY-MM format, in which the most
-   * recently held role in this Experience began.
+   * recently held role in this {@link Experience} began.
    */
   start: string;
 
   /**
-   * The month, in YYYY-MM format, in which the most recently held
-   * role in this Experience ended. Omitted if said role is ongoing.
+   * The month, in YYYY-MM format, in which the most recently held role
+   * in this {@link Experience} ended. Omitted if said role is ongoing.
    */
   end?: string;
 
   /**
-   * The role(s) held prior to the most recently held role in
-   * this Experience (if any), in order from most to least recent.
+   * The role(s) held prior to the most recently held role in this
+   * {@link Experience} (if any), in order from most to least recent.
    */
   formerRoles?: {
     /**
@@ -141,28 +148,28 @@ export type Experience = {
 
   /**
    * One or more bullet points that outline
-   * the work performed in this Experience.
+   * the work performed in this {@link Experience}.
    */
   description: ReactNode[];
 
   /**
    * Links to publicly accessible work products (e.g., a live app or
    * its source code) and case studies (located in /work and linked by
-   * their relative paths) associated with this Experience, in the order
-   * in which they are to be displayed.
+   * their relative paths) associated with this {@link Experience},
+   * in the order in which they are to be displayed.
    */
   links?: { label: string; href: string }[];
 
   /**
-   * The IDs of the Skills that are most relevant to the role,
+   * The IDs of the {@link Skill}s that are most relevant to the role,
    * in the order in which they are to be displayed.
    */
   skillIDs?: SkillID[];
 
   /**
-   * True if this Experience should always be visible in the "Experience"
-   * section of /resume, false if it should only appear when that section
-   * is expanded.
+   * `true` if this {@link Experience} should always be visible in the
+   * "Experience" section of `/resume`, `false` if it should only appear
+   * when that section is expanded (and by default).
    */
   featured?: boolean;
 };
@@ -172,63 +179,69 @@ export type Experience = {
  */
 export type Education = {
   /**
-   * The name of the degree that is the subject of this Education.
+   * The name of the degree that is the subject of this {@link Education}.
    */
   degree: string;
 
   /**
-   * The webpage of the degree program that is the subject of this Education.
+   * The webpage of the degree program that
+   * is the subject of this {@link Education}.
    */
   href?: string;
 
   /**
-   * The Organization at which this Education was (or is being) pursued.
+   * The {@link Organization} at which this
+   * {@link Education} was (or is being) pursued.
    */
   institution: Organization;
 
   /**
-   * The month, in YYYY-MM format, in which this Education was initiated.
+   * The month, in YYYY-MM format, in which
+   * this {@link Education} was initiated.
    */
   start: string;
 
   /**
-   * The month, in YYYY-MM format, in which this Education was completed.
-   * Omitted if this Education is still in progress.
+   * The month, in YYYY-MM format, in which this {@link Education}
+   * was completed. Omitted if this {@link Education} is still in progress.
    */
   end?: string;
 
   /**
-   * Additional information about this Education.
+   * Additional information about this {@link Education}.
    */
   description?: ReactNode;
 };
 
 /**
- * A certification or honor bestowed by an Organization.
+ * A certification or honor bestowed by an {@link Organization}.
  */
 export type Recognition = {
   /**
-   * The name of this Recognition.
+   * The name of this {@link Recognition}.
    */
   title: string;
 
   /**
-   * A webpage about this Recognition or containing proof of its receipt.
+   * A webpage about this {@link Recognition}
+   * or containing proof of its receipt.
    */
   href?: string;
 
   /**
-   * The Organization that bestowed this Recognition.
+   * The {@link Organization} that bestowed this {@link Recognition}.
    */
   organization: Organization;
 
   /**
-   * The city and state in which this Recognition was bestowed, if relevant.
+   * The city and state in which this
+   * {@link Recognition} was bestowed, if relevant.
    */
   location?: string;
 
   /**
-   * The date, in YYYY-MM-DD format, on which this Recognition was bestowed.
+   * The date, in YYYY-MM-DD format, on which
+   * this {@link Recognition} was bestowed.
    */
   date: string;
 };

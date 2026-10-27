@@ -2,34 +2,32 @@
 
 import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
-import { useTapOutside } from "@/utils/useTapOutside";
-import { useTextDimensions } from "@/utils/useTextDimensions";
+import useTapOutside from "@/utils/useTapOutside";
+import useTextDimensions from "@/utils/useTextDimensions";
 import { getArrowheadPath, getMarkerPaths, rasterizeArrow } from "./paths";
 import { useDiagramAnimationTimeline } from "./timeline";
-import { MarkerShape, type Arrow } from "./types";
+import {
+  MarkerShape,
+  type Arrow,
+  type ArrowAnchor,
+  type ArrowEnd,
+} from "./types";
 
 export type DiagramAnimationProps = {
   /**
-   * The display text for this DiagramAnimation.
-   * Subject to leading-none and whitespace-nowrap.
+   * The display text for this {@link DiagramAnimation}.
+   * Subject to `leading-none` and `whitespace-nowrap`.
    */
   text: string;
 
   /**
-   * The Arrows that comprise this DiagramAnimation.
+   * The {@link Arrow}s that comprise this {@link DiagramAnimation}.
    */
   arrows: Arrow[];
 
   /**
-   * Classes for the container `<div>` of this DiagramAnimation.
-   * Color is inherited by both the text (which also inherits font)
-   * and the diagram elements.
-   */
-  className?: string;
-
-  /**
-   * Optional settings for this DiagramAnimation.
-   * Unspecified values are set according to DEFAULT_OPTIONS.
+   * Optional settings for this {@link DiagramAnimation}.
+   * Unspecified values are set according to {@link DEFAULT_OPTIONS}.
    */
   options?: {
     /**
@@ -38,53 +36,56 @@ export type DiagramAnimationProps = {
      */
     appearance?: {
       /**
-       * The amount of space, in ems, between the bounding box
-       * of the text at the center of this DiagramAnimation and
-       * the locations of any ArrowAnchors that surround it.
-       */
-      diagramPadding?: number;
-
-      /**
-       * The width, in ems, of the lines in this DiagramAnimation.
-       */
-      strokeWidth?: number;
-
-      /**
        * The radius, in ems, of the corners
-       * of the Arrows in this DiagramAnimation.
+       * of the {@link Arrow}s in this {@link DiagramAnimation}.
        */
       cornerRadius?: number;
 
       /**
+       * The amount of space, in ems, between the bounding box of
+       * the text at the center of this {@link DiagramAnimation} and
+       * the locations of any {@link ArrowAnchor}s that surround it.
+       */
+      diagramPadding?: number;
+
+      /**
        * The distance, in ems, between the tips of the arrowheads in this
-       * DiagramAnimation and the tips of the arms of those arrowheads,
-       * measured parallel to the ends of the bodies of the Arrows to
+       * {@link DiagramAnimation} and the tips of the arms of those arrowheads,
+       * measured parallel to the ends of the bodies of the {@link Arrow}s to
        * which they correspond.
        */
       headLength?: number;
 
       /**
-       * The distance away from the body of an Arrow to which the outer tips
-       * of the arms that form the head of that Arrow should extend,
-       * expressed as a fraction of the headLength.
+       * The distance away from the body of an {@link Arrow} to which the
+       * outer tips of the arms that form the head of that {@link Arrow}
+       * should extend, expressed as a fraction of the `headLength`.
        */
       headSpread?: number;
 
       /**
-       * The side length, in ems, of the bounding box according to
-       * which the markers in this DiagramAnimation should be sized.
+       * The visible distance, in ems, between an end of the body of an
+       * {@link Arrow} in this {@link DiagramAnimation} and the nearest
+       * part of a marker located at that end.
+       * Identical for every {@link MarkerShape}.
+       *
+       * @remarks
+       *
+       * "Visible distance" means that things like stroke
+       * width and rounded line caps are accounted for.
+       */
+      markerGap?: number;
+
+      /**
+       * The side length, in ems, of the bounding box according to which
+       * the markers in this {@link DiagramAnimation} should be sized.
        */
       markerSize?: number;
 
       /**
-       * The visible distance, in ems, between an end of the body of an Arrow
-       * in this DiagramAnimation and the nearest part of a marker located at
-       * that end. Identical for every MarkerShape.
-       *
-       * "Visible distance" means that things like stroke width and rounded
-       * line caps are accounted for.
+       * The width, in ems, of the lines in this {@link DiagramAnimation}.
        */
-      markerGap?: number;
+      strokeWidth?: number;
     };
 
     /**
@@ -93,23 +94,25 @@ export type DiagramAnimationProps = {
      */
     precision?: {
       /**
-       * The distance, in ems, between two like-dimension coordinates of
-       * the connection points of the `from` and `to` ArrowEnds of an Arrow
-       * below which those coordinates should be made to perfectly align
-       * with each other. If snapping occurs, only the `to` ArrowEnd is
-       * actually moved.
-       *
-       * Exists to circumvent rounding errors that would otherwise cause
-       * orthogonal-path-finding to introduce tiny imperfections
-       * in the paths that it creates.
-       */
-      snapDistance?: number;
-
-      /**
        * The number of decimal places to which path values
        * should be approximated when applying rounded corners.
        */
       pathPrecision?: number;
+
+      /**
+       * The distance, in ems, between two like-dimension coordinates of
+       * the connection points of the `from` and `to` {@link ArrowEnd}s of
+       * an {@link Arrow} below which those coordinates should be made to
+       * perfectly align with each other. If snapping occurs, only the `to`
+       * {@link ArrowEnd} is actually moved.
+       *
+       * @remarks
+       *
+       * Exists to circumvent rounding errors that would otherwise cause
+       * `orthogonal-path-finding` to introduce tiny imperfections in the
+       * paths that it creates.
+       */
+      snapDistance?: number;
     };
 
     /**
@@ -118,39 +121,46 @@ export type DiagramAnimationProps = {
     animation?: {
       /**
        * The duration, in seconds, over which the elements
-       * in this DiagramAnimation should appear.
+       * in this {@link DiagramAnimation} should appear.
        */
       forwardDuration?: number;
 
       /**
-       * The number of times faster than the forwardDuration at which
-       * the elements in this DiagramAnimation should disappear.
+       * The number of times faster than the `forwardDuration` at which
+       * the elements in this {@link DiagramAnimation} should disappear.
        */
       backwardSpeedup?: number;
 
       /**
-       * The fraction of the forwardDuration over which the arrowheads
-       * in this DiagramAnimation should grow into view.
-       */
-      headGrowthDuration?: number;
-
-      /**
        * The duration, in seconds, over which the elements
-       * in this DiagramAnimation should fade into view.
+       * in this {@link DiagramAnimation} should fade into view.
        */
       fadeInDuration?: number;
+
+      /**
+       * The fraction of the `forwardDuration` over which the arrowheads
+       * in this {@link DiagramAnimation} should grow into view.
+       */
+      headGrowthDuration?: number;
     };
   };
+
+  /**
+   * Classes for the container `<div>` of this {@link DiagramAnimation}.
+   * Color is inherited by both the text (which also inherits font) and
+   * the diagram elements.
+   */
+  className?: string;
 };
 
 /**
- * The options prop as a non-optional type in which all groups are required.
+ * The `options` prop as a non-optional type in which all groups are required.
  * Exists as a helper type for the declaration that follows.
  */
 type Groups = Required<NonNullable<DiagramAnimationProps["options"]>>;
 
 /**
- * The options prop after all DEFAULT_OPTIONS have been applied.
+ * The `options` prop after all {@link DEFAULT_OPTIONS} have been applied.
  * Defined such that the prop itself, every group within it,
  * and every setting within every group are no longer optional.
  */
@@ -159,27 +169,27 @@ export type DiagramAnimationOptions = {
 };
 
 /**
- * The values used for any settings that are omitted from the options prop.
+ * The values used for any settings that are omitted from the `options` prop.
  */
 export const DEFAULT_OPTIONS: DiagramAnimationOptions = {
   appearance: {
-    diagramPadding: 0.18,
-    strokeWidth: 0.085, // matches ConnectingDotsText
     cornerRadius: 0.3,
+    diagramPadding: 0.18,
     headLength: 0.22,
     headSpread: 0.7,
-    markerSize: 0.4,
     markerGap: 0.18,
+    markerSize: 0.4,
+    strokeWidth: 0.085, // matches `ConnectingDotsText`
   },
   precision: {
-    snapDistance: 0.05,
     pathPrecision: 2,
+    snapDistance: 0.05,
   },
   animation: {
     forwardDuration: 0.5,
     backwardSpeedup: 1.8,
-    headGrowthDuration: 0.5,
     fadeInDuration: 0.05,
+    headGrowthDuration: 0.5,
   },
 };
 
@@ -197,8 +207,8 @@ export const DEFAULT_OPTIONS: DiagramAnimationOptions = {
 const DiagramAnimation = ({
   text,
   arrows,
-  className,
   options,
+  className,
 }: DiagramAnimationProps) => {
   const textRef = useRef<HTMLHeadingElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -264,7 +274,7 @@ const DiagramAnimation = ({
     resolvedOptions.animation,
   );
 
-  // Mirrors the state of the timeline; exposed through data-active
+  // Mirrors the state of the timeline; exposed through `data-active`
   const [active, setActive] = useState(false);
   const activate = (value: boolean) => {
     setActive(value);
@@ -282,8 +292,8 @@ const DiagramAnimation = ({
       data-active={active || undefined}
       className={twMerge("relative", className)}
     >
-      {/* Applying leading-none brings the bounding box closer to the letters;
-          doing so here prevents the class from being overridden via twMerge() */}
+      {/* Applying `leading-none` brings the bounding box closer to the letters;
+          doing so here prevents the class from being overridden via `twMerge()` */}
       <h1
         ref={textRef}
         className="leading-none whitespace-nowrap"
@@ -328,7 +338,7 @@ const DiagramAnimation = ({
                   />
                 </g>
               ))}
-              {/* Wrapper exists to keep the GSAP motion-path
+              {/* Wrapper exists to keep the GSAP `motionPath`
                   transform separate from the arrowhead scaling */}
               <g data-carrier>
                 <path data-arrowhead d={arrowheadPath} />

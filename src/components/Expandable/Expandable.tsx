@@ -8,33 +8,33 @@ import styles from "./Expandable.module.css";
 
 export type ExpandableProps = {
   /**
-   * The labels for the toggle button in this Expandable, or undefined
+   * The labels for the toggle button in this {@link Expandable}; omit
    * if the toggle button should be omitted (e.g., because there is no
    * extra content to show).
    */
   labels?: {
     /**
-     * The label for the toggle button in this Expandable when its
+     * The label for the toggle button in this {@link Expandable} when its
      * `data-extra` descendants are hidden (meaning that clicking
-     * on the button would expand this Expandable).
+     * on the button would expand this {@link Expandable}).
      */
     expand: string;
     /**
-     * The label for the toggle button in this Expandable when its
+     * The label for the toggle button in this {@link Expandable} when its
      * `data-extra` descendants are visible (meaning that clicking
-     * on the button would collapse this Expandable).
+     * on the button would collapse this {@link Expandable}).
      */
     collapse: string;
   };
 
   /**
-   * Classes for the root element of this Expandable.
+   * Classes for the container `<div>` of this {@link Expandable}.
    */
   className?: string;
 
   /**
-   * The content of this Expandable. Any descendant bearing the `data-extra`
-   * attribute stays hidden until this Expandable is expanded, so `data-extra`
+   * The content of this {@link Expandable}. Any descendant bearing the `data-extra`
+   * attribute stays hidden until this {@link Expandable} is expanded, so `data-extra`
    * and always-visible content can be interwoven (e.g., to keep a list in
    * chronological order).
    *

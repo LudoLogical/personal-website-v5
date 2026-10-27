@@ -1,24 +1,29 @@
-import { type ConnectingDotsTextOptions } from "./ConnectingDotsText";
+import type {
+  default as ConnectingDotsText,
+  ConnectingDotsTextOptions,
+} from "./ConnectingDotsText";
 
 /**
  * The delay, in seconds, between the moment when the text in a
- * ConnectingDotsText finishes fading out and the moment when the line
- * in that ConnectingDotsText begins to draw itself. Exists to give the
- * first few dots a head start so that the line has something to connect.
+ * {@link ConnectingDotsText} finishes fading out and the moment
+ * when the line in that {@link ConnectingDotsText} begins to
+ * draw itself. Exists to give the first few dots a head start
+ * so that the line has something to connect.
  */
 const LINE_DRAW_DELAY = 0.12;
 
 /**
- * The delay, in seconds, between the moment when a ConnectingDotsText is
- * deactivated and the moment when its rightmost dot begins to shrink.
+ * The delay, in seconds, between the moment when a {@link ConnectingDotsText}
+ * is deactivated and the moment when its rightmost dot begins to shrink.
  * Exists to allow the line to begin retracting before the dots follow suit.
  */
 const DOT_SHRINK_DELAY = 0.15;
 
 /**
- * The delay, in seconds, between the moment when both the line and the dots
- * in a ConnectingDotsText finish disappearing completely and the moment
- * when the text in that ConnectingDotsText begins to fade back in.
+ * The delay, in seconds, between the moment when both the line and the
+ * dots in a {@link ConnectingDotsText} finish disappearing completely
+ * and the moment when the text in that {@link ConnectingDotsText} begins
+ * to fade back in.
  */
 const TEXT_FADE_IN_BUFFER = 0.07;
 
@@ -39,7 +44,8 @@ const DOT_GROW_CURVE = "cubic-bezier(.3,1.6,.5,1)";
 const DOT_SHRINK_CURVE = "cubic-bezier(.5,0,.75,0)";
 
 /**
- * The CSS transitions for each of the elements in a ConnectingDotsText.
+ * The CSS transitions for each of the
+ * elements in a {@link ConnectingDotsText}.
  */
 export type ConnectingDotsTransitions = {
   /**
@@ -48,7 +54,7 @@ export type ConnectingDotsTransitions = {
   text: string;
 
   /**
-   * The transition for the stroke-dashoffset of the line.
+   * The transition for the `stroke-dashoffset` of the line.
    */
   line: string;
 
@@ -60,16 +66,16 @@ export type ConnectingDotsTransitions = {
 };
 
 /**
- * Creates the CSS transitions that orchestrate the animation
- * of a ConnectingDotsText based on the specified active state.
+ * Creates the CSS transitions that orchestrate the animation of
+ * a {@link ConnectingDotsText} based on the specified active state.
  * "Activation" means animating the text *away* from view and
  * then animating the dots and line *into* view.
- * @param active true if the ConnectingDotsText is being activated;
- *               false if it is being deactivated
- * @param dotCount the number of dots in the ConnectingDotsText
+ * @param active `true` if the {@link ConnectingDotsText} is being activated,
+ *               `false` if it is being deactivated
+ * @param dotCount the number of dots in the {@link ConnectingDotsText}
  * @param animationOptions the animation options for
- *                         the ConnectingDotsText
- * @returns the ConnectingDotsTransitions for the specified state
+ *                         the {@link ConnectingDotsText}
+ * @returns the {@link ConnectingDotsTransitions} for the specified state
  */
 export const getTransitions = (
   active: boolean,

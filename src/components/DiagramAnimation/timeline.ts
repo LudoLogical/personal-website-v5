@@ -2,18 +2,21 @@ import { useCallback, useLayoutEffect, useRef, type RefObject } from "react";
 import { gsap } from "gsap";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
-import { type DiagramAnimationOptions } from "./DiagramAnimation";
-import { type MarkerShape, type RasterizedArrow } from "./types";
+import type {
+  default as DiagramAnimation,
+  DiagramAnimationOptions,
+} from "./DiagramAnimation";
+import type { MarkerShape, RasterizedArrow } from "./types";
 
 gsap.registerPlugin(DrawSVGPlugin, MotionPathPlugin);
 
 /**
- * Adds the animations for the specified arrow Element (including
- * its body, arrowhead, and any markers) to the specified Timeline.
- * @param arrow the Element containing the SVG for the arrow to be animated
- * @param timeline the GSAP Timeline to which the animations should be added
- * @param animationOptions the animation options for
- *                         the associated DiagramAnimation
+ * Adds the animations for the specified `arrow` `Element` (including
+ * its body, arrowhead, and any markers) to the specified {@link gsap.core.Timeline}.
+ * @param arrow the `Element` containing the SVG for the arrow to be animated
+ * @param timeline the {@link gsap.core.Timeline} to which the animations should be added
+ * @param animationOptions the `options.animation` for the
+ *                         associated {@link DiagramAnimation}
  */
 const animateArrow = (
   arrow: Element,
@@ -36,7 +39,7 @@ const animateArrow = (
     .fromTo(body, { drawSVG: "0%" }, { drawSVG: "100%" }, 0)
     // Move the arrowhead along the body; note that the path can be followed
     // as-is because the carrier exists within the same coordinate space as
-    // the body, so there's no need for the "align" option
+    // the body, so there's no need for the `align` option
     .fromTo(
       carrier,
       // Override GSAP's default origin (the top-left corner of the bounding
@@ -75,37 +78,36 @@ const animateArrow = (
 };
 
 /**
- * The controls returned by useDiagramAnimationTimeline.
+ * The controls returned by `useDiagramAnimationTimeline()`.
  */
 export type DiagramAnimationTimelineControls = {
   /**
-   * Plays the animation forward (if the specified value is true) or
-   * in reverse (if the specified value is false). Snaps immediately
+   * Plays the animation forward (if the specified `value` is `true`) or
+   * in reverse (if the specified `value` is `false`). Snaps immediately
    * to the appropriate end state if the user `prefers-reduced-motion`.
    */
   setActive: (value: boolean) => void;
 
   /**
-   * Calls setActive with the opposite of the most recently specified value.
+   * Calls `setActive` with the opposite of the most recently specified `value`.
    */
   toggleActive: () => void;
 };
 
 /**
  * Animates the diagram elements within the specified SVG.
- * Rebuilds the animation whenever the specified paths or animation
- * options change. Progress is preserved across builds so that
+ * Rebuilds the animation whenever the specified paths or `animationOptions` change. Progress is preserved across builds so that
  * mid-animation interruptions do not cause jumps.
- * @param svgRef a RefObject for the SVG Element to be animated
+ * @param svgRef a `RefObject` for the SVG `Element` to be animated
  * @param arrowheadPath the arrowhead path rendered in the SVG;
  *                      passed to trigger a rebuild when changed
- * @param arrows the RasterizedArrows rendered in the SVG;
+ * @param arrows the {@link RasterizedArrow}s rendered in the SVG;
  *               passed to trigger a rebuild when changed
  * @param markerPaths the marker paths rendered in the SVG;
  *                    passed to trigger a rebuild when changed
- * @param animationOptions the animation options for
- *                         the associated DiagramAnimation
- * @returns the DiagramAnimationTimelineControls for the animation
+ * @param animationOptions the `options.animation` for the
+ *                         associated {@link DiagramAnimation}
+ * @returns the {@link DiagramAnimationTimelineControls} for the animation
  */
 export const useDiagramAnimationTimeline = (
   svgRef: RefObject<Element | null>,
@@ -118,7 +120,7 @@ export const useDiagramAnimationTimeline = (
   const active = useRef(false); // active ? animate in : animate out
   const savedProgress = useRef(0); // Used only when rebuilding
 
-  // Extracted so that the memo below doesn't depend on other animationOptions
+  // Extracted so that the memo below doesn't depend on other `animationOptions`
   const { backwardSpeedup } = animationOptions;
   // Memoized so that the layout effect below can depend on it
   const setActive = useCallback(

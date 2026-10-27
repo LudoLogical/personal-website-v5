@@ -2,6 +2,13 @@ import { ArrowUpRight } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
+const KIND_CLASS_NAMES: Record<ExternalLinkProps["kind"], string> = {
+  underline: "inline link whitespace-nowrap link-hover",
+  highlight:
+    "inline-flex items-center gap-2 transition-colors text-base-content/55 hover:text-base-content/85",
+  button: "btn inline-flex items-center gap-1 btn-soft text-sm btn-sm",
+};
+
 export type ExternalLinkProps = Omit<
   ComponentProps<"a">,
   "target" | "rel" | "children"
@@ -9,20 +16,20 @@ export type ExternalLinkProps = Omit<
   (
     | {
         /**
-         * The manner in which this ExternalLink should be rendered.
+         * The manner in which this {@link ExternalLink} should be rendered.
          * - `"underline"`: underlined on hover; the content (which must be
          *                  plain text) is permitted to wrap with the sole
-         *                  constraint that the ArrowUpRight icon will never
+         *                  constraint that the `ArrowUpRight` icon will never
          *                  wrap separately from the last word
          * - `"highlight"`: brightened on hover; the content is placed within
-         *                  a single inline-flex box
+         *                  a single `inline-flex` box
          * - `"button"`: the content is placed within a `btn-soft btn-sm`
          *               daisyUI button
          */
         kind: "underline";
         /**
          * The content of the link.
-         * Must be plain text iff using the underline kind.
+         * Must be plain text iff using the `"underline"` `kind`.
          */
         children: string;
       }
@@ -32,16 +39,9 @@ export type ExternalLinkProps = Omit<
       }
   );
 
-const kindClassNames: Record<ExternalLinkProps["kind"], string> = {
-  underline: "inline link whitespace-nowrap link-hover",
-  highlight:
-    "inline-flex items-center gap-2 transition-colors text-base-content/55 hover:text-base-content/85",
-  button: "btn inline-flex items-center gap-1 btn-soft text-sm btn-sm",
-};
-
 /**
  * Renders a link to a page outside of this website that opens in a new tab.
- * The link is annotated with an ArrowUpRight icon and an explanatory note
+ * The link is annotated with an `ArrowUpRight` icon and an explanatory note
  * for screen readers.
  */
 const ExternalLink = ({
@@ -57,7 +57,7 @@ const ExternalLink = ({
       target="_blank"
       rel="noopener noreferrer"
       {...props}
-      className={twMerge(kindClassNames[kind], className)}
+      className={twMerge(KIND_CLASS_NAMES[kind], className)}
     >
       {kind === "underline" ? (
         <>

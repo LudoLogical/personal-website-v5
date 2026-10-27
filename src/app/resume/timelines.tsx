@@ -1,12 +1,13 @@
-import { MapPin, BookOpen, Link } from "lucide-react";
+import { BookOpen, Link, MapPin } from "lucide-react";
 import type { ReactNode } from "react";
+import type Expandable from "@/components/Expandable";
 import ExternalLink from "@/components/ExternalLink";
 import { OrgLogo, DateRange, OrgName, SkillChip } from "./atoms";
-import { skills } from "./content";
+import { SKILLS } from "./content";
 import type { Education, Experience, Organization } from "./types";
 
 /**
- * Renders the specified title to the left of
+ * Renders the specified `title` to the left of
  * (or, on narrow viewports, above) the specified time span.
  */
 const EntryHeader = ({
@@ -26,13 +27,14 @@ const EntryHeader = ({
 
 export type ExperienceEntryProps = {
   /**
-   * The Experience to be rendered in this ExperienceEntry.
+   * The {@link Experience} to be rendered in this {@link ExperienceEntry}.
    */
   entry: Experience;
 };
 
 /**
- * Renders the specified Experience as the body of a TimelineItem.
+ * Renders the specified {@link Experience}
+ * as the body of a {@link TimelineItem}.
  */
 export const ExperienceEntry = ({
   entry: {
@@ -120,7 +122,7 @@ export const ExperienceEntry = ({
       <ul aria-label="Relevant skills" className="flex flex-wrap gap-1.5">
         {skillIDs.map((id) => (
           <li key={id}>
-            <SkillChip skill={skills[id]} />
+            <SkillChip skill={SKILLS[id]} />
           </li>
         ))}
       </ul>
@@ -130,13 +132,14 @@ export const ExperienceEntry = ({
 
 export type EducationEntryProps = {
   /**
-   * The Education to be rendered in this EducationEntry.
+   * The {@link Education} to be rendered in this {@link EducationEntry}.
    */
   entry: Education;
 };
 
 /**
- * Renders the specified Education as the body of a TimelineItem.
+ * Renders the specified {@link Education}
+ * as the body of a {@link TimelineItem}.
  */
 export const EducationEntry = ({
   entry: { degree, href, institution, start, end, description },
@@ -164,39 +167,40 @@ export const EducationEntry = ({
 
 export type TimelineItemProps = {
   /**
-   * The Organization whose logo marks this TimelineItem.
+   * The {@link Organization} whose logo marks this {@link TimelineItem}.
    */
   organization: Organization;
 
   /**
-   * True if this TimelineItem should only appear when the Expandable
-   * containing it is expanded (i.e., if it should bear the `data-extra`
-   * attribute), false otherwise (and by default).
+   * `true` if this {@link TimelineItem} should only appear when the
+   * {@link Expandable} containing it is expanded (i.e., if it should bear
+   * the `data-extra` attribute), `false` otherwise (and by default).
    */
   extra?: boolean;
 
   /**
-   * True if this is the last TimelineItem in its parent Timeline that is not
-   * extra (i.e., visible while the Expandable containing it is collapsed),
-   * false otherwise (and by default).
+   * `true` if this is the last {@link TimelineItem} in its parent
+   * {@link Timeline} that is not extra (i.e., visible while the
+   * {@link Expandable} containing it is collapsed),
+   * `false` otherwise (and by default).
    */
   lastFeatured?: boolean;
 
   /**
-   * True if this is the last TimelineItem in its parent Timeline,
-   * false otherwise (and by default).
+   * `true` if this is the last {@link TimelineItem} in its parent
+   * {@link Timeline}, `false` otherwise (and by default).
    */
   last?: boolean;
 
   /**
-   * The content of this TimelineItem
-   * (currently either an ExperienceEntry or an EducationEntry).
+   * The content of this {@link TimelineItem} (currently either
+   * an {@link ExperienceEntry} or an {@link EducationEntry}).
    */
   children: ReactNode;
 };
 
 /**
- * Renders a single item in a Timeline.
+ * Renders a single item in a {@link Timeline}.
  */
 export const TimelineItem = ({
   organization,
@@ -212,12 +216,12 @@ export const TimelineItem = ({
     <div className="timeline-end m-0 ms-4 self-start justify-self-stretch sm:ms-6">
       {children}
     </div>
-    {/* Extended by Timeline's gap-10 (and aligned to the top of its flex row)
-        so that it reaches the logo of the next TimelineItem.*/}
+    {/* Extended by Timeline's `gap-10` (and aligned to the top of its
+        flex row) so that it reaches the logo of the next `TimelineItem`.*/}
     {!last && (
       <hr
-        // Need to hide the line if this is the last TimelineItem overall
-        // *or* the last one visible while collapsed (i.e., lastFeatured)
+        // Need to hide the line if this is the last `TimelineItem` overall
+        // *or* the last one visible while collapsed (i.e., `lastFeatured`)
         data-extra={lastFeatured || undefined}
         className="h-[calc(100%+(--spacing(10)))] w-0.5 self-start bg-base-content/10"
       />
@@ -227,17 +231,17 @@ export const TimelineItem = ({
 
 export type TimelineProps = {
   /**
-   * The TimelineItems that comprise this Timeline.
+   * The {@link TimelineItem}s that comprise this {@link Timeline}.
    */
   children: ReactNode;
 };
 
 /**
- * Renders a vertical timeline consisting of
- * TimelineItems marked by Organizations' logos.
+ * Renders a vertical timeline consisting of {@link TimelineItem}s marked by
+ * {@link Organization}s' logos. Designed to be {@link Expandable}.
  */
 export const Timeline = ({ children }: TimelineProps) => (
-  // Use gap instead of margin so hidden TimelineItems don't create extra space
+  // Use gap instead of margin so hidden `TimelineItem`s don't create extra space
   <ol className="timeline timeline-vertical timeline-compact gap-10">
     {children}
   </ol>

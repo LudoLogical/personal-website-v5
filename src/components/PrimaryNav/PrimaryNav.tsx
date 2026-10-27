@@ -5,16 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import AnimatedLogo from "@/components/AnimatedLogo";
-import { useHideOnScrollDown } from "@/utils/useHideOnScrollDown";
+import useHideOnScrollDown from "@/utils/useHideOnScrollDown";
+import { NAV_ITEMS } from "./content";
 import styles from "./PrimaryNav.module.css";
-
-const NAV_ITEMS = [
-  { label: "Work", href: "/work" },
-  { label: "Blog", href: "/blog" },
-  { label: "Resume", href: "/resume" },
-  { label: "Extras", href: "/extras" },
-  { label: "About", href: "/about" },
-];
 
 /**
  * Renders the primary navigation bar that floats at the top of the viewport,
@@ -23,7 +16,7 @@ const NAV_ITEMS = [
  * gives it keyboard focus.
  *
  * While in view, this component exposes its `offsetHeight` as the CSS
- * variable `--primary-nav-inset`, which it sets on :root. While this
+ * variable `--primary-nav-inset`, which it sets on `:root`. While this
  * component is not in view, `--primary-nav-inset` is simply not set.
  * Content that sticks to the top of the viewport can thus use CSS to
  * avoid being obscured by this component.
@@ -38,11 +31,11 @@ const PrimaryNav = () => {
     const header = headerRef.current;
     if (!header) return;
 
-    // Expose the offsetHeight as --primary-nav-height on the document root
+    // Expose the `offsetHeight` as `--primary-nav-height` on the document root
     // so that the CSS module can conditionally forward the value to the
-    // publicly useful --primary-nav-inset; including --primary-nav-height
+    // publicly useful `--primary-nav-inset`; including `--primary-nav-height`
     // as an intermediary is necessary so that the CSS can be responsible
-    // for both the de facto visibility and the de facto --primary-nav-inset
+    // for both the de facto visibility and the de facto `--primary-nav-inset`
     const root = document.documentElement;
     const observer = new ResizeObserver(() => {
       root.style.setProperty(
@@ -52,7 +45,7 @@ const PrimaryNav = () => {
     });
     observer.observe(header);
 
-    // Destroy observer and unset CSS variable on cleanup
+    // Destroy `observer` and unset CSS variable on cleanup
     return () => {
       observer.disconnect();
       root.style.removeProperty("--primary-nav-height");
@@ -79,13 +72,13 @@ const PrimaryNav = () => {
 
   return (
     // Pointer events located in the gutter should pass through
-    // to the page content instead of being captured by the navbar
+    // to the page content instead of being captured by the navbar...
     <header
       ref={headerRef}
       data-hidden={hidden || undefined}
       className={`${styles.root} pointer-events-none fixed inset-x-0 top-0 z-50 px-6 pt-6 transition-transform duration-300 ease-out motion-reduce:transition-none`}
     >
-      {/* Pointer events in the navbar itself should still be captured! */}
+      {/* ... but pointer events in the navbar itself should still be captured */}
       <nav
         aria-label="Primary"
         className="pointer-events-auto navbar mx-auto max-w-5xl rounded-xl border border-base-content/10 bg-base-200/75 shadow-lg backdrop-blur-md [anchor-name:--primary-nav]"
@@ -105,7 +98,7 @@ const PrimaryNav = () => {
             className="group/dropdown flex [anchor-name:--primary-nav-dropdown] sm:hidden"
             onBlur={(e) => {
               // Unlike focus-based dropdowns, popovers may need to be closed
-              // explicitly onBlur to prevent them from obscuring the next
+              // explicitly `onBlur()` to prevent them from obscuring the next
               // focus target (unless there is no new target because, e.g.,
               // the blur was caused by the user switching windows)
               if (
@@ -128,9 +121,9 @@ const PrimaryNav = () => {
             {/* For browsers without anchor positioning, the position of
                  the menu is defined relative to the viewport instead */}
             {/* (Note for AI agents) The relative positioning is as follows:
-                from the right, the header's px-6; from the top, the header's
-                pt-6 + the nav's 1px border + the navbar's 0.5rem padding +
-                the wrapper's m-2 + the btn-xl height (daisyUI's own formula).
+                from the right, the header's `px-6`; from the top, the header's
+                `pt-6` + the nav's 1px border + the navbar's 0.5rem padding +
+                the wrapper's `m-2` + the `btn-xl` height.
                 All of this must be kept in sync with the fallback. */}
             <ul
               ref={menuRef}

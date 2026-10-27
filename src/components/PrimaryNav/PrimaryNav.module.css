@@ -1,8 +1,8 @@
 /*
- * IF useHideOnScrollDown says the PrimaryNav should be hidden...
- * AND PrimaryNav does not have keyboard focus...
+ * IF `useHideOnScrollDown()` says the `PrimaryNav` should be hidden...
+ * AND `PrimaryNav` does not have keyboard focus...
  * AND the dropdown menu is not open...
- * THEN hide the PrimaryNav
+ * THEN hide the `PrimaryNav`
  */
 .root[data-hidden]:not(:has(:focus-visible, :popover-open)) {
   translate: 0 calc(-100% - 1rem);
@@ -10,8 +10,8 @@
 
 /*
  * IF (the exact opposite of the above)...
- * THEN expose the offsetHeight as --primary-nav-inset on the document root;
- * descendent selectors are used b/c :has() cannot be nested
+ * THEN expose the `offsetHeight` as `--primary-nav-inset` on the document root;
+ * descendent selectors are used b/c `:has()` cannot be nested
  */
 :root:has(.root:not([data-hidden]), .root :focus-visible, .root :popover-open) {
   --primary-nav-inset: var(--primary-nav-height);

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 /**
  * The minimum distance, in pixels, by which the page must be scrolled
- * in one direction before the useHideOnScrollDown state is changed.
+ * in one direction before the `useHideOnScrollDown()` state is changed.
  * Exists to prevent jitter.
  */
 const SCROLL_THRESHOLD = 8;
@@ -21,9 +21,9 @@ const getClampedScrollY = () => {
  * Tracks whether an element that hides on scroll should be hidden,
  * which is the case after the user scrolls down by any meaningful amount.
  * Scrolling up by any meaningful amount reveals it again.
- * @returns true if the element should be hidden, false otherwise
+ * @returns `true` if the element should be hidden, `false` otherwise
  */
-export const useHideOnScrollDown = (): boolean => {
+const useHideOnScrollDown = (): boolean => {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
@@ -35,14 +35,14 @@ export const useHideOnScrollDown = (): boolean => {
       const scrollY = getClampedScrollY();
       const delta = scrollY - lastScrollY;
 
-      // Let small movements accumulate until they surpass SCROLL_THRESHOLD
+      // Let small movements accumulate until they surpass `SCROLL_THRESHOLD`
       if (Math.abs(delta) < SCROLL_THRESHOLD) return;
 
       setHidden(delta > 0);
       lastScrollY = scrollY;
     };
 
-    // Throttle to one handleScroll invocation per frame
+    // Throttle to one `handleScroll()` invocation per frame
     const onScroll = () => {
       if (!pendingFrameRequestID) {
         pendingFrameRequestID = requestAnimationFrame(handleScroll);
@@ -58,3 +58,5 @@ export const useHideOnScrollDown = (): boolean => {
 
   return hidden;
 };
+
+export default useHideOnScrollDown;

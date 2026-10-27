@@ -2,25 +2,25 @@ import type { CSSProperties } from "react";
 
 export type CharCodeTextProps = {
   /**
-   * The text in this CharCodeText. Subject to whitespace-pre.
+   * The text in this {@link CharCodeText}. Subject to `whitespace-pre`.
    */
   text: string;
 
   /**
-   * Optional settings for this CharCodeText.
-   * Unspecified values are set according to DEFAULT_OPTIONS.
+   * Optional settings for this {@link CharCodeText}.
+   * Unspecified values are set according to {@link DEFAULT_OPTIONS}.
    */
   options?: {
-    /**
-     * The distance, in ems, that a character should rise when hovered.
-     */
-    liftHeight?: number;
-
     /**
      * The duration, in seconds, over which a character
      * should rise and change color when hovered.
      */
     liftDuration?: number;
+
+    /**
+     * The distance, in ems, that a character should rise when hovered.
+     */
+    liftHeight?: number;
 
     /**
      * The minimum number of digits with which the binary
@@ -32,18 +32,16 @@ export type CharCodeTextProps = {
 };
 
 /**
- * The options prop after all DEFAULT_OPTIONS have been applied.
+ * The `options` prop after all {@link DEFAULT_OPTIONS} have been applied.
  */
-export type CharCodeTextOptions = Required<
-  NonNullable<CharCodeTextProps["options"]>
->;
+type CharCodeTextOptions = Required<NonNullable<CharCodeTextProps["options"]>>;
 
 /**
- * The values used for any settings that are omitted from the options prop.
+ * The values used for any settings that are omitted from the `options` prop.
  */
 export const DEFAULT_OPTIONS: CharCodeTextOptions = {
-  liftHeight: 0.1,
   liftDuration: 0.2,
+  liftHeight: 0.1,
   minBinaryDigits: 8,
 };
 
@@ -51,26 +49,26 @@ export const DEFAULT_OPTIONS: CharCodeTextOptions = {
  * Renders the specified display text such that, when any one of its
  * (non-whitespace) characters is hovered, that character is elevated,
  * changes color, and reveals a tooltip containing the decimal,
- * hexadecimal, and binary representations of its codepoint.
+ * hexadecimal, and binary representations of its code point.
  * Motionless if the user `prefers-reduced-motion`.
  *
  * Animated using CSS alone and thus valid as a server component.
  */
 const CharCodeText = ({ text, options }: CharCodeTextProps) => {
-  const { liftHeight, liftDuration, minBinaryDigits } = {
+  const { liftDuration, liftHeight, minBinaryDigits } = {
     ...DEFAULT_OPTIONS,
     ...options,
   };
 
   // Variables injected directly into CSS to avoid introducing client-side JS
   const liftVariables = {
-    "--lift-height": `${liftHeight}em`,
     "--lift-duration": `${liftDuration}s`,
+    "--lift-height": `${liftHeight}em`,
   } as CSSProperties;
 
   return (
     <span className="flex whitespace-pre" style={liftVariables}>
-      {/* Screen readers ignore aria-label on generic elements
+      {/* Screen readers ignore `aria-label` on generic elements
           like spans, so the text is exposed this way instead */}
       <span className="sr-only">{text}</span>
       {/* Spreading iterates by code point, so "astral"
@@ -94,9 +92,9 @@ const CharCodeText = ({ text, options }: CharCodeTextProps) => {
           <span
             key={i}
             aria-hidden
-            // Apply z-10 on hover so the tooltip floats
+            // Apply `z-10` on hover so the tooltip floats
             // over any content that might exist below it;
-            // use base-hover: instead of hover: so that the lift
+            // use `base-hover:` instead of `hover:` so that the lift
             // and color follow the tooltip on touch screens too
             className="tooltip cursor-default leading-none transition-[translate,color] duration-(--lift-duration) ease-out motion-reduce:transition-none base-hover:z-10 base-hover:-translate-y-(--lift-height) base-hover:text-primary"
           >
