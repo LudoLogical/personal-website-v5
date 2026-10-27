@@ -11,7 +11,7 @@ Remote (Seattle, Washington)
 *formerly* Consulting Software Engineer, 2023-10 to 2024-12
 
 - Manage, train, and hire for a team of 6 consulting software engineers
-- Design, deliver, and maintain kickoff presentations for an internship-style program that have dramatically improved interns’ awareness of resources
+- Design, deliver, and maintain kickoff presentations for an internship-style program that have dramatically improved interns' awareness of resources
 - Conduct novel, federally-backed research on program outcomes
 - Co-develop organizational strategies for AI use and alumni engagement
 - Helped interns make 40+ code contributions to 10+ open-source projects

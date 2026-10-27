@@ -68,7 +68,7 @@ const SKILLS_BY_ID = {
     featured: true,
   },
   angularjs: { name: "Angular.js", icon: SiAngular, group: "Engineering" },
-  restApis: { name: "REST APIs", icon: Server, group: "Engineering" },
+  restAPIs: { name: "REST APIs", icon: Server, group: "Engineering" },
   automatedTesting: {
     name: "Automated Testing",
     icon: FlaskConical,
@@ -181,7 +181,7 @@ export const EXPERIENCES: Experience[] = [
     ],
     description: [
       "Manage, train, and hire for a team of 6 consulting software engineers",
-      "Design, deliver, and maintain kickoff presentations for an internship-style program that have dramatically improved interns’ awareness of resources",
+      "Design, deliver, and maintain kickoff presentations for an internship-style program that have dramatically improved interns' awareness of resources",
       "Conduct novel, federally-backed research on program outcomes",
       "Co-develop organizational strategies for AI use and alumni engagement",
       "Helped interns make 40+ code contributions to 10+ open-source projects",
@@ -293,7 +293,7 @@ export const EXPERIENCES: Experience[] = [
       "Reduced technical debt by investigating issues with several existing integration tests and presenting findings",
       "Improved internal documentation by correcting outdated information and creating new diagrams and resources",
     ],
-    skillIDs: ["restApis", "automatedTesting", "documentation", "diagramming"],
+    skillIDs: ["restAPIs", "automatedTesting", "documentation", "diagramming"],
     featured: true,
   },
   {
@@ -348,7 +348,7 @@ export const EXPERIENCES: Experience[] = [
     start: "2017-05",
     end: "2017-06",
     description: [
-      "Constructed a template for the company’s new website alongside a small team and under the direction of its founder",
+      "Constructed a template for the company's new website alongside a small team and under the direction of its founder",
     ],
     links: [
       {

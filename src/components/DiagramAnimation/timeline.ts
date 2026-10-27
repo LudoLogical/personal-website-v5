@@ -1,7 +1,7 @@
-import { useCallback, useLayoutEffect, useRef, type RefObject } from "react";
 import { gsap } from "gsap";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
+import { useCallback, useLayoutEffect, useRef, type RefObject } from "react";
 import type {
   default as DiagramAnimation,
   DiagramAnimationOptions,

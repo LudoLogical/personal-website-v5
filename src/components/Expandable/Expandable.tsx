@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { type ReactNode, useId, useRef, useState } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { twMerge } from "tailwind-merge";
 import styles from "./Expandable.module.css";

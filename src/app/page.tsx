@@ -124,13 +124,13 @@ const Home = () => {
                   </div>
                   <div className="flex flex-nowrap">
                     <HoverOrTapAffordance
-                      fadeInDelay={0.15 + 0.25 + 0.18 + 0.07}
-                      fadeInOnTapOutside
-                      inline
                       // (first dot starts shrinking)
                       // + (last dot starts shrinking)
                       // + (shrinking duration)
                       // + (buffer before text starts fading in)
+                      fadeInDelay={0.15 + 0.25 + 0.18 + 0.07}
+                      fadeInOnTapOutside
+                      inline
                       affordanceClassName={affordanceLineClassName}
                     >
                       <ConnectingDotsText

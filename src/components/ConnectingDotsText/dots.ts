@@ -103,8 +103,7 @@ const generateDotPositions = (count: number, margin: number): number[] =>
  *                     and positions are generated randomly if there are none
  * @param dotMargin the minimum vertical distance, in ems, between
  *                  each randomly generated position and the edges
- *                  of the bounding box of the the bounding box of
- *                  the {@link ConnectingDotsText}
+ *                  of the bounding box of the {@link ConnectingDotsText}
  *                  to which the computed {@link DotsInfo} will be assigned;
  *                  unused unless `dotPositions` is empty or unspecified
  * @returns the computed {@link DotsInfo}
@@ -129,13 +128,13 @@ export const useDots = (
   const textDimensions = useTextDimensions(containerRef);
 
   // Construct and cache characters array
-  const { characters, dotCount } = useMemo(() => {
-    let dotCount = 0;
+  const { characters, numDots } = useMemo(() => {
+    let numDots = 0;
     const characters: Character[] = [...text].map((char) => ({
       char,
-      dotIndex: /\s/.test(char) ? null : dotCount++,
+      dotIndex: /\s/.test(char) ? null : numDots++,
     }));
-    return { characters, dotCount };
+    return { characters, numDots };
   }, [text]);
 
   // Serialized so the effect below evaluates this dependency by value;
@@ -149,15 +148,15 @@ export const useDots = (
     // Wait until the `TextDimensions` can be determined
     if (!textDimensions) return;
 
-    // Randomly generate the dotPositions if necessary
+    // Randomly generate the `dotPositions` if necessary
     let positions: number[] = JSON.parse(serializedDotPositions);
     if (!positions?.length) {
       const cache = randomDotPositions.current;
-      // Only regenerate on dotCount or dotMargin change
-      if (cache.positions.length !== dotCount || cache.margin !== dotMargin) {
+      // Only regenerate on `numDots` or `dotMargin` change
+      if (cache.positions.length !== numDots || cache.margin !== dotMargin) {
         randomDotPositions.current = {
           margin: dotMargin,
-          positions: generateDotPositions(dotCount, dotMargin),
+          positions: generateDotPositions(numDots, dotMargin),
         };
       }
       positions = randomDotPositions.current.positions;
@@ -165,12 +164,12 @@ export const useDots = (
 
     setPoints(
       // Ignore any refs left over from any longer text rendered previously
-      letterRefs.current.slice(0, dotCount).map((el, i) => ({
+      letterRefs.current.slice(0, numDots).map((el, i) => ({
         x: el ? Math.round(el.offsetLeft + el.offsetWidth / 2) : 0,
         y: positions[i % positions.length] * textDimensions.em,
       })),
     );
-  }, [text, textDimensions, serializedDotPositions, dotCount, dotMargin]);
+  }, [text, textDimensions, serializedDotPositions, numDots, dotMargin]);
 
   const setLetterRef = (dotIndex: number, element: HTMLSpanElement | null) => {
     letterRefs.current[dotIndex] = element;

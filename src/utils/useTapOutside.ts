@@ -8,7 +8,7 @@ import { useEffect, useEffectEvent, type RefObject } from "react";
  *            of which taps must be observed
  * @param enabled `true` if `useTapOutside()` should currently
  *                be listening for taps, `false` otherwise
- * @param onTapOutside the callback be invoked on each appropriate tap
+ * @param onTapOutside the callback to be invoked on each appropriate tap
  */
 const useTapOutside = (
   ref: RefObject<Element | null>,

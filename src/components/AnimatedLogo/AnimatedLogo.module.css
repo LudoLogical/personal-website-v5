@@ -7,7 +7,7 @@
  *              the body and dot follow it with only 1px overshoot.
  *   190ms      CONTACT. The D begins its own timeline.
  *   190–330ms  RESPONSE. The D is pushed 6px away and tilts 6 degrees.
- *   330–490ms  REBOUND. The D overshoots its return by 1px and -1 degeee.
+ *   330–490ms  REBOUND. The D overshoots its return by 1px and -1 degree.
  *   490–666ms  SETTLE. The D returns to its original position.
  */
 

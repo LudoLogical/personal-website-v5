@@ -53,7 +53,7 @@ const WaveText = ({ text, className }: WaveTextProps) => (
           key={i}
           aria-hidden
           className={twMerge("inline-block", styles.char)}
-          // Subracting `chars.length` keeps every `animation-delay` negative,
+          // Subtracting `chars.length` keeps every `animation-delay` negative,
           // which ensures that none of the characters are motionless at first
           // (i.e., while they wait for the wave effect to "reach" them)
           style={{ "--wave-offset": i - chars.length } as CSSProperties}

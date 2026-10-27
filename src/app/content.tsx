@@ -6,7 +6,7 @@ import {
   Side,
   type Arrow,
 } from "@/components/DiagramAnimation";
-import { Levels } from "@/components/IcebergExplainerText";
+import type { Levels } from "@/components/IcebergExplainerText";
 
 // TODO: Replace AI-generated tips with hand-written ones
 export const TIPS = [
@@ -44,9 +44,9 @@ export const TIPS = [
 
   // Hints about microinteractions
   "Hover over (or tap) my name to see how all of its pieces connect.",
-  "Every letter in “Software Engineer” hides a secret number. Hover over each one to reveal it.",
-  "Slowly scrub across “Systems Thinker” to dive deeper below the surface.",
-  "Hover over “Sense-Maker” (or Tab to it with your keyboard) to connect the dots.",
+  'Every letter in "Software Engineer" hides a secret number. Hover over each one to reveal it.',
+  'Slowly scrub across "Systems Thinker" to dive deeper below the surface.',
+  'Hover over "Sense-Maker" (or Tab to it with your keyboard) to connect the dots.',
   "The navigation bar ducks out of the way as you scroll down. Scroll back up to summon it.",
   "Scroll to the very bottom of the page to find what's engraved beneath it.",
   "Leave and come back to hear another tip. There are plenty more where this came from!",

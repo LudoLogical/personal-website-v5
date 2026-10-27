@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type Expandable from "@/components/Expandable";
 import ExternalLink from "@/components/ExternalLink";
-import { OrgLogo, DateRange, OrgName, SkillChip } from "./atoms";
+import { DateRange, OrgLogo, OrgName, SkillChip } from "./atoms";
 import { SKILLS } from "./content";
 import type { Education, Experience, Organization } from "./types";
 

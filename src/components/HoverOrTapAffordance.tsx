@@ -68,7 +68,7 @@ export type HoverOrTapAffordanceProps = {
    *
    * Note: the children (i.e., content) are wrapped in a `z-10` stacking
    * context, so if any of them must overlap subsequent siblings of this
-   * {@link HoverOrTapAffordance}'s root element, a z-inded above `z-10` must be
+   * {@link HoverOrTapAffordance}'s root element, a z-index above `z-10` must be
    * set here.
    */
   className?: string;

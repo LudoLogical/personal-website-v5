@@ -20,13 +20,13 @@ import {
   SKILLS,
   type SkillID,
 } from "./content";
-import { SKILL_GROUPS, type Recognition, type Skill } from "./types";
 import {
   EducationEntry,
   ExperienceEntry,
   Timeline,
   TimelineItem,
 } from "./timelines";
+import { SKILL_GROUPS, type Recognition, type Skill } from "./types";
 
 export const metadata: Metadata = {
   title: 'Resume | Daniel "Ludo" DeAnda',
@@ -110,7 +110,7 @@ const skillsByGroup = SKILL_GROUPS.map((group) => ({
   entries: skillEntries.filter(([, skill]) => skill.group === group),
 })); // as { group: SkillGroup, entries: [SkillID, Skill][] }[]
 
-const extraSkillCount = skillEntries.filter(
+const numExtraSkills = skillEntries.filter(
   ([, { featured }]) => !featured, // i.e., [_, { featured }]
 ).length;
 
@@ -181,7 +181,7 @@ const Resume = () => {
 
       <Section id="skills" title="Skills" icon={Wrench}>
         <LabeledExpandable
-          numExtras={extraSkillCount}
+          numExtras={numExtraSkills}
           singleItemName="skill"
           pluralItemName="skills"
           className="gap-8"

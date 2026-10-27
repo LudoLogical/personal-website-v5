@@ -1,6 +1,6 @@
 import type {
-  default as ConnectingDotsText,
   ConnectingDotsTextOptions,
+  default as ConnectingDotsText,
 } from "./ConnectingDotsText";
 
 /**
@@ -72,14 +72,14 @@ export type ConnectingDotsTransitions = {
  * then animating the dots and line *into* view.
  * @param active `true` if the {@link ConnectingDotsText} is being activated,
  *               `false` if it is being deactivated
- * @param dotCount the number of dots in the {@link ConnectingDotsText}
+ * @param numDots the number of dots in the {@link ConnectingDotsText}
  * @param animationOptions the animation options for
  *                         the {@link ConnectingDotsText}
  * @returns the {@link ConnectingDotsTransitions} for the specified state
  */
 export const getTransitions = (
   active: boolean,
-  dotCount: number,
+  numDots: number,
   animationOptions: ConnectingDotsTextOptions["animation"],
 ): ConnectingDotsTransitions => {
   const {
@@ -95,7 +95,7 @@ export const getTransitions = (
 
   // How long to wait between animation start times for neighboring dots
   const getStagger = (spread: number) =>
-    dotCount > 1 ? spread / (dotCount - 1) : 0;
+    numDots > 1 ? spread / (numDots - 1) : 0;
 
   if (active) {
     const dotStagger = getStagger(dotEntranceSpread);
@@ -124,6 +124,6 @@ export const getTransitions = (
     line: `stroke-dashoffset ${lineRetractDuration}s ${LINE_DRAW_RETRACT_CURVE} 0s`,
     // Shrink out of view shortly after the line starts retracting
     dot: (i) =>
-      `transform ${dotExitDuration}s ${DOT_SHRINK_CURVE} ${DOT_SHRINK_DELAY + (dotCount - 1 - i) * dotStagger}s`,
+      `transform ${dotExitDuration}s ${DOT_SHRINK_CURVE} ${DOT_SHRINK_DELAY + (numDots - 1 - i) * dotStagger}s`,
   };
 };

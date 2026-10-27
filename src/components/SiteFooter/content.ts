@@ -1,10 +1,10 @@
 import { Mail } from "lucide-react";
-import { ComponentType } from "react";
+import type { ComponentType } from "react";
 import {
-  FaLinkedin,
-  FaGithub,
   FaCodepen,
   FaDiscord,
+  FaGithub,
+  FaLinkedin,
   FaReddit,
 } from "react-icons/fa6";
 import type SiteFooter from "./SiteFooter";

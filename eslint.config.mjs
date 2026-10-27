@@ -9,7 +9,44 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     plugins: { jsdoc },
-    rules: { "jsdoc/no-undefined-types": "warn" }, // flags {@link}s to names not in scope; counts the rest as uses
+    // Flag `@link`s to names not in scope; count the rest as uses
+    rules: { "jsdoc/no-undefined-types": "warn" },
+  },
+  {
+    // Enforce preferred import order (see AGENTS.md -> Conventions -> Imports)
+    // Usable because `eslint-config-next` includes `eslint-plugin-import`
+    rules: {
+      "import/order": [
+        "warn",
+        {
+          groups: [["builtin", "external"], "internal", ["parent", "sibling"]],
+          pathGroups: [
+            { pattern: "@/**", group: "internal" },
+            { pattern: "./*.module.css", group: "sibling", position: "after" },
+          ],
+          "newlines-between": "never",
+          alphabetize: { order: "asc", caseInsensitive: true },
+          named: { enabled: true, types: "types-last" },
+        },
+      ],
+      // Works like `import/consistent-type-specifier-style` but
+      // allows inline `type` specifiers iff they are mixed with values
+      "custom-type-specifier-style": [
+        "warn",
+        {
+          selector:
+            'ImportDeclaration[importKind="value"]:has(ImportSpecifier[importKind="type"]):not(:has(ImportSpecifier[importKind="value"], ImportDefaultSpecifier, ImportNamespaceSpecifier))',
+          message:
+            "Use `import type { … }` when every imported name is a type.",
+        },
+        {
+          selector:
+            'ExportNamedDeclaration[exportKind="value"]:has(ExportSpecifier[exportKind="type"]):not(:has(ExportSpecifier[exportKind="value"]))',
+          message:
+            "Use `export type { … }` when every exported name is a type.",
+        },
+      ],
+    },
   },
   prettier, // disables ESLint rules that conflict w/ Prettier
 ]);

@@ -1,6 +1,6 @@
 # Organization logos (resume page)
 
-Every entry on `/resume` (Experience, Education, Certifications, Honors) shows its organization's logo, set as `logo: "/logos/<slug>.png"` on an `Organization` in `src/app/resume/content.tsx`. `OrgLogo` in `src/app/resume/page.tsx` masks it to a squircle (daisyUI `mask-squircle`) and displays it at 40–48px. If an organization has no logo, omit `logo`; its initials are shown instead.
+Every entry on `/resume` (Experience, Education, Certifications, Honors) shows its organization's logo, set as `logo: "/logos/<slug>.png"` on an `Organization` in `src/app/resume/content.tsx`. `OrgLogo` in `src/app/resume/atoms.tsx` masks it to a squircle (daisyUI `mask-squircle`) and displays it at 40–48px. If an organization has no logo, omit `logo`; its initials are shown instead.
 
 ## The spec
 
