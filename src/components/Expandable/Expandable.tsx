@@ -54,7 +54,7 @@ export type ExpandableProps = {
 const Expandable = ({ labels, className, children }: ExpandableProps) => {
   const [expanded, setExpanded] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const contentId = useId();
+  const contentID = useId();
 
   const toggle = () => {
     const button = buttonRef.current;
@@ -74,7 +74,7 @@ const Expandable = ({ labels, className, children }: ExpandableProps) => {
       data-expanded={expanded || undefined}
       className={twMerge(styles.root, "flex flex-col items-start", className)}
     >
-      <div id={contentId} className="w-full">
+      <div id={contentID} className="w-full">
         {children}
       </div>
       {labels && (
@@ -82,7 +82,7 @@ const Expandable = ({ labels, className, children }: ExpandableProps) => {
           ref={buttonRef}
           type="button"
           aria-expanded={expanded}
-          aria-controls={contentId}
+          aria-controls={contentID}
           onClick={toggle}
           className="btn gap-1.5 btn-soft btn-sm"
         >

@@ -23,7 +23,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => (
   >
     <body className="flex min-h-full min-w-93.75 flex-col bg-base-300">
       <PrimaryNav />
-      <div className="rounded-b-paper relative z-10 flex flex-1 flex-col bg-base-100 shadow-page">
+      <div className="relative z-10 flex flex-1 flex-col rounded-b-page bg-base-100 shadow-page">
         {children}
       </div>
       <SiteFooter />
