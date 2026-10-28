@@ -123,13 +123,14 @@ const Resume = () => {
           <p className="mb-3 text-sm font-bold tracking-widest text-primary uppercase">
             Resume
           </p>
-          <h1 className="text-3xl leading-tight font-bold xxs:text-4xl sm:text-5xl">
+          <h1 className="text-3xl leading-tight font-bold xs:text-4xl sm:text-5xl">
             Daniel <span className="text-primary">&ldquo;Ludo&rdquo;</span>{" "}
             DeAnda
           </h1>
           <p className="mt-3 text-lg text-base-content/70 sm:text-xl">
             <strong className="text-base-content">Software Engineer</strong>,
-            Systems Thinker, Sense-Maker
+            Systems Thinker,{" "}
+            <span className="whitespace-nowrap">Sense-Maker</span>
           </p>
         </div>
         <a

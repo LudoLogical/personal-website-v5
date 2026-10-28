@@ -409,7 +409,7 @@ export const EDUCATIONS: Education[] = [
 export const CERTIFICATIONS: Recognition[] = [
   {
     title: "AWS Cloud Solutions Architect",
-    href: "https://www.coursera.org/professional-certificates/aws-cloud-solutions-architect",
+    href: "https://coursera.org/share/f2adff1610e77e5ccc5bb0ebe47577bf",
     organization: {
       name: "Coursera",
       href: "https://www.coursera.org",
