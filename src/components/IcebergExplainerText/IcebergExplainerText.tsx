@@ -66,7 +66,8 @@ const getCardShift = (textRect: DOMRect, cardWidth: number) => {
 
 export type IcebergExplainerTextProps = {
   /**
-   * The hoverable text in this {@link IcebergExplainerText}. Subject to `leading-none`.
+   * The hoverable text in this {@link IcebergExplainerText}.
+   * Subject to `leading-none`.
    */
   text: string;
 
@@ -124,9 +125,9 @@ export type IcebergExplainerTextProps = {
       indicatorSlideDuration?: number;
 
       /**
-       * The duration, in seconds, over which the {@link Level} panels and the depth
-       * marker should scroll to their respective positions corresponding
-       * to the active {@link Level}.
+       * The duration, in seconds, over which the {@link Level} panels
+       * and the depth marker should scroll to their respective positions
+       * corresponding to the active {@link Level}.
        */
       scrollDuration?: number;
     };
@@ -138,16 +139,16 @@ export type IcebergExplainerTextProps = {
    */
   childClassNames?: {
     /**
-     * Classes for the explainer card in which the {@link Level}s are displayed.
-     * Inherited by the text in every {@link Level} panel. May be used to set the
-     * width of the card (defaults to 330px).
+     * Classes for the explainer card in which the {@link Level}s are
+     * displayed. Inherited by the text in every {@link Level} panel.
+     * May be used to set the width of the card (defaults to 330px).
      */
     card?: string;
 
     /**
-     * Classes for the depth marker that slides along the rail
-     * on the left side of the explainer card to indicate which
-     * {@link Level} is currently being displayed.
+     * Classes for the depth marker that slides along the rail on the left
+     * side of the explainer card to indicate which {@link Level} is currently
+     * being displayed.
      */
     marker?: string;
 
@@ -183,9 +184,9 @@ export type IcebergExplainerTextProps = {
     };
 
     /**
-     * Classes for the scrub indicator that appears beneath the hoverable text
-     * and marks the bounds of the hovered region that causes the active {@link Level}
-     * to be displayed.
+     * Classes for the scrub indicator that appears beneath the hoverable
+     * text and marks the bounds of the hovered region that causes the
+     * active {@link Level} to be displayed.
      */
     scrub?: string;
   };
@@ -226,14 +227,14 @@ export const DEFAULT_OPTIONS: IcebergExplainerTextOptions = {
  * Renders the specified `text` and, while that `text` is hovered, adds a card
  * beneath it that explains a concept at four different levels of depth using
  * an "iceberg" model. Scrubbing horizontally across the display text causes
- * the card to "descend" through the specified {@link Level}s, each of which takes up
- * the full card when displayed. A single low-poly iceberg SVG spans the
- * backgrounds of all four {@link Level}s, which get progressively darker from top
- * to bottom. Motionless if the user `prefers-reduced-motion`.
+ * the card to "descend" through the specified {@link Level}s, each of which
+ * takes up the full card when displayed. A single low-poly iceberg SVG spans
+ * the backgrounds of all four {@link Level}s, which get progressively darker
+ * from top to bottom. Motionless if the user `prefers-reduced-motion`.
  *
  * On touch screens, tapping a region of the text displays the card and the
- * corresponding {@link Level}, dragging horizontally across the text scrubs through
- * the {@link Level}s, and tapping anywhere else dismisses the card.
+ * corresponding {@link Level}, dragging horizontally across the text scrubs
+ * through the {@link Level}s, and tapping anywhere else dismisses the card.
  */
 const IcebergExplainerText = ({
   text,
@@ -294,7 +295,8 @@ const IcebergExplainerText = ({
     DEPTH_RAIL_INSET -
     markerProgress * (2 * DEPTH_RAIL_INSET + DEPTH_MARKER_SIZE);
 
-  // Using `<span>`s allows this component to exist inside of an `<h1>`, `<p>`, `<a>`, etc.
+  // Using `<span>`s allows this component to
+  // exist inside of an `<h1>`, `<p>`, `<a>`, etc.
   return (
     <span
       ref={rootRef}

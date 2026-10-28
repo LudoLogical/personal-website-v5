@@ -94,8 +94,8 @@ const CharCodeText = ({ text, options }: CharCodeTextProps) => {
             aria-hidden
             // Apply `z-10` on hover so the tooltip floats
             // over any content that might exist below it;
-            // use `base-hover:` instead of `hover:` so that the lift
-            // and color follow the tooltip on touch screens too
+            // use `base-hover:` instead of `hover:` so that the
+            // lift and color follow the tooltip on touch screens too
             className="tooltip cursor-default leading-none transition-[translate,color] duration-(--lift-duration) ease-out motion-reduce:transition-none base-hover:z-10 base-hover:-translate-y-(--lift-height) base-hover:text-primary"
           >
             <span className="tooltip-content flex flex-col items-center font-mono text-xs leading-normal shadow-lg xs:text-sm">

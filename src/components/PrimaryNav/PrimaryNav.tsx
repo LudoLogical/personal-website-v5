@@ -31,8 +31,8 @@ const PrimaryNav = () => {
     const header = headerRef.current;
     if (!header) return;
 
-    // Expose the `offsetHeight` as `--primary-nav-height` on the document root
-    // so that the CSS module can conditionally forward the value to the
+    // Expose the `offsetHeight` as `--primary-nav-height` on the document
+    // root so that the CSS module can conditionally forward the value to the
     // publicly useful `--primary-nav-inset`; including `--primary-nav-height`
     // as an intermediary is necessary so that the CSS can be responsible
     // for both the de facto visibility and the de facto `--primary-nav-inset`
@@ -123,8 +123,8 @@ const PrimaryNav = () => {
             {/* (Note for AI agents) The relative positioning is as follows:
                 from the right, the header's `px-6`; from the top, the header's
                 `pt-6` + the nav's 1px border + the navbar's 0.5rem padding +
-                the wrapper's `m-2` + the `btn-xl` height.
-                All of this must be kept in sync with the fallback. */}
+                the wrapper's `m-2` + the `btn-xl` height. All of this must be
+                kept in sync with the fallback. */}
             <ul
               ref={menuRef}
               id="primary-nav-menu"

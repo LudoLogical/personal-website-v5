@@ -81,12 +81,12 @@ const generateDotPositions = (count: number, margin: number): number[] =>
   );
 
 /**
- * Computes (and randomly generates, if necessary) the position of one dot
- * for every non-whitespace code point in the specified `text`.
+ * Computes (and randomly generates, if necessary) the position of one
+ * dot for every non-whitespace code point in the specified `text`.
  *
  * Horizontally, each dot is centered over its corresponding character.
- * Vertically, each dot is positioned according to the specified `dotPositions`,
- * or randomly if `dotPositions` is empty or unspecified.
+ * Vertically, each dot is positioned according to the specified
+ * `dotPositions`, or randomly if `dotPositions` is empty or unspecified.
  *
  * Updates whenever the specified `text`, the {@link TextDimensions} of the
  * specified `containerRef`, the specified `dotPositions`, or the specified
@@ -97,10 +97,11 @@ const generateDotPositions = (count: number, margin: number): number[] =>
  * @param containerRef a `RefObject` for the `HTMLElement`
  *                     containing the specified `text`
  * @param dotPositions the vertical position, in ems from the top of the
- *                     `HTMLElement` in the specified `containerRef`, of each dot;
- *                     extra positions are ignored if there are too many,
- *                     positions are reused cyclically if there are too few,
- *                     and positions are generated randomly if there are none
+ *                     `HTMLElement` in the specified `containerRef`, of
+ *                     each dot; extra positions are ignored if there are
+ *                     too many, positions are reused cyclically if there
+ *                     are too few, and positions are generated randomly
+ *                     if there are none
  * @param dotMargin the minimum vertical distance, in ems, between
  *                  each randomly generated position and the edges
  *                  of the bounding box of the {@link ConnectingDotsText}
@@ -141,9 +142,9 @@ export const useDots = (
   // prevents an identical copy of `dotPositions` from re-triggering the effect
   const serializedDotPositions = JSON.stringify(dotPositions ?? []);
 
-  // `useLayoutEffect` instead of `useEffect` to ensure that, when the specified
-  // `text`, `dotPositions`, or `dotMargin` changes, the returned points can reflect
-  // the new letter offsets in time for the next paint.
+  // `useLayoutEffect` instead of `useEffect` to ensure that, when the
+  // specified `text`, `dotPositions`, or `dotMargin` changes, the returned
+  // points can reflect the new letter offsets in time for the next paint.
   useLayoutEffect(() => {
     // Wait until the `TextDimensions` can be determined
     if (!textDimensions) return;

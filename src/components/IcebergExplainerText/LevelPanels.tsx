@@ -24,13 +24,15 @@ export type LevelPanelsProps = {
   levels: Levels;
 
   /**
-   * The index of the {@link Level} whose panel this {@link LevelPanels} should display.
+   * The index of the {@link Level} whose panel
+   * this {@link LevelPanels} should display.
    */
   currentLevel: number;
 
   /**
-   * The duration and easing curve according to which this {@link LevelPanels} should
-   * scroll between panels, expressed as a partial CSS `transition` value.
+   * The duration and easing curve according to which this
+   * {@link LevelPanels} should scroll between panels,
+   * expressed as a partial CSS `transition` value.
    */
   scrollTransition: string;
 
@@ -49,9 +51,10 @@ export type LevelPanelsProps = {
 };
 
 /**
- * Renders a sliding strip of panels for each of four {@link Level}s, exactly one
- * of which is shown at a time. A single `Iceberg` spans the backgrounds of
- * all four panels, which get progressively darker from top to bottom.
+ * Renders a sliding strip of panels for each of four {@link Level}s,
+ * exactly one of which is shown at a time. A single `Iceberg` spans
+ * the backgrounds of all four panels, which get progressively darker
+ * from top to bottom.
  */
 const LevelPanels = ({
   levels,

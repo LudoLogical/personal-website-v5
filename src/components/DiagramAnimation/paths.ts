@@ -31,8 +31,9 @@ const OUTWARD_UNIT_VECTORS: Record<Side, Point> = {
  * Rasterizes the specified {@link ArrowEnd} by computing
  * the pixel values of its location and connection point.
  * @param end the {@link ArrowEnd} to be rasterized
- * @param textDimensions the {@link TextDimensions} of the display text against which
- *                       the specified {@link ArrowEnd} should be rasterized
+ * @param textDimensions the {@link TextDimensions} of the display text
+ *                       against which the specified {@link ArrowEnd}
+ *                       should be rasterized
  * @param padding the amount of padding, in ems, that should be applied to
  *                the location of the specified {@link ArrowEnd} iff it is
  *                an {@link ArrowAnchor}
@@ -110,9 +111,9 @@ const simplifyPath = (path: Point[]) => {
  * Moves the specified {@link Point} toward the specified
  * `target` {@link Point} by the specified `distance`.
  *
- * If the distance is large enough to cause the {@link Point} to move past
- * the target, it is snapped to the target instead. If the distance is
- * negative the {@link Point} is moved directly *away* from the target
+ * If the distance is large enough to cause the {@link Point} to move
+ * past the target, it is snapped to the target instead. If the distance
+ * is negative, the {@link Point} is moved directly *away* from the target
  * {@link Point} instead.
  *
  * @param point the {@link Point} to be moved
@@ -176,10 +177,10 @@ const getMarkerDimensions = (
 };
 
 /**
- * Places the end marker(s) (if any) of the specified {@link Arrow} at the
- * appropriate end(s) of the specified `pathArray` and then trims that `pathArray` to create
- * a visible gap (the size of which is given by `appearanceOptions.markerGap`)
- * between it and each placed end marker.
+ * Places the end marker(s) (if any) of the specified {@link Arrow} at
+ * the appropriate end(s) of the specified `pathArray` and then trims
+ * that `pathArray` to create a visible gap (the size of which is given
+ * by `appearanceOptions.markerGap`) between it and each placed end marker.
  * @param arrow the {@link Arrow} whose end markers are to be placed
  * @param pathArray the {@link Point}s of the rasterized
  *                  path of the specified {@link Arrow}
@@ -316,8 +317,9 @@ const placePathMarkers = (
  * Converts the specified {@link Arrow} into a rasterized SVG path and
  * computes the positions of the centers of the markers that belong to it.
  * @param arrow the {@link Arrow} to be rasterized
- * @param textDimensions the {@link TextDimensions} of the display text against which
- *                       the specified {@link Arrow} should be rasterized
+ * @param textDimensions the {@link TextDimensions} of the display text
+ *                       against which the specified {@link Arrow} should
+ *                       be rasterized
  * @param appearanceOptions the `options.appearance` for the
  *                          associated {@link DiagramAnimation}
  * @param precisionOptions the `options.precision` for the
@@ -341,8 +343,8 @@ export const rasterizeArrow = (
     appearanceOptions.diagramPadding,
   );
 
-  // Conditionally snap toEnd.connectionPoint to
-  // fromEnd.connectionPoint on each axis independently
+  // Conditionally snap `toEnd.connectionPoint` to
+  // `fromEnd.connectionPoint` on each axis independently
   const epsilon = precisionOptions.snapDistance * textDimensions.em;
   const snappedToConnectionPoint = {
     x:
@@ -355,8 +357,8 @@ export const rasterizeArrow = (
         : toEnd.connectionPoint.y,
   };
 
-  // Preserve pre-existing alignment between the toEnd.location
-  // and toEnd.connectionPoint while allowing the snap to change
+  // Preserve pre-existing alignment between the `toEnd.location`
+  // and `toEnd.connectionPoint` while allowing the snap to change
   // the length of its extension
   if (toEnd.location.x === toEnd.connectionPoint.x) {
     toEnd.location.x = snappedToConnectionPoint.x;
@@ -387,7 +389,7 @@ export const rasterizeArrow = (
     route = [fromEnd.connectionPoint, snappedToConnectionPoint];
   }
 
-  // Join the RasterizedArrowEnd locations and
+  // Join the `RasterizedArrowEnd` locations and
   // connection route into an initial body path
   const pathArray = simplifyPath([fromEnd.location, ...route, toEnd.location]);
 

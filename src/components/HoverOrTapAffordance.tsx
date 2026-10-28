@@ -32,34 +32,39 @@ export type HoverOrTapAffordanceProps = {
 
   /**
    * The delay, in seconds, after which the affordance in this
-   * {@link HoverOrTapAffordance} should start to fade back in once it is no longer
-   * hovered (or, on touch screens, when appropriate based on the values of
-   * `fadeInOnTapOutside` and `fadeInOnTapInside`). Defaults to 0.
+   * {@link HoverOrTapAffordance} should start to fade back in
+   * once it is no longer hovered (or, on touch screens, when
+   * appropriate based on the values of `fadeInOnTapOutside`
+   * and `fadeInOnTapInside`). Defaults to 0.
    */
   fadeInDelay?: number;
 
   /**
-   * `true` if, while the affordance in this {@link HoverOrTapAffordance} is faded out,
-   * tapping anywhere *inside* of the content to which it corresponds should
-   * cause it to fade back in; `false` otherwise. Defaults to `true`.
+   * `true` if, while the affordance in this {@link HoverOrTapAffordance}
+   * is faded out, tapping anywhere *inside* of the content to which it
+   * corresponds should cause it to fade back in; `false` otherwise.
+   * Defaults to `true`.
    *
-   * Note: this prop should always be set to `false` (and `fadeInOnTapOutside` set
-   * to `true` instead) when the content follows `:hover` directly because touch
-   * screens preserve an element's `:hover` state across repeated taps on it.
+   * Note: this prop should always be set to `false` (and `fadeInOnTapOutside`
+   * set to `true` instead) when the content follows `:hover` directly because
+   * touch screens preserve an element's `:hover` state across repeated taps
+   * on it.
    */
   fadeInOnTapInside?: boolean;
 
   /**
-   * `true` if, while the affordance in this {@link HoverOrTapAffordance} is faded out,
-   * tapping anywhere *outside* of the content to which it corresponds should
-   * cause it to fade back in; `false` otherwise (and by default).
+   * `true` if, while the affordance in this {@link HoverOrTapAffordance}
+   * is faded out, tapping anywhere *outside* of the content to which it
+   * corresponds should cause it to fade back in; `false` otherwise
+   * (and by default).
    */
   fadeInOnTapOutside?: boolean;
 
   /**
-   * `true` if the root element of this {@link HoverOrTapAffordance} should be a `<span>`
-   * (so that it can exist inside of a `<p>`, `<h1>`, `<a>`, etc.), `false` if
-   * it should be a `<div>` so that it can contain block-level content (and by default).
+   * `true` if the root element of this {@link HoverOrTapAffordance} should be
+   * a `<span>` (so that it can exist inside of a `<p>`, `<h1>`, `<a>`, etc.),
+   * `false` if it should be a `<div>` so that it can contain block-level
+   * content (and by default).
    */
   inline?: boolean;
 
@@ -68,8 +73,8 @@ export type HoverOrTapAffordanceProps = {
    *
    * Note: the children (i.e., content) are wrapped in a `z-10` stacking
    * context, so if any of them must overlap subsequent siblings of this
-   * {@link HoverOrTapAffordance}'s root element, a z-index above `z-10` must be
-   * set here.
+   * {@link HoverOrTapAffordance}'s root element, a z-index above `z-10`
+   * must be set here.
    */
   className?: string;
 
@@ -89,7 +94,8 @@ export type HoverOrTapAffordanceProps = {
   affordanceClassName?: string;
 
   /**
-   * The content for which this {@link HoverOrTapAffordance} should afford interaction.
+   * The content for which this {@link HoverOrTapAffordance}
+   * should afford interaction.
    */
   children: ReactNode;
 };

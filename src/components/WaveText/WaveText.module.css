@@ -1,7 +1,7 @@
 /*
- * `--wave-height`, `--wave-period`, and `--wave-stagger` are inherited from the
- * root `<span>`; their defaults are specified here as fallbacks to ensure that
- * class overrides don't have to compete with them.
+ * `--wave-height`, `--wave-period`, and `--wave-stagger` are inherited from
+ * the root `<span>`; their defaults are specified here as fallbacks to ensure
+ * that class overrides don't have to compete with them.
  */
 .char {
   @media (prefers-reduced-motion: no-preference) {

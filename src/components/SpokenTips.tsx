@@ -34,9 +34,9 @@ const TAIL_MASK = {
  * `upperBound` is less than 2.
  * @param upperBound the (exclusive) upper bound for
  *                   the randomly generated integer
- * @param forbiddenValue the integer in [0, `upperBound`) from which the
- *                       return value must be distinct,
- *                       or `null` to omit that requirement
+ * @param forbiddenValue the integer in [0, `upperBound`) from which
+ *                       the return value must be distinct, or `null`
+ *                       to omit that requirement
  * @returns the randomly generated integer, or 0 if `upperBound` is less than 2
  */
 const randomDistinctInteger = (

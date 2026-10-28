@@ -17,7 +17,7 @@ export enum Side {
 }
 
 /**
- * An {@link ArrowEnd} located on (but separated from by `diagramPadding`)
+ * An {@link ArrowEnd} located on (but separated by `diagramPadding` from)
  * one {@link Side} of the bounding box of the display text in a
  * {@link DiagramAnimation} and possessing a connection point located `depth`
  * ems away from its location in the direction of its defining {@link Side}.

@@ -24,8 +24,8 @@ export type ConnectingDotsTextProps = {
    * from sticking out of the bounding box of this {@link ConnectingDotsText}.
    *
    * If there are fewer position values than there are non-whitespace
-   * characters in the specified `text`, then the supplied position values are
-   * reused cyclically.
+   * characters in the specified `text`, then the supplied position
+   * values are reused cyclically.
    *
    * If this prop is omitted or the array is empty,
    * then the position values are generated randomly.

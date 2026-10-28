@@ -21,16 +21,16 @@ const Home = () => {
   return (
     <main className="flex flex-1 flex-col overflow-hidden">
       {/* Fills the viewport and adds the page's rounded bottom corners
-          just out of view; the extra bottom padding accounts for the radius of those
-          corners to keep the lockup centered */}
+          just out of view; the extra bottom padding accounts for the
+          radius of those corners to keep the lockup centered */}
       <section className="flex min-h-[calc(100svh+var(--radius-page))] items-center justify-center px-6 pt-24 pb-[calc(--spacing(24)+var(--radius-page))]">
         <div className="group/hero flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-14 lg:gap-16 xl:gap-20">
           <div className="shrink-0">
             <SpokenTips tips={TIPS}>
-              {/* Placed inside `SpokenTips` so that the affordance swells with
-                  the avatar and the speech bubble isn't trapped inside of the
-                  `HoverOrTapAffordance` stacking context; `block` so
-                  it doesn't get a line box (which would pad its bottom) */}
+              {/* Placed inside `SpokenTips` so that the affordance swells
+                  with the avatar and the speech bubble isn't trapped inside
+                  of the `HoverOrTapAffordance` stacking context; `block`
+                  so it doesn't get a line box (which would pad its bottom) */}
               {/* Dimmed here because reducing opacity on `SpokenTips` would
                   create a stacking context on it and thus trap the speech
                   bubble below the `z-10` text on the right side */}

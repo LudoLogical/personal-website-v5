@@ -292,8 +292,9 @@ const DiagramAnimation = ({
       data-active={active || undefined}
       className={twMerge("relative", className)}
     >
-      {/* Applying `leading-none` brings the bounding box closer to the letters;
-          doing so here prevents the class from being overridden via `twMerge()` */}
+      {/* Applying `leading-none` brings the bounding box closer to
+          the letters; doing so here prevents the class from being
+          overridden via `twMerge()` */}
       <h1
         ref={textRef}
         className="leading-none whitespace-nowrap"

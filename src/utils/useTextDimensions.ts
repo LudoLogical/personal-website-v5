@@ -18,11 +18,12 @@ export type TextDimensions = {
 };
 
 /**
- * Tracks the width, height, and font size of the `HTMLElement` assigned to the
- * specified `targetRef`. Updates whenever the dimensions of the `HTMLElement`
- * change (which includes when web fonts finish loading).
+ * Tracks the width, height, and font size of the `HTMLElement` assigned
+ * to the specified `targetRef`. Updates whenever the dimensions of the
+ * `HTMLElement` change (which includes when web fonts finish loading).
  * @param ref a `RefObject` for the `HTMLElement` to be measured  
- * @returns the {@link TextDimensions} of the `HTMLElement`, or `null` if ref is `null`
+ * @returns the {@link TextDimensions} of the `HTMLElement`,
+ *                                     or `null` if ref is `null`
  */
 const useTextDimensions = (
   ref: RefObject<HTMLElement | null>,

@@ -242,7 +242,7 @@ export type TimelineProps = {
  * {@link Organization}s' logos. Designed to be {@link Expandable}.
  */
 export const Timeline = ({ children }: TimelineProps) => (
-  // Use gap instead of margin so hidden `TimelineItem`s don't create extra space
+  // Use gap instead of margin so hidden `TimelineItem`s don't make extra space
   <ol className="timeline timeline-vertical timeline-compact gap-10">
     {children}
   </ol>

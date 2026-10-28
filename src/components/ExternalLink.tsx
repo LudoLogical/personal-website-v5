@@ -19,12 +19,12 @@ export type ExternalLinkProps = Omit<
          * The manner in which this {@link ExternalLink} should be rendered.
          * - `"underline"`: underlined on hover; the content (which must be
          *                  plain text) is permitted to wrap with the sole
-         *                  constraint that the `ArrowUpRight` icon will never
-         *                  wrap separately from the last word
-         * - `"highlight"`: brightened on hover; the content is placed within
-         *                  a single `inline-flex` box
-         * - `"button"`: the content is placed within a `btn-soft btn-sm`
-         *               daisyUI button
+         *                  constraint that the `ArrowUpRight` icon will
+         *                  never wrap separately from the last word
+         * - `"highlight"`: brightened on hover; the content is placed
+         *                  within a single `inline-flex` box
+         * - `"button"`: the content is placed within a
+         *               `btn-soft btn-sm` daisyUI button
          */
         kind: "underline";
         /**

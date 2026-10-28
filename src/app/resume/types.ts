@@ -18,10 +18,10 @@ export type Organization = {
   href?: string;
 
   /**
-   * The path (within `public/logos/`) to the logo for this {@link Organization}.
+   * The path (in `public/logos/`) to the logo for this {@link Organization}.
    * Expected to be a square image with a filled (i.e., not transparent)
-   * background. If omitted, the initials of this {@link Organization}'s name
-   * are used as a placeholder instead.
+   * background. If omitted, the initials of this {@link Organization}'s
+   * name are used as a placeholder instead.
    */
   logo?: string;
 };
@@ -74,7 +74,8 @@ export type Skill = {
   /**
    * `true` if this {@link Skill} should be visually emphasized
    * everywhere it appears (i.e., in both the "Skills" and "Experience"
-   * sections), `false` otherwise (and by default). A {@link Skill} that is `highlighted` should always also be `featured`.
+   * sections), `false` otherwise (and by default). A {@link Skill} that
+   * is `highlighted` should always also be `featured`.
    */
   highlighted?: boolean;
 };
@@ -107,7 +108,8 @@ export type Experience = {
   location: string;
 
   /**
-   * `true` if this {@link Experience} was remote, `false` otherwise (and by default).
+   * `true` if this {@link Experience} was remote,
+   * `false` otherwise (and by default).
    */
   isRemote?: boolean;
 

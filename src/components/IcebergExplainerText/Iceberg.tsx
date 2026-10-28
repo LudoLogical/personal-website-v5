@@ -70,8 +70,8 @@ const POINTS: [number, number][] = [
 
 /**
  * The triangular facets of the iceberg SVG, written as triples of
- * indices in `POINTS`. Computed as the Delaunay triangulation of `POINTS`
- * (excluding everything outside of the outline).
+ * indices in `POINTS`. Computed as the Delaunay triangulation of
+ * `POINTS` (excluding everything outside of the outline).
  */
 const FACETS: [number, number, number][] = [
   [0, 1, 19],
@@ -150,7 +150,8 @@ type FacetShading = {
 };
 
 /**
- * {@link FacetShading} info is static, so it can be pre-computed for every facet.
+ * {@link FacetShading} info is static,
+ * so it can be pre-computed for every facet.
  *
  * Brightness values assume evenly-distributed lighting from the left side,
  * but include some noise to ensure that neighboring facets appear distinct.
@@ -187,8 +188,9 @@ export type IcebergProps = {
 
 /**
  * Renders an SVG of a low-poly iceberg that spans the entire sliding strip
- * of an {@link IcebergExplainerText}. The facets above the waterline are fully opaque,
- * but those below it become more and more translucent (i.e., fade) with depth.
+ * of an {@link IcebergExplainerText}. The facets above the waterline are
+ * fully opaque, but those below it become more and more translucent
+ * (i.e., fade) with depth.
  */
 const Iceberg = ({ height, waterline }: IcebergProps) => {
   // Necessary b/c there could be more than one `Iceberg` instance on a page

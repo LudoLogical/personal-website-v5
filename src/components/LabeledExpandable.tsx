@@ -12,7 +12,8 @@ export type LabeledExpandableProps = Omit<ExpandableProps, "labels"> & {
   singleItemName: string;
 
   /**
-   * The plural form of the noun for a single item in this {@link LabeledExpandable}.
+   * The plural form of the noun for a single
+   * item in this {@link LabeledExpandable}.
    */
   pluralItemName: string;
 };

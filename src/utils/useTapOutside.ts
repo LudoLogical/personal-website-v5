@@ -20,7 +20,7 @@ const useTapOutside = (
   useEffect(() => {
     if (!enabled) return;
 
-    // Scrolling is ignored because it ends in a `pointercancel`, not a `pointerup`
+    // Scrolling is ignored b/c it ends in a `pointercancel`, not a `pointerup`
     const onPointerUp = (e: PointerEvent) => {
       if (e.pointerType !== "touch") return;
       if (ref.current?.contains(e.target as Node)) return;

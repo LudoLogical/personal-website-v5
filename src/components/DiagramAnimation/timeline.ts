@@ -11,10 +11,12 @@ import type { MarkerShape, RasterizedArrow } from "./types";
 gsap.registerPlugin(DrawSVGPlugin, MotionPathPlugin);
 
 /**
- * Adds the animations for the specified `arrow` `Element` (including
- * its body, arrowhead, and any markers) to the specified {@link gsap.core.Timeline}.
+ * Adds the animations for the specified `arrow` `Element`
+ * (including its body, arrowhead, and any markers) to the
+ * specified {@link gsap.core.Timeline}.
  * @param arrow the `Element` containing the SVG for the arrow to be animated
- * @param timeline the {@link gsap.core.Timeline} to which the animations should be added
+ * @param timeline the {@link gsap.core.Timeline} to
+ *                 which the animations should be added
  * @param animationOptions the `options.animation` for the
  *                         associated {@link DiagramAnimation}
  */
@@ -96,8 +98,9 @@ export type DiagramAnimationTimelineControls = {
 
 /**
  * Animates the diagram elements within the specified SVG.
- * Rebuilds the animation whenever the specified paths or `animationOptions` change. Progress is preserved across builds so that
- * mid-animation interruptions do not cause jumps.
+ * Rebuilds the animation whenever the specified paths or
+ * `animationOptions` change. Progress is preserved across
+ * builds so that mid-animation interruptions do not cause jumps.
  * @param svgRef a `RefObject` for the SVG `Element` to be animated
  * @param arrowheadPath the arrowhead path rendered in the SVG;
  *                      passed to trigger a rebuild when changed

@@ -33,10 +33,10 @@ export type ExpandableProps = {
   className?: string;
 
   /**
-   * The content of this {@link Expandable}. Any descendant bearing the `data-extra`
-   * attribute stays hidden until this {@link Expandable} is expanded, so `data-extra`
-   * and always-visible content can be interwoven (e.g., to keep a list in
-   * chronological order).
+   * The content of this {@link Expandable}. Any descendant bearing the
+   * `data-extra` attribute stays hidden until this {@link Expandable}
+   * is expanded, so `data-extra` and always-visible content can be
+   * interwoven (e.g., to keep a list in chronological order).
    *
    * Note: `data-extra` elements use their `transition` property to fade into
    * view, so avoid overriding that property by wrapping them if necessary.
