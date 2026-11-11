@@ -7,10 +7,9 @@ import {
   Wrench,
 } from "lucide-react";
 import type { Metadata } from "next";
-import type { ComponentType, ReactNode } from "react";
 import ExternalLink from "@/components/ExternalLink";
 import LabeledExpandable from "@/components/LabeledExpandable";
-import type PrimaryNav from "@/components/PrimaryNav";
+import PageSection from "@/components/PageSection";
 import { OrgLogo, OrgName, SkillChip } from "./atoms";
 import {
   CERTIFICATIONS,
@@ -64,38 +63,6 @@ const RecognitionList = ({ items }: { items: Recognition[] }) => (
   </ul>
 );
 
-/**
- * Renders a section of the resume. On wide viewports, its heading is located
- * in a column to the left of its content and sticks to the top of the viewport
- * (but respects the {@link PrimaryNav}).
- */
-const Section = ({
-  id,
-  title,
-  icon: Icon,
-  children,
-}: {
-  id: string;
-  title: string;
-  icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
-  children: ReactNode;
-}) => (
-  <section
-    id={id}
-    aria-labelledby={`${id}-heading`}
-    className="scroll-mt-32 border-t border-base-content/10 py-12 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-x-10"
-  >
-    <h2
-      id={`${id}-heading`}
-      className="mb-8 flex items-center gap-3 text-2xl font-bold motion-reduce:transition-none lg:sticky lg:top-[calc(var(--primary-nav-inset,0px)+(--spacing(12)))] lg:mb-0 lg:self-start lg:transition-[top] lg:duration-300 lg:ease-out"
-    >
-      <Icon aria-hidden className="size-6 shrink-0 text-secondary" />
-      {title}
-    </h2>
-    <div className="min-w-0">{children}</div>
-  </section>
-);
-
 const numExtraExperiences = EXPERIENCES.filter(
   ({ featured }) => !featured,
 ).length;
@@ -143,7 +110,7 @@ const Resume = () => {
         </a>
       </header>
 
-      <Section id="experience" title="Experience" icon={Briefcase}>
+      <PageSection id="experience" title="Experience" icon={Briefcase}>
         <LabeledExpandable
           numExtras={numExtraExperiences}
           singleItemName="role"
@@ -164,9 +131,9 @@ const Resume = () => {
             ))}
           </Timeline>
         </LabeledExpandable>
-      </Section>
+      </PageSection>
 
-      <Section id="education" title="Education" icon={GraduationCap}>
+      <PageSection id="education" title="Education" icon={GraduationCap}>
         <Timeline>
           {EDUCATIONS.map((entry, i) => (
             <TimelineItem
@@ -178,9 +145,9 @@ const Resume = () => {
             </TimelineItem>
           ))}
         </Timeline>
-      </Section>
+      </PageSection>
 
-      <Section id="skills" title="Skills" icon={Wrench}>
+      <PageSection id="skills" title="Skills" icon={Wrench}>
         <LabeledExpandable
           numExtras={numExtraSkills}
           singleItemName="skill"
@@ -213,15 +180,15 @@ const Resume = () => {
             )}
           </div>
         </LabeledExpandable>
-      </Section>
+      </PageSection>
 
-      <Section id="certifications" title="Certifications" icon={BadgeCheck}>
+      <PageSection id="certifications" title="Certifications" icon={BadgeCheck}>
         <RecognitionList items={CERTIFICATIONS} />
-      </Section>
+      </PageSection>
 
-      <Section id="honors" title="Honors" icon={Trophy}>
+      <PageSection id="honors" title="Honors" icon={Trophy}>
         <RecognitionList items={HONORS} />
-      </Section>
+      </PageSection>
     </main>
   );
 };

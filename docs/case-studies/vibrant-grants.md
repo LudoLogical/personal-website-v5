@@ -14,7 +14,7 @@ An end-to-end grant workflow for community-driven non-profit leaders
 > **Design Note**: The videos in the carousel above should behave like `.gif`s in that they should play automatically and their controls should be hidden from users. When one video finishes playing, the carousel should move on to the next one (or, in the case of the last video, return to the first one) automatically. However, the user should be able to cycle through the videos in the carousel at will. Each video should always play from the very beginning every time it appears, even if the user switched the carousel to show a different video partway through. The carousel should feature an indicator that graphically depicts how much of the current video has played (i.e., as a fraction of its total length). The user should be able to pause (or resume) the current video at any time by clicking on it. The carousel should never automatically switch videos while the current video is paused. However, if the user manually switches the current video, the new current video should begin playing automatically from the beginning as normal.
 
 - Team:
-	- [Daniel "Ludo" DeAnda](https://www.linkedin.com/in/danielchristiandeanda/): Lead Engineer
+	- **[Daniel "Ludo" DeAnda](https://www.linkedin.com/in/danielchristiandeanda/): Lead Engineer**
 	- [Soyon Kim](https://www.linkedin.com/in/soyon-kim/): Co-Lead Researcher and Designer
 	- [Anissa Patel](https://www.linkedin.com/in/anissa-patel/): Project Manager and Data Engineer
 	- [Priyal Shrivastava](https://www.linkedin.com/in/priyalshri/): Co-Lead Researcher and AI Strategist
