@@ -4,6 +4,28 @@ import type { ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import type { Picture } from "./types";
 
+export type CaptionProps = {
+  /**
+   * The content of this {@link Caption}.
+   */
+  children: ReactNode;
+};
+
+/**
+ * Renders the specified `children` as the caption of the `<figure>` that
+ * contains this component, centered beneath the visual that it describes.
+ *
+ * Note: This component's box is trimmed to the cap height of its first line
+ * and the baseline of its last, so any space around it is visible as such.
+ */
+export const Caption = ({ children }: CaptionProps) => (
+  // Inset so that the text never appears to extend past the edges of the
+  // visual above it, which is usually exactly as wide as the `<figure>`
+  <figcaption className="px-4 text-center text-sm text-balance text-base-content/60 text-box-trim">
+    {children}
+  </figcaption>
+);
+
 export type FigureProps = {
   /**
    * The {@link Picture} to be rendered in this {@link Figure}.
@@ -35,8 +57,8 @@ export type FigureProps = {
 };
 
 /**
- * Renders the specified {@link Picture} with rounded
- * corners above the specified `caption` (if any).
+ * Renders the specified {@link Picture} with rounded corners
+ * above the specified `caption` (if any) in a {@link Caption}.
  */
 export const Figure = ({
   picture: { src, alt, width, height },
@@ -45,7 +67,7 @@ export const Figure = ({
   className,
   imageClassName,
 }: FigureProps) => (
-  <figure className={twMerge("flex flex-col gap-3", className)}>
+  <figure className={twMerge("flex flex-col gap-4", className)}>
     <Image
       src={src}
       alt={alt}
@@ -54,11 +76,7 @@ export const Figure = ({
       sizes={sizes}
       className={twMerge("h-auto w-full rounded-xl", imageClassName)}
     />
-    {caption && (
-      <figcaption className="text-sm text-base-content/60">
-        {caption}
-      </figcaption>
-    )}
+    {caption && <Caption>{caption}</Caption>}
   </figure>
 );
 

@@ -1,6 +1,32 @@
 import type { ComponentType, ReactNode } from "react";
 
 /**
+ * A heading that labels a section of the case study.
+ */
+export type Heading = {
+  /**
+   * The `id` of the `<section>` that this {@link Heading} labels.
+   */
+  id: string;
+
+  /**
+   * The text of this {@link Heading}.
+   */
+  title: string;
+};
+
+/**
+ * A {@link Heading} that labels a top-level section of the case study.
+ */
+export type SectionHeading = Heading & {
+  /**
+   * The {@link Heading}s of the subsections that the table of contents
+   * lists beneath this {@link SectionHeading}. Omitted if it lists none.
+   */
+  subheadings?: Heading[];
+};
+
+/**
  * A raster image (i.e., a photograph, diagram, or screenshot)
  * located in `public/`.
  */
@@ -136,11 +162,6 @@ export type Receipt = {
    * The name of the tool that issued this {@link Receipt}.
    */
   title: string;
-
-  /**
-   * A description of the tool that issued this {@link Receipt}.
-   */
-  subtitle: string;
 
   /**
    * The line items on this {@link Receipt},

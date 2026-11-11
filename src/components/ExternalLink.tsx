@@ -4,6 +4,8 @@ import { twMerge } from "tailwind-merge";
 
 const KIND_CLASS_NAMES: Record<ExternalLinkProps["kind"], string> = {
   underline: "inline link whitespace-nowrap link-hover",
+  inline:
+    "inline link whitespace-nowrap decoration-current/40 underline-offset-2 transition-colors hover:decoration-current motion-reduce:transition-none",
   highlight:
     "inline-flex items-center gap-2 transition-colors text-base-content/55 hover:text-base-content/85",
   button: "btn inline-flex items-center gap-1 btn-soft text-sm btn-sm",
@@ -21,15 +23,18 @@ export type ExternalLinkProps = Omit<
          *                  plain text) is permitted to wrap with the sole
          *                  constraint that the `ArrowUpRight` icon will
          *                  never wrap separately from the last word
+         * - `"inline"`: like `"underline"`, but faintly underlined even
+         *               when not hovered so that it stands out from the
+         *               running text around it
          * - `"highlight"`: brightened on hover; the content is placed
          *                  within a single `inline-flex` box
          * - `"button"`: the content is placed within a
          *               `btn-soft btn-sm` daisyUI button
          */
-        kind: "underline";
+        kind: "underline" | "inline";
         /**
-         * The content of the link.
-         * Must be plain text iff using the `"underline"` `kind`.
+         * The content of the link. Must be plain text
+         * iff using the `"underline"` or `"inline"` `kind`.
          */
         children: string;
       }
@@ -50,8 +55,8 @@ const ExternalLink = ({
   children,
   ...props
 }: ExternalLinkProps) => {
-  const lastWordStart =
-    kind === "underline" ? children.lastIndexOf(" ") + 1 : 0;
+  const isText = kind === "underline" || kind === "inline";
+  const lastWordStart = isText ? children.lastIndexOf(" ") + 1 : 0;
   return (
     <a
       target="_blank"
@@ -59,7 +64,7 @@ const ExternalLink = ({
       {...props}
       className={twMerge(KIND_CLASS_NAMES[kind], className)}
     >
-      {kind === "underline" ? (
+      {isText ? (
         <>
           <span className="whitespace-normal">
             {children.slice(0, lastWordStart)}
@@ -73,7 +78,7 @@ const ExternalLink = ({
         aria-hidden
         className={twMerge(
           "size-[0.85em] shrink-0",
-          kind === "underline" && "ms-[0.2em] inline align-baseline",
+          isText && "ms-[0.2em] inline align-baseline",
         )}
       />
       <span className="sr-only">(opens in a new tab)</span>

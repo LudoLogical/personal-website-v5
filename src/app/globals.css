@@ -56,6 +56,15 @@
 @custom-variant base-hover (&:hover);
 
 /*
+ * Trims the space above the first line of a block of text down to its
+ * cap height and the space below the last line down to its baseline, so
+ * that margins, padding, and gaps measure the gaps that are actually seen.
+ */
+@utility text-box-trim {
+  text-box: trim-both cap alphabetic;
+}
+
+/*
  * Surrounds an element with a soft glow in the specified Tailwind theme color
  * (e.g., `glow-primary`) The intensity can be scaled using `--glow-strength`
  * (defaults to 1).

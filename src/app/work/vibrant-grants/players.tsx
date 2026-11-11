@@ -8,10 +8,12 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type ReactNode,
   type RefObject,
 } from "react";
 import { twMerge } from "tailwind-merge";
 import ExternalLink from "@/components/ExternalLink";
+import { Caption } from "./atoms";
 import type { Demo, ProjectPhoto } from "./types";
 
 /**
@@ -200,9 +202,71 @@ const ProgressTrack = ({
     )}
   >
     {active && (
-      <span className="block size-full origin-left scale-x-[var(--playback-progress,0)] bg-primary" />
+      <span className="block size-full origin-left scale-x-(--playback-progress,0) bg-primary" />
     )}
   </span>
+);
+
+/**
+ * Renders a row of buttons, one per item in a carousel, each of which
+ * selects its item and contains a {@link ProgressTrack} that fills while
+ * said item is current.
+ */
+const ProgressSegments = ({
+  labels,
+  currentIndex,
+  className,
+  onSelect,
+}: {
+  labels: string[];
+  currentIndex: number;
+  className?: string;
+  onSelect: (index: number) => void;
+}) => (
+  <ol className={twMerge("flex gap-1.5", className)}>
+    {labels.map((label, i) => (
+      <li key={label} className="flex-1">
+        {/* Padded so that the tap target is taller than the track */}
+        <button
+          type="button"
+          aria-label={label}
+          aria-current={i === currentIndex || undefined}
+          className="group/segment block w-full cursor-pointer py-3"
+          onClick={() => onSelect(i)}
+        >
+          <ProgressTrack
+            active={i === currentIndex}
+            className="transition-colors group-hover/segment:bg-base-content/30 motion-reduce:transition-none"
+          />
+        </button>
+      </li>
+    ))}
+  </ol>
+);
+
+/**
+ * Renders the bar along the bottom of the window frame of a
+ * {@link VideoCarousel}, which holds the specified `caption` and `segments`.
+ * On wide viewports, the `caption` sits to the left of the `segments`.
+ * Otherwise, it sits beneath them, and the gaps that separate the top of the
+ * bar, the tracks of the `segments`, the text of the `caption`, and the
+ * bottom of the bar are all equal.
+ */
+const Taskbar = ({
+  caption,
+  segments,
+}: {
+  caption: ReactNode;
+  segments: ReactNode;
+}) => (
+  // Each gap is 1rem, i.e., this padding (or `gap-1`) plus the
+  // padding that makes the segments' buttons taller than their tracks
+  <div className="flex flex-col-reverse gap-1 px-4 pt-1 pb-4 lg:flex-row lg:items-center lg:gap-8 lg:py-2.5 lg:ps-5">
+    <div className="grid flex-1 text-center text-sm font-semibold text-balance lg:text-start">
+      {caption}
+    </div>
+    {segments}
+  </div>
 );
 
 /**
@@ -306,16 +370,17 @@ export type VideoCarouselProps = {
 };
 
 /**
- * Renders the specified {@link Demo}s as a carousel that shows one video
- * at a time in a window frame above a numbered list of every caption.
+ * Renders the specified {@link Demo}s as a carousel that shows one video at
+ * a time in a window frame. A bar along the bottom of the frame holds the
+ * caption of the current video and a row of segments (one per video).
  *
  * Each video plays automatically (and silently) from its beginning while it
  * is in view, and the carousel moves on to the next video (or back to the
- * first one) when the current one ends. Selecting a caption switches to its
+ * first one) when the current one ends. Selecting a segment switches to its
  * video, and clicking on the current video pauses or resumes it. A paused
  * video never ends, so the carousel only moves on from one if the user
- * selects a caption (which also resumes playback). A bar above the current
- * video's caption depicts how much of that video has played.
+ * selects a segment (which also resumes playback). The current video's
+ * segment fills to depict how much of that video has played.
  *
  * Paused by default if the user `prefers-reduced-motion`.
  */
@@ -353,12 +418,20 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
     setDemoIndex(nextDemoIndex);
   };
 
+  const { src: currentSrc, caption: currentCaption } = demos[demoIndex];
+
   return (
-    <div ref={rootRef} className="flex flex-col gap-6">
-      <div className={WINDOW_CLASS_NAMES}>
+    // The window shrinks to fit the current caption, so it's stacked atop an
+    // invisible copy that fits the longest one, which reserves enough room
+    // for any caption and thus keeps the page below from shifting
+    <div className="grid">
+      <div
+        ref={rootRef}
+        className={twMerge(WINDOW_CLASS_NAMES, "self-start [grid-area:1/1]")}
+      >
         <button
           type="button"
-          aria-label={`${paused ? "Play" : "Pause"} video: ${demos[demoIndex].caption}`}
+          aria-label={`${paused ? "Play" : "Pause"} video: ${currentCaption}`}
           className="group/player relative block aspect-16/10 w-full cursor-pointer"
           onClick={() => setPaused(!paused)}
         >
@@ -386,45 +459,49 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
           ))}
           <PlaybackBadge paused={paused} />
         </button>
+        <Taskbar
+          caption={
+            // Keyed by video so that each new caption fades in
+            <p
+              key={currentSrc}
+              className="transition-opacity duration-300 text-box-trim motion-reduce:transition-none starting:opacity-0"
+            >
+              {currentCaption}
+            </p>
+          }
+          segments={
+            <ProgressSegments
+              labels={demos.map(
+                ({ caption }, i) =>
+                  `Video ${i + 1} of ${demos.length}: ${caption}`,
+              )}
+              currentIndex={demoIndex}
+              className="lg:w-60"
+              onSelect={(nextDemoIndex) => {
+                showDemo(nextDemoIndex);
+                setPaused(false);
+              }}
+            />
+          }
+        />
       </div>
 
-      <ol className="grid gap-x-8 gap-y-5 xs:grid-cols-2 md:grid-cols-3">
-        {demos.map(({ src, caption }, i) => {
-          const isCurrent = i === demoIndex;
-          return (
-            <li key={src}>
-              <button
-                type="button"
-                aria-current={isCurrent || undefined}
-                className={twMerge(
-                  "flex w-full cursor-pointer flex-col gap-2.5 text-left transition-colors motion-reduce:transition-none",
-                  isCurrent
-                    ? "text-base-content"
-                    : "text-base-content/55 hover:text-base-content/85",
-                )}
-                onClick={() => {
-                  showDemo(i);
-                  setPaused(false);
-                }}
-              >
-                <ProgressTrack active={isCurrent} />
-                <span className="flex gap-3">
-                  <span
-                    aria-hidden
-                    className={twMerge(
-                      "text-sm leading-6 font-bold tabular-nums",
-                      isCurrent && "text-primary",
-                    )}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="leading-6 font-semibold">{caption}</span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+      <div
+        aria-hidden
+        className={twMerge(WINDOW_CLASS_NAMES, "invisible [grid-area:1/1]")}
+      >
+        <div className="aspect-16/10" />
+        <Taskbar
+          caption={demos.map(({ src, caption }) => (
+            <p key={src} className="[grid-area:1/1] text-box-trim">
+              {caption}
+            </p>
+          ))}
+          // As tall as the `ProgressSegments`, whose
+          // buttons are 1.5rem taller than their tracks
+          segments={<div className="h-7 lg:w-60" />}
+        />
+      </div>
     </div>
   );
 };
@@ -514,22 +591,12 @@ export const PhotoCarousel = ({ photos, className }: PhotoCarouselProps) => {
         >
           <ChevronLeft aria-hidden className="size-4" />
         </button>
-        <ol className="flex flex-1 gap-1.5">
-          {photos.map(({ src }, i) => (
-            <li key={src} className="flex-1">
-              {/* Padded so that the tap target is taller than the track */}
-              <button
-                type="button"
-                aria-label={`Photo ${i + 1} of ${photos.length}`}
-                aria-current={i === photoIndex || undefined}
-                className="block w-full cursor-pointer py-3"
-                onClick={() => showPhoto(i)}
-              >
-                <ProgressTrack active={i === photoIndex} />
-              </button>
-            </li>
-          ))}
-        </ol>
+        <ProgressSegments
+          labels={photos.map((_, i) => `Photo ${i + 1} of ${photos.length}`)}
+          currentIndex={photoIndex}
+          className="flex-1"
+          onSelect={showPhoto}
+        />
         <button
           type="button"
           aria-label="Next photo"
@@ -548,11 +615,11 @@ export const PhotoCarousel = ({ photos, className }: PhotoCarouselProps) => {
         </button>
       </div>
 
-      <figcaption className="text-sm text-base-content/60">
+      <Caption>
         <ExternalLink kind="underline" href={href}>
           {caption}
         </ExternalLink>
-      </figcaption>
+      </Caption>
     </figure>
   );
 };

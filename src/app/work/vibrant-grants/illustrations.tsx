@@ -130,83 +130,49 @@ export const PageFan = ({ pages, label }: PageFanProps) => (
   </div>
 );
 
-/**
- * Renders the serrated edge left behind when a receipt is torn from its roll.
- * The teeth point down unless `flipped`.
- */
-const TornEdge = ({ flipped = false }: { flipped?: boolean }) => (
-  <div
-    aria-hidden
-    // Each 0.5rem-wide tile of the mask keeps only a downward-pointing triangle
-    className={twMerge(
-      "h-1 bg-stone-100 [mask:conic-gradient(from_-45deg_at_bottom,#0000,#000_1deg_89deg,#0000_90deg)_50%/0.5rem_100%]",
-      flipped && "rotate-180",
-    )}
-  />
-);
-
-export type PaperReceiptProps = {
+export type ReceiptCardProps = {
   /**
-   * The {@link Receipt} to be rendered by this {@link PaperReceipt}.
+   * The {@link Receipt} to be rendered by this {@link ReceiptCard}.
    */
   receipt: Receipt;
-
-  /**
-   * Classes for the container `<div>` of this {@link PaperReceipt}.
-   */
-  className?: string;
 };
 
 /**
- * Renders the specified {@link Receipt} as a printed paper receipt whose
- * amount due is the sum of its line items. Every amount is expressed in
- * hours, to two decimal places.
+ * Renders the specified {@link Receipt} as an itemized bill whose amount
+ * due is the sum of its line items. Every amount is expressed in hours,
+ * to two decimal places.
  */
-export const PaperReceipt = ({
-  receipt: { title, subtitle, items },
-  className,
-}: PaperReceiptProps) => {
+export const ReceiptCard = ({
+  receipt: { title, items },
+}: ReceiptCardProps) => {
   const formatHours = (hours: number) => `${hours.toFixed(2)} hrs`;
   const hoursDue = items.reduce((sum, { hours }) => sum + hours, 0);
 
   return (
-    <div
-      className={twMerge(
-        "w-72 font-mono text-xs text-stone-800 drop-shadow-xl",
-        className,
-      )}
-    >
-      <TornEdge flipped />
-      <div className="flex flex-col gap-3 bg-stone-100 px-5 py-4">
-        <p className="text-center uppercase">
-          <strong className="block text-base tracking-widest">{title}</strong>
-          {subtitle}
+    <div className="card w-full max-w-72 border border-base-content/10 bg-base-200 text-sm">
+      <div className="card-body gap-4 p-5">
+        <p className="text-center font-bold tracking-widest uppercase">
+          {title}
         </p>
-        <hr className="border-dashed border-stone-400" />
+        <hr className="border-dashed border-base-content/20" />
         <dl className="flex flex-col gap-1.5">
           {items.map(({ label, hours }) => (
             <div key={label} className="flex justify-between gap-4">
-              <dt>{label}</dt>
+              <dt className="text-base-content/75">{label}</dt>
               <dd className="whitespace-nowrap tabular-nums">
                 {formatHours(hours)}
               </dd>
             </div>
           ))}
         </dl>
-        <hr className="border-dashed border-stone-400" />
-        <dl className="flex justify-between gap-4 text-sm font-bold uppercase">
-          <dt>Amount due</dt>
-          <dd className="whitespace-nowrap tabular-nums">
+        <hr className="border-dashed border-base-content/20" />
+        <dl className="flex justify-between gap-4 font-bold">
+          <dt className="tracking-wide uppercase">Amount due</dt>
+          <dd className="whitespace-nowrap text-primary tabular-nums">
             {formatHours(hoursDue)}
           </dd>
         </dl>
-        {/* Barcode */}
-        <div
-          aria-hidden
-          className="mt-2 h-8 bg-[repeating-linear-gradient(90deg,currentColor_0_2px,transparent_2px_3px,currentColor_3px_4px,transparent_4px_7px,currentColor_7px_10px,transparent_10px_12px,currentColor_12px_13px,transparent_13px_15px)]"
-        />
       </div>
-      <TornEdge />
     </div>
   );
 };

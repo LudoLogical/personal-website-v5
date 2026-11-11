@@ -6,6 +6,7 @@ import type {
   ProjectPhoto,
   Receipt,
   ResearchActivity,
+  SectionHeading,
   Service,
   Stakeholders,
   TeamMember,
@@ -124,8 +125,8 @@ export const PICTURES = {
   dataFlowModel: {
     src: "/case-studies/vibrant-grants/diagrams/data-flow-model-simplified.png",
     alt: "A diagram in which 18 unlabeled data stores and processes are joined by a tangle of crisscrossing solid and dashed arrows.",
-    width: 3384,
-    height: 2436,
+    width: 2936,
+    height: 1988,
   },
   systemMappingFigurines: {
     src: "/case-studies/vibrant-grants/photos/system-mapping-figurines.jpg",
@@ -160,8 +161,8 @@ export const PICTURES = {
   ingestionMechanism: {
     src: "/case-studies/vibrant-grants/diagrams/ingestion-mechanism.png",
     alt: "A flowchart in which a list of grant hub URLs feeds an algorithmic web scraper, whose output passes through an AI-powered grant parser and into the Vibrant Grants database.",
-    width: 1384,
-    height: 1288,
+    width: 936,
+    height: 840,
   },
 } satisfies Record<string, Picture>;
 
@@ -246,8 +247,7 @@ export const GRANT_OPPORTUNITY_HREF =
 // The amount due on each receipt is the sum of its line items
 export const RECEIPTS: Receipt[] = [
   {
-    title: "Free Trial",
-    subtitle: "New, specialized tool",
+    title: "Shiny New Tool",
     items: [
       { label: "Read comparison articles", hours: 0.75 },
       { label: "Compare pricing options", hours: 0.25 },
@@ -258,9 +258,8 @@ export const RECEIPTS: Receipt[] = [
     ],
   },
   {
-    title: "Existing Tool",
-    subtitle: "Old, general-purpose tool",
-    items: [{ label: "Click to open", hours: 0 }],
+    title: "Old Reliable",
+    items: [{ label: "Just pull it up", hours: 0 }],
   },
 ];
 
@@ -379,6 +378,20 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
     ],
   },
 ];
+
+// Listed in the order in which the sections appear
+export const SECTION_HEADINGS = {
+  client: { id: "client", title: "The Client" },
+  opportunity: { id: "opportunity", title: "The Opportunity" },
+  strategy: { id: "strategy", title: "Our Strategy" },
+  learnings: { id: "learnings", title: "What We Learned" },
+  solution: {
+    id: "solution",
+    title: "Our Solution",
+    subheadings: FEATURE_GROUPS.map(({ id, title }) => ({ id, title })),
+  },
+  impact: { id: "impact", title: "Our Impact" },
+} satisfies Record<string, SectionHeading>;
 
 // Quoted from NSR staff and acceptance testing participants;
 // bracketed text marks editorial changes
