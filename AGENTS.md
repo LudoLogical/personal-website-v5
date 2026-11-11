@@ -53,7 +53,7 @@ Follow these in new and edited code, even where an older line still deviates fro
 - Reach other folders through `@/` (`@/components/Expandable`, `@/utils/useTapOutside`), never `../`, and import components through their barrels.
 - Sort the names inside braces case-insensitively, values first and then inline `type` specifiers: `{ along, anchor, free, MarkerShape, Side, type Arrow }`.
 - Use `import type { … }` when every name is a type, inline `type` when mixing, `import Logo, { type LogoProps } from "@/components/Logo";` for a default plus types, and `import type { default as Name, NameOptions } from "./Name";` when the default is needed only as a type. `default` sorts as the word "default" (`{ ConnectingDotsTextOptions, default as ConnectingDotsText }`).
-- `pnpm lint` enforces these rules (except for side-effect imports like `import "./globals.css";`). `import/order` checks the ordering, and `pnpm exec eslint --fix <paths>` applies it. `custom-type-specifier-style` flags `import { type … }` and `export { type … }` statements whose names are all types, but it can't fix them since it is a custom rule.
+- `pnpm lint` enforces these rules (except for side-effect imports like `import "./globals.css";`). `import/order` checks the ordering, and `pnpm exec eslint --fix <paths>` applies it. `no-restricted-syntax` flags `import { type … }` and `export { type … }` statements whose names are all types, but it can't fix them since it is a custom rule.
 
 ## Naming
 

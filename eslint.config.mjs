@@ -31,7 +31,7 @@ const eslintConfig = defineConfig([
       ],
       // Works like `import/consistent-type-specifier-style` but
       // allows inline `type` specifiers iff they are mixed with values
-      "custom-type-specifier-style": [
+      "no-restricted-syntax": [
         "warn",
         {
           selector:

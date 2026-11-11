@@ -54,7 +54,7 @@ NSR and its clients were **struggling to secure grant funding**. Its digital ser
 
 **This design challenge implicated many different stakeholders**. We took care to ensure that our work would benefit them all by routinely seeking input from each one throughout the project.
 
-> **Visual**: a modified version of nsr-stakeholder-diagram.png, replicated in HTML (i.e., do NOT use an image element). For each concentric circle, find the default Tailwind shade of orange (e.g., `orange-500`) that aligns most closely with its background color, then use the shade of yellow with the same weight (e.g., `yellow-500`) as the actual background color. (All four background colors must be distinct.) Add solid borders around the innermost and third-innermost circles; also add a dashed one around the second-innermost circle. Swap out "Non profit client" for "Client non-profits" and "Non profit landscape" for "All non-profits".
+> **Visual**: a modified version of `stakeholders.png`, replicated in HTML (i.e., do NOT use an image element). For each concentric circle, find the default Tailwind shade of orange (e.g., `orange-500`) that aligns most closely with its background color, then use the shade of yellow with the same weight (e.g., `yellow-500`) as the actual background color. (All four background colors must be distinct.) Add solid borders around the innermost and third-innermost circles; also add a dashed one around the second-innermost circle. Swap out "Non profit client" for "Client non-profits" and "Non profit landscape" for "All non-profits".
 > **Caption**: (None)
 
 > **Design Note**: the subsections that follow should be rendered as an accordion. The first subsection should be expanded by default. No more than one subsection should be expanded at any given time. However, zero subsections may be expanded if the user simply collapses whichever subsection is expanded at the time.
@@ -154,7 +154,7 @@ When both time and money are hard to come by and existing tools are "good enough
 
 Despite how unstructured the grant ecosystem often is, Vibrant Grants can **source grant opportunities automatically** thanks to a novel ingestion mechanism that leverages both a deterministic web scraper and an asynchronous, AI-powered data extraction workload.
 
-> **Visual**: `diagrams/ingestion-mechanism-flowchart.png`
+> **Visual**: `diagrams/ingestion-mechanism.png`
 > **Caption**: (None)
 
 #### Holistic Relevance Assessments
