@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { twMerge } from "tailwind-merge";
-import type { Receipt, Stakeholders } from "./types";
+import type { Picture, Receipt, Stakeholders } from "./types";
 
 /**
  * The classes that size, position, and color each ring in a
@@ -80,6 +80,47 @@ export const StakeholderRings = ({
         </span>
       </div>
     ))}
+  </div>
+);
+
+export type SplitPictureProps = {
+  /**
+   * The {@link Picture} whose left half is rendered in this
+   * {@link SplitPicture}. Its intrinsic dimensions must match `right`'s.
+   */
+  left: Picture;
+
+  /**
+   * The {@link Picture} whose right half
+   * is rendered in this {@link SplitPicture}.
+   */
+  right: Picture;
+};
+
+/**
+ * Renders the left half of the specified `left` {@link Picture} beside
+ * the right half of the specified `right` one, as a single picture with
+ * rounded corners and no visible boundary between the halves.
+ *
+ * Exposed to ATs as two images, each with its own text alternative.
+ */
+export const SplitPicture = ({ left, right }: SplitPictureProps) => (
+  // Both pictures share the grid's only cell, so they overlap exactly
+  <div className="grid overflow-hidden rounded-xl *:col-start-1 *:row-start-1">
+    <Image
+      src={left.src}
+      alt={left.alt}
+      width={left.width}
+      height={left.height}
+      className="h-auto w-full"
+    />
+    <Image
+      src={right.src}
+      alt={right.alt}
+      width={right.width}
+      height={right.height}
+      className="h-auto w-full [clip-path:inset(0_0_0_50%)]"
+    />
   </div>
 );
 

@@ -27,8 +27,8 @@ export type SectionHeading = Heading & {
 };
 
 /**
- * A raster image (i.e., a photograph, diagram, or screenshot)
- * located in `public/`.
+ * An image (i.e., a photograph, diagram, or
+ * screenshot) located in `public/`.
  */
 export type Picture = {
   /**

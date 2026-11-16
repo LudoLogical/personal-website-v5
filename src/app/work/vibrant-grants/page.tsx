@@ -25,7 +25,12 @@ import {
   TESTIMONIALS,
   TIMELINE,
 } from "./content";
-import { PageFan, ReceiptCard, StakeholderRings } from "./illustrations";
+import {
+  PageFan,
+  ReceiptCard,
+  SplitPicture,
+  StakeholderRings,
+} from "./illustrations";
 import { TableOfContents } from "./menus";
 import { LoopingVideo, PhotoCarousel, VideoCarousel } from "./players";
 import type { Heading, SectionHeading } from "./types";
@@ -176,7 +181,7 @@ const Method = ({
     <summary className="collapse-title">
       <h3 className="text-lg leading-snug font-semibold">{title}</h3>
     </summary>
-    <div className="collapse-content">
+    <div className="collapse-content pb-6">
       <div className="flex flex-col gap-6">
         {purpose && <Paragraph>{purpose}</Paragraph>}
         {children}
@@ -360,7 +365,7 @@ const VibrantGrants = () => (
                 title="Participatory System Mapping"
                 purpose={
                   <>
-                    Learn how NSR&apos;s many services{" "}
+                    Discover how NSR&apos;s many services{" "}
                     <strong>fit together</strong>
                   </>
                 }
@@ -467,25 +472,17 @@ const VibrantGrants = () => (
 
         <Section heading={SECTION_HEADINGS.learnings}>
           <div className="flex flex-col gap-10">
-            <article className="grid gap-8 sm:grid-cols-[minmax(0,1fr)_14rem]">
+            <article className="flex flex-col gap-8">
               <Finding title="Non-profit leaders are community-oriented, not business-minded or data-driven.">
                 They excel at qualitative thinking and delivering impact, but
                 struggle with the admin work that keeps their orgs up and
                 running. In their eyes, that extra work gets in the way of doing
                 good.
               </Finding>
-              {/* Stretched to the height of the finding beside it (if
-                  any), to which the photo is then cropped */}
-              <div className="relative aspect-4/3 overflow-hidden rounded-xl sm:aspect-auto">
-                <Image
-                  src={PICTURES.nonProfitLeaders.src}
-                  alt={PICTURES.nonProfitLeaders.alt}
-                  fill
-                  sizes="(min-width: 640px) 224px, 100vw"
-                  // Keeps the volunteers' faces in frame
-                  className="object-cover object-[50%_30%]"
-                />
-              </div>
+              <SplitPicture
+                left={PICTURES.communityOriented}
+                right={PICTURES.dataDriven}
+              />
             </article>
 
             <article className="flex flex-col gap-8">

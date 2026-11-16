@@ -152,11 +152,19 @@ export const PICTURES = {
     width: 1703,
     height: 1471,
   },
-  nonProfitLeaders: {
-    src: "/case-studies/vibrant-grants/photos/non-profit-leaders.jpg",
-    alt: "Three masked volunteers portioning pasta into takeout containers at a long table.",
-    width: 1920,
-    height: 2560,
+  // Two versions of one scene, shown as the halves of a single picture. Alt
+  // text adapted from each SVG's own `aria-label`, which `<img>` ignores.
+  communityOriented: {
+    src: "/case-studies/vibrant-grants/diagrams/community-oriented.svg",
+    alt: "A community supper photo, warm and in color, with handwritten circles and notes about the people in it.",
+    width: 540,
+    height: 380,
+  },
+  dataDriven: {
+    src: "/case-studies/vibrant-grants/diagrams/data-driven.svg",
+    alt: "The same community supper photo seen as a computer would: greyscale, with every person and plate boxed and labeled with a confidence score.",
+    width: 540,
+    height: 380,
   },
   ingestionMechanism: {
     src: "/case-studies/vibrant-grants/diagrams/ingestion-mechanism.png",
