@@ -1,7 +1,8 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { twMerge } from "tailwind-merge";
-import type { Picture, Receipt, Stakeholders } from "./types";
+import type { Picture } from "@/app/work/types";
+import type { Receipt, Stakeholders } from "./types";
 
 /**
  * The classes that size, position, and color each ring in a

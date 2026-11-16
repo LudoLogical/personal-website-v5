@@ -1,117 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
-
-/**
- * A heading that labels a section of the case study.
- */
-export type Heading = {
-  /**
-   * The `id` of the `<section>` that this {@link Heading} labels.
-   */
-  id: string;
-
-  /**
-   * The text of this {@link Heading}.
-   */
-  title: string;
-};
-
-/**
- * A {@link Heading} that labels a top-level section of the case study.
- */
-export type SectionHeading = Heading & {
-  /**
-   * The {@link Heading}s of the subsections that the table of contents
-   * lists beneath this {@link SectionHeading}. Omitted if it lists none.
-   */
-  subheadings?: Heading[];
-};
-
-/**
- * An image (i.e., a photograph, diagram, or
- * screenshot) located in `public/`.
- */
-export type Picture = {
-  /**
-   * The path (in `public/`) to this {@link Picture}.
-   */
-  src: string;
-
-  /**
-   * The text alternative for this {@link Picture}.
-   */
-  alt: string;
-
-  /**
-   * The intrinsic width, in pixels, of this {@link Picture}.
-   */
-  width: number;
-
-  /**
-   * The intrinsic height, in pixels, of this {@link Picture}.
-   */
-  height: number;
-};
-
-/**
- * A {@link Picture} of a project whose caption links to that project's webpage.
- */
-export type ProjectPhoto = Picture & {
-  /**
-   * The name of the project depicted in this {@link ProjectPhoto}.
-   */
-  caption: string;
-
-  /**
-   * The webpage of the project depicted in this {@link ProjectPhoto}.
-   */
-  href: string;
-};
-
-/**
- * A screen recording of one part of the Vibrant Grants workflow.
- */
-export type Demo = {
-  /**
-   * The path (in `public/`) to the video file for this {@link Demo}.
-   */
-  src: string;
-
-  /**
-   * A summary of what the user accomplishes in this {@link Demo}.
-   */
-  caption: string;
-};
-
-/**
- * A person who worked on Vibrant Grants.
- */
-export type TeamMember = {
-  /**
-   * The full name of this {@link TeamMember}.
-   */
-  name: string;
-
-  /**
-   * The LinkedIn profile of this {@link TeamMember}.
-   */
-  href: string;
-
-  /**
-   * The role(s) that this {@link TeamMember} held on the team.
-   */
-  role: string;
-
-  /**
-   * The path (in `public/`) to a square portrait of this {@link TeamMember}.
-   */
-  portrait: string;
-
-  /**
-   * `true` if this {@link TeamMember} should be visually
-   * emphasized, `false` otherwise (and by default).
-   */
-  highlighted?: boolean;
-};
+import type { Heading, Picture } from "@/app/work/types";
 
 /**
  * A category of services that New Sun Rising offers to its clients.
@@ -203,20 +91,10 @@ export type Feature = {
 };
 
 /**
- * The {@link Feature}s that support one stage of the grant lifecycle.
+ * The {@link Feature}s that support one stage of the grant lifecycle,
+ * labeled by a {@link Heading} whose `title` is the goal of that stage.
  */
-export type FeatureGroup = {
-  /**
-   * The `id` of the `<section>` in which this {@link FeatureGroup} is rendered.
-   */
-  id: string;
-
-  /**
-   * The goal of the stage of the grant lifecycle
-   * that this {@link FeatureGroup} supports.
-   */
-  title: string;
-
+export type FeatureGroup = Heading & {
   /**
    * The {@link Feature}s in this {@link FeatureGroup},
    * in the order in which they are to be displayed.

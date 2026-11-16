@@ -2,7 +2,24 @@ import { Quote } from "lucide-react";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
-import type { Picture } from "./types";
+import type { Client, Picture } from "./types";
+
+export type ParagraphProps = {
+  /**
+   * The content of this {@link Paragraph}.
+   */
+  children: ReactNode;
+};
+
+/**
+ * Renders the specified `children` as a paragraph
+ * of body copy in which `<strong>` text stands out.
+ */
+export const Paragraph = ({ children }: ParagraphProps) => (
+  <p className="text-base-content/75 [&_strong]:text-base-content">
+    {children}
+  </p>
+);
 
 export type CaptionProps = {
   /**
@@ -33,12 +50,6 @@ export type FigureProps = {
   picture: Picture;
 
   /**
-   * The caption displayed beneath the {@link Picture} in this
-   * {@link Figure}. Omitted if said {@link Picture} needs no explanation.
-   */
-  caption?: ReactNode;
-
-  /**
    * The `sizes` attribute of the `<img>` in this {@link Figure}. Defaults
    * to a value that suits a {@link Figure} as wide as the page's content.
    */
@@ -57,12 +68,11 @@ export type FigureProps = {
 };
 
 /**
- * Renders the specified {@link Picture} with rounded corners
- * above the specified `caption` (if any) in a {@link Caption}.
+ * Renders the specified {@link Picture} with rounded
+ * corners above its `caption` (if any) in a {@link Caption}.
  */
 export const Figure = ({
-  picture: { src, alt, width, height },
-  caption,
+  picture: { src, alt, width, height, caption },
   sizes = "(min-width: 1024px) 728px, 100vw",
   className,
   imageClassName,
@@ -101,7 +111,8 @@ export type TestimonialProps = {
 };
 
 /**
- * Renders the specified `quote` as a callout.
+ * Renders the specified `quote` as a callout, wrapped in quotation
+ * marks and followed by the specified attribution (if any).
  */
 export const Testimonial = ({
   quote,
@@ -127,4 +138,29 @@ export const Testimonial = ({
       {children && <figcaption>{children}</figcaption>}
     </div>
   </figure>
+);
+
+export type ClientLogoProps = {
+  /**
+   * The {@link Client} whose logo is
+   * to be rendered in this {@link ClientLogo}.
+   */
+  client: Client;
+};
+
+/**
+ * Renders the logo of the specified {@link Client} in a squircle, which
+ * lets its filled background read as a tile. Hidden from ATs because the
+ * name of the {@link Client} should always be displayed alongside it.
+ */
+export const ClientLogo = ({ client: { logo } }: ClientLogoProps) => (
+  <Image
+    src={logo}
+    alt=""
+    width={256}
+    height={256}
+    sizes="40px"
+    aria-hidden
+    className="mask size-10 shrink-0 mask-squircle"
+  />
 );

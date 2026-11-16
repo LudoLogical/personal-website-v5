@@ -1,16 +1,27 @@
 import { ChartColumn, HandCoins, Sprout } from "lucide-react";
 import type {
+  Client,
   Demo,
-  FeatureGroup,
+  Finding,
+  Method,
   Picture,
   ProjectPhoto,
+  SectionHeading,
+  TeamMember,
+} from "@/app/work/types";
+import ExternalLink from "@/components/ExternalLink";
+import type {
+  FeatureGroup,
   Receipt,
   ResearchActivity,
-  SectionHeading,
   Service,
   Stakeholders,
-  TeamMember,
 } from "./types";
+
+export const TITLE = "Vibrant Grants";
+
+export const SUBTITLE =
+  "An end-to-end grant workflow for community-driven non-profit leaders";
 
 // Listed in the order in which a non-profit leader would encounter them
 export const DEMOS: Demo[] = [
@@ -43,7 +54,7 @@ export const DEMOS: Demo[] = [
 
 export const TIMELINE = { start: "2026-01", end: "2026-07" };
 
-export const CLIENT = {
+export const CLIENT: Client = {
   name: "New Sun Rising",
   href: "https://www.newsunrising.org",
   logo: "/logos/nsr.png",
@@ -53,6 +64,15 @@ export const CLIENT_EXECUTIVE_DIRECTOR = {
   name: "Scott Wolovich",
   href: "https://www.linkedin.com/in/scott-wolovich-91141033b/",
 };
+
+export const OUTCOME = (
+  <>
+    Endorsed for full implementation and integration by Executive Director{" "}
+    <ExternalLink kind="inline" href={CLIENT_EXECUTIVE_DIRECTOR.href}>
+      {CLIENT_EXECUTIVE_DIRECTOR.name}
+    </ExternalLink>
+  </>
+);
 
 export const TEAM: TeamMember[] = [
   {
@@ -115,6 +135,36 @@ export const STAKEHOLDERS: Stakeholders = [
   "NSR",
 ];
 
+export const METHODS = {
+  systemMapping: {
+    title: "Participatory System Mapping",
+    purpose: (
+      <>
+        Discover how NSR&apos;s many services <strong>fit together</strong>
+      </>
+    ),
+  },
+  fieldWork: {
+    title: "Field Work and Semi-Structured Interviews",
+    purpose: (
+      <>
+        Appreciate the <strong>experiences, processes, and pain points</strong>{" "}
+        of non-profit leaders
+      </>
+    ),
+  },
+  cardSorting: {
+    title: "Card Sorting and Usability Testing",
+    purpose: (
+      <>
+        Assess how non-profit leaders intuit the{" "}
+        <strong>organization and structure</strong> of NSR&apos;s digital
+        services
+      </>
+    ),
+  },
+} satisfies Record<string, Method>;
+
 export const PICTURES = {
   nsrTeam: {
     src: "/case-studies/vibrant-grants/photos/new-sun-rising-team.jpg",
@@ -127,30 +177,59 @@ export const PICTURES = {
     alt: "A diagram in which 18 unlabeled data stores and processes are joined by a tangle of crisscrossing solid and dashed arrows.",
     width: 2936,
     height: 1988,
+    caption:
+      "Modeling how data flowed through NSR revealed a disorganized and unnecessarily complex status quo.",
   },
   systemMappingFigurines: {
     src: "/case-studies/vibrant-grants/photos/system-mapping-figurines.jpg",
     alt: "Clay figurines on a wooden table. Their handwritten labels include “Hunter,” “Scott,” “Non Profit,” “Social Enterprise,” and “Vibrancy Portal.”",
     width: 4032,
     height: 3024,
+    caption:
+      "We made a custom set of figurines and pre-labeled some based on our initial research.",
   },
   systemMappingInProgress: {
     src: "/case-studies/vibrant-grants/photos/system-mapping-in-progress.jpg",
     alt: "A workshop participant placing a clay figurine on a paper-covered table among hand-drawn arrows, sticky notes, and markers.",
     width: 5712,
     height: 4284,
+    caption:
+      "NSR staff helped us make a model out of our miniatures in an on-site workshop.",
   },
   dendrogram: {
     src: "/case-studies/vibrant-grants/diagrams/dendrogram-mini.png",
     alt: "A dendrogram in which six color-coded clusters of concepts merge at levels of consensus that range from 100% down to 50%.",
     width: 1352,
     height: 1212,
+    caption: (
+      <>
+        This diagram (known as a &ldquo;
+        <ExternalLink
+          kind="inline"
+          href="https://en.wikipedia.org/wiki/Dendrogram"
+        >
+          dendrogram
+        </ExternalLink>
+        &rdquo;) shows how often{" "}
+        <ExternalLink
+          kind="inline"
+          href="https://www.nngroup.com/articles/card-sorting-definition/"
+        >
+          card sorting
+        </ExternalLink>{" "}
+        participants grouped the concepts and content we gave them. Consensus
+        decreases from left to right, so the leftmost merges represent the most
+        common groupings.
+      </>
+    ),
   },
   usabilityTesting: {
     src: "/case-studies/vibrant-grants/diagrams/usability-testing.png",
     alt: "A screenshot of NSR’s Vibrancy Portal on which parts of the interface are annotated with the questions “Noticeable?”, “Known to users?”, “Meaningful?”, “Helpful?”, and “Important?”",
     width: 1703,
     height: 1471,
+    caption:
+      "We were particularly interested in NSR's Vibrancy Index because our initial research suggested that it was underutilized. Our testing revealed that few people knew when, why, or even how to use it.",
   },
   // Two versions of one scene, shown as the halves of a single picture. Alt
   // text adapted from each SVG's own `aria-label`, which `<img>` ignores.
@@ -241,16 +320,56 @@ export const OTHER_RESEARCH_ACTIVITIES: ResearchActivity[] = [
   },
 ];
 
-// One image per page of the PDF linked from the caption of the fan
-// (i.e., `GRANT_OPPORTUNITY_HREF`), in order from first to last
+export const FINDINGS = {
+  communityOriented: {
+    title:
+      "Non-profit leaders are community-oriented, not business-minded or data-driven.",
+    description:
+      "They excel at qualitative thinking and delivering impact, but struggle with the admin work that keeps their orgs up and running. In their eyes, that extra work gets in the way of doing good.",
+  },
+  grantDiscovery: {
+    title:
+      "Finding relevant grant opportunities can be overwhelming and time-consuming.",
+    description:
+      "The world of grants has no central database and no standardization. Plus, many listings take ages to read. Helping non-profit leaders surface relevant grants can save them a lot of time.",
+  },
+  riskAversion: {
+    title: "Non-profits avoid experimenting with new tools to manage risk.",
+    description: (
+      <>
+        When both time and money are hard to come by and existing tools are
+        &ldquo;good enough,&rdquo; searching for the perfect solution just
+        isn&apos;t worth it. To overcome this obstacle, tools targeting
+        non-profit leaders must be able to deliver significant value with
+        minimal setup.
+      </>
+    ),
+  },
+} satisfies Record<string, Finding>;
+
+// One image per page of the PDF linked from `GRANT_OPPORTUNITY_CAPTION`,
+// in order from first to last
 export const GRANT_OPPORTUNITY_PAGES = Array.from(
   { length: 16 },
   (_, i) =>
     `/case-studies/vibrant-grants/grant-pages/page-${String(i + 1).padStart(2, "0")}.png`,
 );
 
-export const GRANT_OPPORTUNITY_HREF =
-  "https://simpler.grants.gov/opportunity/bd1b6f4b-400a-451b-9af9-14b572457e6f";
+export const GRANT_OPPORTUNITY_LABEL = `The ${GRANT_OPPORTUNITY_PAGES.length} pages of a notice of funding opportunity, fanned out like a hand of playing cards.`;
+
+export const GRANT_OPPORTUNITY_CAPTION = (
+  <>
+    An early, {GRANT_OPPORTUNITY_PAGES.length}-page(!) outline of a single grant
+    opportunity published on <time dateTime="2026-05-04">2026-05-04</time> (
+    <ExternalLink
+      kind="inline"
+      href="https://simpler.grants.gov/opportunity/bd1b6f4b-400a-451b-9af9-14b572457e6f"
+    >
+      source
+    </ExternalLink>
+    ).
+  </>
+);
 
 // The amount due on each receipt is the sum of its line items
 export const RECEIPTS: Receipt[] = [

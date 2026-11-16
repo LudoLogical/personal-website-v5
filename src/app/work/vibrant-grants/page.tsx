@@ -1,11 +1,23 @@
 import { Award } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
-import type { ReactNode } from "react";
-import { twMerge } from "tailwind-merge";
+import {
+  Caption,
+  ClientLogo,
+  Figure,
+  Paragraph,
+  Testimonial,
+} from "@/app/work/atoms";
+import { PhotoCarousel, VideoCarousel } from "@/app/work/carousels";
+import { TableOfContents } from "@/app/work/menus";
+import {
+  FindingStatement,
+  MethodItem,
+  ProjectSummary,
+  Section,
+  Subsection,
+} from "@/app/work/sections";
+import { LoopingVideo } from "@/app/work/videos";
 import ExternalLink from "@/components/ExternalLink";
-import Logo from "@/components/Logo";
-import { Caption, Figure, Testimonial } from "./atoms";
 import {
   CLIENT,
   CLIENT_EXECUTIVE_DIRECTOR,
@@ -13,17 +25,23 @@ import {
   DEMOS,
   EXECUTIVE_DIRECTOR_TESTIMONIAL,
   FEATURE_GROUPS,
-  GRANT_OPPORTUNITY_HREF,
+  FINDINGS,
+  GRANT_OPPORTUNITY_CAPTION,
+  GRANT_OPPORTUNITY_LABEL,
   GRANT_OPPORTUNITY_PAGES,
+  METHODS,
   OTHER_RESEARCH_ACTIVITIES,
+  OUTCOME,
   PICTURES,
   RECEIPTS,
   SECTION_HEADINGS,
   SERVICES,
   STAKEHOLDERS,
+  SUBTITLE,
   TEAM,
   TESTIMONIALS,
   TIMELINE,
+  TITLE,
 } from "./content";
 import {
   PageFan,
@@ -31,14 +49,10 @@ import {
   SplitPicture,
   StakeholderRings,
 } from "./illustrations";
-import { TableOfContents } from "./menus";
-import { LoopingVideo, PhotoCarousel, VideoCarousel } from "./players";
-import type { Heading, SectionHeading } from "./types";
 
 export const metadata: Metadata = {
-  title: 'Vibrant Grants | Daniel "Ludo" DeAnda',
-  description:
-    "An end-to-end grant workflow for community-driven non-profit leaders",
+  title: `${TITLE} | Daniel "Ludo" DeAnda`,
+  description: SUBTITLE,
 };
 
 /**
@@ -47,165 +61,6 @@ export const metadata: Metadata = {
  */
 const HALF_WIDTH_SIZES =
   "(min-width: 1024px) 340px, (min-width: 640px) 50vw, 100vw";
-
-/**
- * Renders a paragraph of body copy in which `<strong>` text stands out.
- */
-const Paragraph = ({ children }: { children: ReactNode }) => (
-  <p className="text-base-content/75 [&_strong]:text-base-content">
-    {children}
-  </p>
-);
-
-/**
- * Renders the client's logo in a squircle, which lets its white background
- * read as a tile. Hidden from ATs because the name of the client should
- * always be displayed alongside it.
- */
-const ClientLogo = () => (
-  <Image
-    src={CLIENT.logo}
-    alt=""
-    width={256}
-    height={256}
-    sizes="40px"
-    aria-hidden
-    className="mask size-10 shrink-0 mask-squircle"
-  />
-);
-
-/**
- * Renders a top-level section of the case study, labeled
- * by the specified {@link SectionHeading} in the primary color.
- */
-const Section = ({
-  heading: { id, title },
-  children,
-}: {
-  heading: SectionHeading;
-  children: ReactNode;
-}) => (
-  <section
-    id={id}
-    aria-labelledby={`${id}-heading`}
-    className="scroll-mt-28 border-base-content/10 py-12 not-first:border-t"
-  >
-    <h2
-      id={`${id}-heading`}
-      className="mb-8 text-2xl leading-tight font-bold text-primary sm:text-3xl"
-    >
-      {title}
-    </h2>
-    {children}
-  </section>
-);
-
-/**
- * Renders a subsection of a {@link Section}, labeled by the specified
- * {@link Heading}, whose title is marked by the arrow from the {@link Logo}
- * (in the secondary color). The arrowhead is vertically centered on the
- * first line of the title.
- */
-const Subsection = ({
-  heading: { id, title },
-  children,
-}: {
-  heading: Heading;
-  children: ReactNode;
-}) => (
-  <section
-    id={id}
-    aria-labelledby={`${id}-heading`}
-    className="flex scroll-mt-44 flex-col gap-10"
-  >
-    <h3
-      id={`${id}-heading`}
-      className="flex items-start gap-3 text-xl leading-snug font-bold"
-    >
-      {/* Cropped to the bounds of the arrow, the only part left visible,
-          whose arrowhead is centered 16 of its 24 units (i.e., 0.8em) from
-          the top and is thus raised to the middle of the capitals */}
-      <Logo
-        viewBox="4 9 18 24"
-        className="mt-[calc(0.5cap-0.8em)] h-[1.2em] w-auto shrink-0 **:fill-secondary **:data-dot:hidden **:data-letter-d:hidden"
-      />
-      {/* Trimmed so that its top edge lies at the top of the capitals */}
-      <span className="text-box-trim">{title}</span>
-    </h3>
-    {children}
-  </section>
-);
-
-/**
- * Renders one labeled entry in the summary of the project.
- */
-const Fact = ({
-  label,
-  className,
-  children,
-}: {
-  label: string;
-  className?: string;
-  children: ReactNode;
-}) => (
-  <div className={className}>
-    <dt className="mb-3 text-xs font-bold tracking-widest text-base-content/50 uppercase">
-      {label}
-    </dt>
-    <dd>{children}</dd>
-  </div>
-);
-
-/**
- * Renders one research method as an item in an accordion whose content
- * opens with the method's `purpose` (if any). Opening an item closes
- * whichever other item is open, but every item can be closed at once.
- */
-const Method = ({
-  title,
-  purpose,
-  open = false,
-  children,
-}: {
-  title: string;
-  purpose?: ReactNode;
-  open?: boolean;
-  children: ReactNode;
-}) => (
-  // Sharing a `name` is what makes the browser close the other items
-  <details
-    name="research-methods"
-    open={open}
-    className="collapse-arrow collapse join-item border border-base-content/10 bg-base-200"
-  >
-    <summary className="collapse-title">
-      <h3 className="text-lg leading-snug font-semibold">{title}</h3>
-    </summary>
-    <div className="collapse-content pb-6">
-      <div className="flex flex-col gap-6">
-        {purpose && <Paragraph>{purpose}</Paragraph>}
-        {children}
-      </div>
-    </div>
-  </details>
-);
-
-/**
- * Renders the statement of something learned from the
- * research above the paragraph that elaborates on it.
- */
-const Finding = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) => (
-  <div className="flex flex-col gap-3 border-s-2 border-secondary ps-5">
-    <h3 className="text-xl leading-snug font-semibold text-balance">{title}</h3>
-    <Paragraph>{children}</Paragraph>
-  </div>
-);
 
 const VibrantGrants = () => (
   // Clears the navigation bar, which floats above the top of the page
@@ -216,73 +71,22 @@ const VibrantGrants = () => (
           Case Study
         </p>
         <h1 className="text-3xl leading-tight font-bold xs:text-4xl sm:text-5xl">
-          Vibrant Grants
+          {TITLE}
         </h1>
         <p className="mt-3 text-lg text-base-content/70 sm:text-xl">
-          An end-to-end grant workflow for community-driven non-profit leaders
+          {SUBTITLE}
         </p>
       </div>
 
       <VideoCarousel demos={DEMOS} />
 
-      {/* The last row absorbs the height left over by the team, which
-          keeps the facts beside it packed together at the top */}
-      <dl className="mt-4 grid gap-x-10 gap-y-8 md:grid-cols-2 md:grid-rows-[auto_auto_1fr]">
-        <Fact label="Team" className="md:row-span-3">
-          <ul className="flex flex-col gap-4">
-            {TEAM.map(({ name, href, role, portrait, highlighted }) => (
-              <li
-                key={href}
-                className={twMerge(
-                  "flex items-center gap-4",
-                  highlighted && "font-bold",
-                )}
-              >
-                <div className="avatar">
-                  <div className="mask size-12 mask-squircle">
-                    <Image src={portrait} alt="" width={48} height={48} />
-                  </div>
-                </div>
-                <div className="flex min-w-0 flex-col gap-0.5">
-                  <span>
-                    <ExternalLink kind="underline" href={href}>
-                      {name}
-                    </ExternalLink>
-                  </span>
-                  <span
-                    className={twMerge(
-                      "text-sm",
-                      !highlighted && "text-base-content/70",
-                    )}
-                  >
-                    {role}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Fact>
-        <Fact label="Client">
-          <div className="flex items-center gap-3">
-            <ClientLogo />
-            <ExternalLink kind="underline" href={CLIENT.href}>
-              {CLIENT.name}
-            </ExternalLink>
-          </div>
-        </Fact>
-        <Fact label="Timeline">
-          <span className="tabular-nums">
-            <time dateTime={TIMELINE.start}>{TIMELINE.start}</time> to{" "}
-            <time dateTime={TIMELINE.end}>{TIMELINE.end}</time>
-          </span>
-        </Fact>
-        <Fact label="Outcome">
-          Endorsed for full implementation and integration by Executive Director{" "}
-          <ExternalLink kind="inline" href={CLIENT_EXECUTIVE_DIRECTOR.href}>
-            {CLIENT_EXECUTIVE_DIRECTOR.name}
-          </ExternalLink>
-        </Fact>
-      </dl>
+      <ProjectSummary
+        team={TEAM}
+        client={CLIENT}
+        timeline={TIMELINE}
+        outcome={OUTCOME}
+        className="mt-4"
+      />
     </header>
 
     <div className="border-t border-base-content/10 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-x-10">
@@ -339,7 +143,6 @@ const VibrantGrants = () => (
             </Paragraph>
             <Figure
               picture={PICTURES.dataFlowModel}
-              caption="Modeling how data flowed through NSR revealed a disorganized and unnecessarily complex status quo."
               sizes="(min-width: 640px) 448px, 100vw"
               className="mx-auto max-w-md"
             />
@@ -361,96 +164,45 @@ const VibrantGrants = () => (
             />
 
             <div className="join join-vertical">
-              <Method
-                title="Participatory System Mapping"
-                purpose={
-                  <>
-                    Discover how NSR&apos;s many services{" "}
-                    <strong>fit together</strong>
-                  </>
-                }
-                open
-              >
+              <MethodItem method={METHODS.systemMapping} open>
                 <div className="grid gap-6 sm:grid-cols-2">
                   <Figure
                     picture={PICTURES.systemMappingFigurines}
-                    caption="We made a custom set of figurines and pre-labeled some based on our initial research."
                     sizes={HALF_WIDTH_SIZES}
                   />
                   <Figure
                     picture={PICTURES.systemMappingInProgress}
-                    caption="NSR staff helped us make a model out of our miniatures in an on-site workshop."
                     sizes={HALF_WIDTH_SIZES}
                   />
                 </div>
-              </Method>
+              </MethodItem>
 
-              <Method
-                title="Field Work and Semi-Structured Interviews"
-                purpose={
-                  <>
-                    Appreciate the{" "}
-                    <strong>experiences, processes, and pain points</strong> of
-                    non-profit leaders
-                  </>
-                }
-              >
+              <MethodItem method={METHODS.fieldWork}>
                 <PhotoCarousel
                   photos={CLIENT_NON_PROFIT_PHOTOS}
                   className="mx-auto w-full max-w-xl"
                 />
-              </Method>
+              </MethodItem>
 
-              <Method
-                title="Card Sorting and Usability Testing"
-                purpose={
-                  <>
-                    Assess how non-profit leaders intuit the{" "}
-                    <strong>organization and structure</strong> of NSR&apos;s
-                    digital services
-                  </>
-                }
-              >
+              <MethodItem method={METHODS.cardSorting}>
                 {/* Each figure spans two shared rows (one for the images and
                     one for the captions) so that its caption lines up with
                     the other's even though the images' heights differ */}
                 <div className="grid gap-6 sm:grid-cols-2">
                   <Figure
                     picture={PICTURES.dendrogram}
-                    caption={
-                      <>
-                        This diagram (known as a &ldquo;
-                        <ExternalLink
-                          kind="inline"
-                          href="https://en.wikipedia.org/wiki/Dendrogram"
-                        >
-                          dendrogram
-                        </ExternalLink>
-                        &rdquo;) shows how often{" "}
-                        <ExternalLink
-                          kind="inline"
-                          href="https://www.nngroup.com/articles/card-sorting-definition/"
-                        >
-                          card sorting
-                        </ExternalLink>{" "}
-                        participants grouped the concepts and content we gave
-                        them. Consensus decreases from left to right, so the
-                        leftmost merges represent the most common groupings.
-                      </>
-                    }
                     sizes={HALF_WIDTH_SIZES}
                     className="row-span-2 grid grid-rows-subgrid"
                     imageClassName="self-end"
                   />
                   <Figure
                     picture={PICTURES.usabilityTesting}
-                    caption="We were particularly interested in NSR's Vibrancy Index because our initial research suggested that it was underutilized. Our testing revealed that few people knew when, why, or even how to use it."
                     sizes={HALF_WIDTH_SIZES}
                     className="row-span-2 grid grid-rows-subgrid"
                     imageClassName="self-end"
                   />
                 </div>
-              </Method>
+              </MethodItem>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -473,12 +225,7 @@ const VibrantGrants = () => (
         <Section heading={SECTION_HEADINGS.learnings}>
           <div className="flex flex-col gap-10">
             <article className="flex flex-col gap-8">
-              <Finding title="Non-profit leaders are community-oriented, not business-minded or data-driven.">
-                They excel at qualitative thinking and delivering impact, but
-                struggle with the admin work that keeps their orgs up and
-                running. In their eyes, that extra work gets in the way of doing
-                good.
-              </Finding>
+              <FindingStatement finding={FINDINGS.communityOriented} />
               <SplitPicture
                 left={PICTURES.communityOriented}
                 right={PICTURES.dataDriven}
@@ -486,37 +233,18 @@ const VibrantGrants = () => (
             </article>
 
             <article className="flex flex-col gap-8">
-              <Finding title="Finding relevant grant opportunities can be overwhelming and time-consuming.">
-                The world of grants has no central database and no
-                standardization. Plus, many listings take ages to read. Helping
-                non-profit leaders surface relevant grants can save them a lot
-                of time.
-              </Finding>
+              <FindingStatement finding={FINDINGS.grantDiscovery} />
               <figure className="flex flex-col gap-4">
                 <PageFan
                   pages={GRANT_OPPORTUNITY_PAGES}
-                  label={`The ${GRANT_OPPORTUNITY_PAGES.length} pages of a notice of funding opportunity, fanned out like a hand of playing cards.`}
+                  label={GRANT_OPPORTUNITY_LABEL}
                 />
-                <Caption>
-                  An early, {GRANT_OPPORTUNITY_PAGES.length}-page(!) outline of
-                  a single grant opportunity published on{" "}
-                  <time dateTime="2026-05-04">2026-05-04</time> (
-                  <ExternalLink kind="inline" href={GRANT_OPPORTUNITY_HREF}>
-                    source
-                  </ExternalLink>
-                  ).
-                </Caption>
+                <Caption>{GRANT_OPPORTUNITY_CAPTION}</Caption>
               </figure>
             </article>
 
             <article className="flex flex-col gap-8">
-              <Finding title="Non-profits avoid experimenting with new tools to manage risk.">
-                When both time and money are hard to come by and existing tools
-                are &ldquo;good enough,&rdquo; searching for the perfect
-                solution just isn&apos;t worth it. To overcome this obstacle,
-                tools targeting non-profit leaders must be able to deliver
-                significant value with minimal setup.
-              </Finding>
+              <FindingStatement finding={FINDINGS.riskAversion} />
               <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center">
                 {RECEIPTS.map((receipt) => (
                   <ReceiptCard key={receipt.title} receipt={receipt} />
@@ -591,7 +319,7 @@ const VibrantGrants = () => (
               </Paragraph>
               <Testimonial quote={EXECUTIVE_DIRECTOR_TESTIMONIAL} featured>
                 <div className="flex items-center gap-3">
-                  <ClientLogo />
+                  <ClientLogo client={CLIENT} />
                   <div className="flex flex-col text-sm text-base-content/70">
                     <span className="text-base font-bold text-base-content">
                       <ExternalLink
@@ -605,8 +333,8 @@ const VibrantGrants = () => (
                   </div>
                 </div>
               </Testimonial>
-              {/* TODO: ask Scott about the exact amount he had secured back then
-                  and for a status update on the funding and/or integration */}
+              {/* TODO: ask Scott about the exact amount he had secured back
+                  then and for a status update on the funding/integration */}
               <div className="card border border-base-content/10 bg-base-200">
                 <div className="card-body flex-row items-center gap-5 p-5 text-base sm:p-6">
                   <Award aria-hidden className="size-8 shrink-0 text-primary" />
