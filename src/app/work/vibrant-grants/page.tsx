@@ -177,14 +177,14 @@ const VibrantGrants = () => (
                 </div>
               </MethodItem>
 
-              <MethodItem method={METHODS.fieldWork}>
+              <MethodItem method={METHODS.fieldWorkAndSSIs}>
                 <PhotoCarousel
                   photos={CLIENT_NON_PROFIT_PHOTOS}
                   className="mx-auto w-full max-w-xl"
                 />
               </MethodItem>
 
-              <MethodItem method={METHODS.cardSorting}>
+              <MethodItem method={METHODS.cardSortingAndUsabilityTesting}>
                 {/* Each figure spans two shared rows (one for the images and
                     one for the captions) so that its caption lines up with
                     the other's even though the images' heights differ */}

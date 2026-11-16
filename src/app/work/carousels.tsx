@@ -14,7 +14,7 @@ import {
   ProgressSegments,
 } from "./controls";
 import { play, showProgress, usePlayback } from "./playback";
-import type { Demo, ProjectPhoto } from "./types";
+import type { Demo, LinkCaptionedPicture } from "./types";
 import { ExpandedVideo, WINDOW_CLASS_NAMES } from "./videos";
 
 /**
@@ -226,10 +226,10 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
 
 export type PhotoCarouselProps = {
   /**
-   * The {@link ProjectPhoto}s through which this {@link PhotoCarousel}
+   * The {@link LinkCaptionedPicture}s through which this {@link PhotoCarousel}
    * cycles, in the order in which they are to be shown.
    */
-  photos: ProjectPhoto[];
+  photos: LinkCaptionedPicture[];
 
   /**
    * Classes for the container `<figure>` of this {@link PhotoCarousel}.
@@ -238,7 +238,7 @@ export type PhotoCarouselProps = {
 };
 
 /**
- * Renders the specified {@link ProjectPhoto}s as a carousel that
+ * Renders the specified {@link LinkCaptionedPicture}s as a carousel that
  * shows one photo at a time above its caption and a row of controls.
  *
  * While it is in view, the carousel shows each photo for the same fixed

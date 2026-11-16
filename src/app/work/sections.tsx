@@ -6,9 +6,9 @@ import Logo from "@/components/Logo";
 import { ClientLogo, Paragraph } from "./atoms";
 import type {
   Client,
-  Finding,
+  Insight,
   Heading,
-  Method,
+  ResearchMethod,
   SectionHeading,
   TeamMember,
 } from "./types";
@@ -37,6 +37,8 @@ export type ProjectSummaryProps = {
   /**
    * The {@link TeamMember}s who worked on the project,
    * in the order in which they are to be listed.
+   *
+   * Note: The first is visually emphasized.
    */
   team: TeamMember[];
 
@@ -93,12 +95,12 @@ export const ProjectSummary = ({
   >
     <Fact label="Team" className="md:row-span-3">
       <ul className="flex flex-col gap-4">
-        {team.map(({ name, href, role, portrait, highlighted }) => (
+        {team.map(({ name, href, role, portrait }, i) => (
           <li
             key={href}
             className={twMerge(
               "flex items-center gap-4",
-              highlighted && "font-bold",
+              i === 0 && "font-bold",
             )}
           >
             <div className="avatar">
@@ -113,10 +115,7 @@ export const ProjectSummary = ({
                 </ExternalLink>
               </span>
               <span
-                className={twMerge(
-                  "text-sm",
-                  !highlighted && "text-base-content/70",
-                )}
+                className={twMerge("text-sm", i > 0 && "text-base-content/70")}
               >
                 {role}
               </span>
@@ -222,9 +221,9 @@ export const Subsection = ({
 
 export type MethodItemProps = {
   /**
-   * The {@link Method} to be rendered in this {@link MethodItem}.
+   * The {@link ResearchMethod} to be rendered in this {@link MethodItem}.
    */
-  method: Method;
+  method: ResearchMethod;
 
   /**
    * `true` if this {@link MethodItem} should start
@@ -234,15 +233,15 @@ export type MethodItemProps = {
 
   /**
    * The content that this {@link MethodItem} reveals while it is open
-   * (e.g., evidence of the {@link Method} in use), which follows the
-   * `purpose` of the {@link Method} (if any).
+   * (e.g., evidence of the {@link ResearchMethod} in use), which follows the
+   * `purpose` of the {@link ResearchMethod} (if any).
    */
   children: ReactNode;
 };
 
 /**
- * Renders the specified {@link Method} as an item in an accordion whose
- * content opens with the `purpose` of the {@link Method} (if any). Opening
+ * Renders the specified {@link ResearchMethod} as an item in an accordion whose
+ * content opens with the `purpose` of the {@link ResearchMethod} (if any). Opening
  * an item closes whichever other one on the page is open, but every item
  * can be closed at once.
  *
@@ -250,7 +249,7 @@ export type MethodItemProps = {
  * parent is responsible for supplying `join join-vertical`.
  */
 export const MethodItem = ({
-  method: { title, purpose },
+  method: { name: title, purpose },
   open = false,
   children,
 }: MethodItemProps) => (
@@ -274,17 +273,17 @@ export const MethodItem = ({
 
 export type FindingStatementProps = {
   /**
-   * The {@link Finding} to be rendered in this {@link FindingStatement}.
+   * The {@link Insight} to be rendered in this {@link FindingStatement}.
    */
-  finding: Finding;
+  finding: Insight;
 };
 
 /**
- * Renders the statement of the specified {@link Finding}
+ * Renders the statement of the specified {@link Insight}
  * above the paragraph that elaborates on it.
  */
 export const FindingStatement = ({
-  finding: { title, description },
+  finding: { headline: title, details: description },
 }: FindingStatementProps) => (
   <div className="flex flex-col gap-3 border-s-2 border-secondary ps-5">
     <h3 className="text-xl leading-snug font-semibold text-balance">{title}</h3>

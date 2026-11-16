@@ -2,10 +2,10 @@ import { ChartColumn, HandCoins, Sprout } from "lucide-react";
 import type {
   Client,
   Demo,
-  Finding,
-  Method,
+  Insight,
+  LinkCaptionedPicture,
   Picture,
-  ProjectPhoto,
+  ResearchMethod,
   SectionHeading,
   TeamMember,
 } from "@/app/work/types";
@@ -80,7 +80,6 @@ export const TEAM: TeamMember[] = [
     href: "https://www.linkedin.com/in/danielchristiandeanda/",
     role: "Lead Engineer",
     portrait: "/case-studies/vibrant-grants/team/ludo.png",
-    highlighted: true,
   },
   {
     name: "Soyon Kim",
@@ -137,15 +136,15 @@ export const STAKEHOLDERS: Stakeholders = [
 
 export const METHODS = {
   systemMapping: {
-    title: "Participatory System Mapping",
+    name: "Participatory System Mapping",
     purpose: (
       <>
         Discover how NSR&apos;s many services <strong>fit together</strong>
       </>
     ),
   },
-  fieldWork: {
-    title: "Field Work and Semi-Structured Interviews",
+  fieldWorkAndSSIs: {
+    name: "Field Work and Semi-Structured Interviews",
     purpose: (
       <>
         Appreciate the <strong>experiences, processes, and pain points</strong>{" "}
@@ -153,8 +152,8 @@ export const METHODS = {
       </>
     ),
   },
-  cardSorting: {
-    title: "Card Sorting and Usability Testing",
+  cardSortingAndUsabilityTesting: {
+    name: "Card Sorting and Usability Testing",
     purpose: (
       <>
         Assess how non-profit leaders intuit the{" "}
@@ -163,7 +162,7 @@ export const METHODS = {
       </>
     ),
   },
-} satisfies Record<string, Method>;
+} satisfies Record<string, ResearchMethod>;
 
 export const PICTURES = {
   nsrTeam: {
@@ -253,7 +252,7 @@ export const PICTURES = {
   },
 } satisfies Record<string, Picture>;
 
-export const CLIENT_NON_PROFIT_PHOTOS: ProjectPhoto[] = [
+export const CLIENT_NON_PROFIT_PHOTOS: LinkCaptionedPicture[] = [
   {
     src: "/case-studies/vibrant-grants/photos/client-non-profits-001.png",
     alt: "Four children crouching around a tree stump that holds a pile of colorful beads.",
@@ -322,20 +321,20 @@ export const OTHER_RESEARCH_ACTIVITIES: ResearchActivity[] = [
 
 export const FINDINGS = {
   communityOriented: {
-    title:
+    headline:
       "Non-profit leaders are community-oriented, not business-minded or data-driven.",
-    description:
+    details:
       "They excel at qualitative thinking and delivering impact, but struggle with the admin work that keeps their orgs up and running. In their eyes, that extra work gets in the way of doing good.",
   },
   grantDiscovery: {
-    title:
+    headline:
       "Finding relevant grant opportunities can be overwhelming and time-consuming.",
-    description:
+    details:
       "The world of grants has no central database and no standardization. Plus, many listings take ages to read. Helping non-profit leaders surface relevant grants can save them a lot of time.",
   },
   riskAversion: {
-    title: "Non-profits avoid experimenting with new tools to manage risk.",
-    description: (
+    headline: "Non-profits avoid experimenting with new tools to manage risk.",
+    details: (
       <>
         When both time and money are hard to come by and existing tools are
         &ldquo;good enough,&rdquo; searching for the perfect solution just
@@ -345,7 +344,7 @@ export const FINDINGS = {
       </>
     ),
   },
-} satisfies Record<string, Finding>;
+} satisfies Record<string, Insight>;
 
 // One image per page of the PDF linked from `GRANT_OPPORTUNITY_CAPTION`,
 // in order from first to last

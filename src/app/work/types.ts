@@ -27,8 +27,7 @@ export type SectionHeading = Heading & {
 };
 
 /**
- * An image (i.e., a photograph, diagram, or
- * screenshot) located in `public/`.
+ * An image, plus its associated sizing and caption information.
  */
 export type Picture = {
   /**
@@ -37,7 +36,7 @@ export type Picture = {
   src: string;
 
   /**
-   * The text alternative for this {@link Picture}.
+   * The alt text for this {@link Picture}.
    */
   alt: string;
 
@@ -52,30 +51,31 @@ export type Picture = {
   height: number;
 
   /**
-   * The caption displayed beneath this {@link Picture} wherever it appears
-   * as a figure. Omitted if this {@link Picture} needs no explanation.
+   * The caption to be displayed beneath this {@link Picture} wherever
+   * it appears as a figure. Omitted if no explanation is necessary.
    */
   caption?: ReactNode;
 };
 
 /**
- * A {@link Picture} of a project whose caption links to that project's webpage.
+ * A {@link Picture} whose *entire* caption links to an external site.
  */
-export type ProjectPhoto = Omit<Picture, "caption"> & {
+export type LinkCaptionedPicture = Omit<Picture, "caption"> & {
   /**
-   * The name of the project depicted in this {@link ProjectPhoto}.
+   * The caption to be displayed beneath this {@link LinkCaptionedPicture}.
    */
   caption: string;
 
   /**
-   * The webpage of the project depicted in this {@link ProjectPhoto}.
+   * The external link to be applied to the caption
+   * beneath this {@link LinkCaptionedPicture}.
    */
   href: string;
 };
 
 /**
- * A screen recording of one part of the
- * workflow that a case study presents.
+ * A screen recording showing a workflow
+ * from a product presented in a case study.
  */
 export type Demo = {
   /**
@@ -84,13 +84,13 @@ export type Demo = {
   src: string;
 
   /**
-   * A summary of what the user accomplishes in this {@link Demo}.
+   * A summary of the workflow shown in this {@link Demo}.
    */
   caption: string;
 };
 
 /**
- * A person who worked on the project that a case study presents.
+ * A person who worked on a product presented in a case study.
  */
 export type TeamMember = {
   /**
@@ -99,30 +99,23 @@ export type TeamMember = {
   name: string;
 
   /**
-   * The LinkedIn profile of this {@link TeamMember}.
+   * A link to the LinkedIn profile of this {@link TeamMember}.
    */
   href: string;
 
   /**
-   * The role(s) that this {@link TeamMember} held on the team.
+   * The role that this {@link TeamMember} held on their team.
    */
   role: string;
 
   /**
-   * The path (in `public/`) to a square portrait of this {@link TeamMember}.
+   * The path (in `public/`) to a (square) portrait of this {@link TeamMember}.
    */
   portrait: string;
-
-  /**
-   * `true` if this {@link TeamMember} should be visually
-   * emphasized, `false` otherwise (and by default).
-   */
-  highlighted?: boolean;
 };
 
 /**
- * An organization for which the project
- * that a case study presents was carried out.
+ * An organization for which a product presented in a case study was created.
  */
 export type Client = {
   /**
@@ -136,40 +129,39 @@ export type Client = {
   href: string;
 
   /**
-   * The path (in `public/`) to the logo for this {@link Client}. Expected to
-   * be a square image with a filled (i.e., not transparent) background.
+   * The path (in `public/`) to the logo for this {@link Client}. Expected
+   * to be a square image with a filled (i.e., not transparent) background.
    */
   logo: string;
 };
 
 /**
- * A research method employed during the project that a case study presents.
+ * A research method employed during a project presented in a case study.
  */
-export type Method = {
+export type ResearchMethod = {
   /**
-   * The name of this {@link Method}.
+   * The name of this {@link ResearchMethod}.
    */
-  title: string;
+  name: string;
 
   /**
-   * A summary of what this {@link Method} was meant to
-   * accomplish. Omitted if its name needs no explanation.
+   * A summary of what this {@link ResearchMethod} was meant to accomplish.
    */
-  purpose?: ReactNode;
+  purpose: ReactNode;
 };
 
 /**
- * Something learned from the research
- * conducted for the project that a case study presents.
+ * A key finding gleaned from the research conducted
+ * for a project presented in a case study.
  */
-export type Finding = {
+export type Insight = {
   /**
-   * A statement of this {@link Finding}.
+   * A one-sentence summary of this {@link Insight}.
    */
-  title: string;
+  headline: string;
 
   /**
-   * An elaboration on this {@link Finding} and what follows from it.
+   * An elaboration on the nature and significance of this {@link Insight}.
    */
-  description: ReactNode;
+  details: ReactNode;
 };
