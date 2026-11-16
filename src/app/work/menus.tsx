@@ -7,19 +7,19 @@ import type { Heading, SectionHeading } from "./types";
 /**
  * The distance, in pixels, between the top of the viewport and the line
  * that the top edge of a section must cross for a {@link TableOfContents}
- * to consider that section to be the one being read.
+ * to consider that section to be the one currently being read.
  *
- * Note: This must exceed the `scroll-mt` of every {@link Section}
- * and {@link Subsection} so that following a link to a section
- * makes that section current.
+ * Note: This value must exceed the `scroll-mt` of every {@link Section}
+ * and {@link Subsection} so that following a link to a section is guaranteed
+ * to make that section current.
  */
-const READING_LINE_OFFSET = 256;
+const READING_THRESHOLD_OFFSET = 256;
 
 /**
- * Computes the `id`s of the specified {@link SectionHeading}s
+ * Lists the `id`s of the specified `heading`s
  * and all of their `subheadings`, in document order.
- * @param headings the {@link SectionHeading}s whose `id`s are to be collected
- * @returns the collected `id`s
+ * @param headings the {@link SectionHeading}s whose `id`s are to be listed
+ * @returns the list of `id`s
  */
 const getIDs = (headings: SectionHeading[]): string[] =>
   headings.flatMap(({ id, subheadings = [] }) => [
@@ -28,13 +28,14 @@ const getIDs = (headings: SectionHeading[]): string[] =>
   ]);
 
 /**
- * Tracks which of the elements with the specified `id`s the user is
- * currently reading, i.e., the last one whose top edge has scrolled above
- * the line defined by {@link READING_LINE_OFFSET}. Updates whenever the
- * page scrolls or the viewport is resized.
+ * Tracks which of the elements with the specified `id`s is currently
+ * being read (defined as the last such element that appears above the
+ * line defined by {@link READING_THRESHOLD_OFFSET}). Updates whenever
+ * the page scrolls or the viewport is resized.
  * @param ids the `id`s of the elements to be tracked, in document order
- * @returns the `id` of the element being read, or `null` if
- *          the top edge of none of them has reached the line
+ * @returns the `id` of the element currently being read,
+ *          or `null` if none of the elements' top edges
+ *          have reached the {@link READING_THRESHOLD_OFFSET}.
  */
 const useCurrentSectionID = (ids: string[]): string | null => {
   const [currentSectionID, setCurrentSectionID] = useState<string | null>(null);
@@ -51,7 +52,8 @@ const useCurrentSectionID = (ids: string[]): string | null => {
     const handleScroll = () => {
       pendingFrameRequestID = 0;
       const currentSection = sections.findLast(
-        (section) => section.getBoundingClientRect().top <= READING_LINE_OFFSET,
+        (section) =>
+          section.getBoundingClientRect().top <= READING_THRESHOLD_OFFSET,
       );
       setCurrentSectionID(currentSection?.id ?? null);
     };
@@ -63,7 +65,9 @@ const useCurrentSectionID = (ids: string[]): string | null => {
       }
     };
 
-    onScroll(); // the page may have loaded partway down (e.g., at a hash)
+    // Run immediately because the page may have
+    // loaded partway down (e.g., at an anchor tag)
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
@@ -77,13 +81,12 @@ const useCurrentSectionID = (ids: string[]): string | null => {
 };
 
 /**
- * Renders a link to the specified {@link Heading}
- * as an item in a daisyUI `menu`.
- * @param heading the {@link Heading} to be linked to
- * @param currentSectionID the `id` of the section that is currently being
- *                         read (which is marked as current), if any
- * @param children the list nested beneath the link, if any
- * @returns the rendered `<li>`
+ * Renders a daisyUI `menu` item that links to the specified {@link Heading}.
+ * @param heading the {@link Heading} to which the menu item should refer
+ * @param currentSectionID the `id` of the section that
+ *                         is currently being read, if any
+ * @param children the sub-menu to be nested beneath the `menu` item, if any
+ * @returns the rendered `menu` item
  */
 const renderItem = (
   { id, title }: Heading,
@@ -91,7 +94,7 @@ const renderItem = (
   children?: ReactNode,
 ) => (
   <li key={id}>
-    {/* daisyUI highlights any menu item that carries `aria-current` */}
+    {/* `aria-current` -> highlighted by daisyUI */}
     <a
       href={`#${id}`}
       aria-current={id === currentSectionID ? "location" : undefined}
@@ -120,7 +123,7 @@ export type TableOfContentsProps = {
  * an indented list of links to its `subheadings` (if any).
  *
  * The link to the section that the user is currently reading (i.e., the
- * last one whose top edge has scrolled near the top of the viewport)
+ * last one whose top edge has scrolled close to the top of the viewport)
  * is highlighted and marked as the `aria-current` location.
  */
 export const TableOfContents = ({
@@ -128,10 +131,10 @@ export const TableOfContents = ({
   className,
 }: TableOfContentsProps) => {
   const currentSectionID = useCurrentSectionID(getIDs(headings));
-
   return (
     <nav aria-label="Table of contents" className={className}>
-      {/* `whitespace-normal` b/c daisyUI keeps nested items from wrapping */}
+      {/* `whitespace-normal` must be forced on sub-menus b/c
+          daisyUI prevents *all* nested items from wrapping */}
       <ul className="menu w-full rounded-box border border-base-content/10 bg-base-200 p-2 text-base-content/70 [&_ul]:whitespace-normal">
         {headings.map(({ subheadings, ...heading }) =>
           renderItem(
