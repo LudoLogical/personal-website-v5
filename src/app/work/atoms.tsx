@@ -29,15 +29,14 @@ export type CaptionProps = {
 };
 
 /**
- * Renders the specified `children` as the caption of the `<figure>` that
+ * Renders the specified `children` as a caption for the `<figure>` that
  * contains this component, centered beneath the visual that it describes.
  *
- * Note: This component's box is trimmed to the cap height of its first line
- * and the baseline of its last, so any space around it is visible as such.
+ * Note: This component uses `text-box-trim` (which clamps the top and bottom
+ * of its bounding box to the cap height of the first line and the baseline of
+ * the last line, respectively, making vertical spacing easier to optimize).
  */
 export const Caption = ({ children }: CaptionProps) => (
-  // Inset so that the text never appears to extend past the edges of the
-  // visual above it, which is usually exactly as wide as the `<figure>`
   <figcaption className="px-4 text-center text-sm text-balance text-base-content/60 text-box-trim">
     {children}
   </figcaption>
@@ -51,7 +50,7 @@ export type FigureProps = {
 
   /**
    * The `sizes` attribute of the `<img>` in this {@link Figure}. Defaults
-   * to a value that suits a {@link Figure} as wide as the page's content.
+   * to a value that assumes a {@link Figure} as wide as the page's content.
    */
   sizes?: string;
 
@@ -68,8 +67,8 @@ export type FigureProps = {
 };
 
 /**
- * Renders the specified {@link Picture} with rounded
- * corners above its `caption` (if any) in a {@link Caption}.
+ * Renders the specified {@link Picture} with
+ * rounded corners and above its `caption` (if any).
  */
 export const Figure = ({
   picture: { src, alt, width, height, caption },
@@ -92,8 +91,8 @@ export const Figure = ({
 
 export type TestimonialProps = {
   /**
-   * The words quoted in this {@link Testimonial},
-   * without quotation marks around them.
+   * The content of this {@link Testimonial}
+   * (without surrounding quotation marks).
    */
   quote: string;
 
@@ -104,8 +103,7 @@ export type TestimonialProps = {
   featured?: boolean;
 
   /**
-   * The attribution displayed beneath the `quote`. Omitted if this
-   * {@link Testimonial} is attributed elsewhere (e.g., as part of a group).
+   * The attribution to be displayed beneath the `quote`.
    */
   children?: ReactNode;
 };
@@ -149,9 +147,9 @@ export type ClientLogoProps = {
 };
 
 /**
- * Renders the logo of the specified {@link Client} in a squircle, which
- * lets its filled background read as a tile. Hidden from ATs because the
- * name of the {@link Client} should always be displayed alongside it.
+ * Renders the logo of the specified {@link Client} in a squircle.
+ * Hidden from ATs because the name of the {@link Client} should
+ * always be displayed alongside it.
  */
 export const ClientLogo = ({ client: { logo } }: ClientLogoProps) => (
   <Image
