@@ -1,4 +1,4 @@
-import { HandCoins } from "lucide-react";
+import { Award } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import type { ReactNode } from "react";
@@ -609,10 +609,7 @@ const VibrantGrants = () => (
                   and for a status update on the funding and/or integration */}
               <div className="card border border-base-content/10 bg-base-200">
                 <div className="card-body flex-row items-center gap-5 p-5 text-base sm:p-6">
-                  <HandCoins
-                    aria-hidden
-                    className="size-8 shrink-0 text-primary"
-                  />
+                  <Award aria-hidden className="size-8 shrink-0 text-primary" />
                   <Paragraph>
                     NSR had already <strong>secured partial funding</strong>{" "}
                     less than two weeks after our initial presentation of the

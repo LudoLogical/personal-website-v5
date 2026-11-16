@@ -406,9 +406,7 @@ export const SECTION_HEADINGS = {
 export const TESTIMONIALS = [
   "[The interface is] not too much for my brain and not overwhelming.",
   "The plain[-]language [analysis] is great! This is where we see a lot of people struggle.",
-  "Everything seems practical and educational.",
-  "This makes me really excited!",
-  "This is all amazing! Who would’ve thought grants could be exciting[?]",
+  "This is all amazing! Who would've thought grants could be exciting[?]",
   "This is awesome! I can already see the increase in grant apps going out!",
 ];
 

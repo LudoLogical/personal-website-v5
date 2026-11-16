@@ -8,10 +8,10 @@ import type { Heading, SectionHeading } from "./types";
  * that the top edge of a section must cross for a {@link TableOfContents}
  * to consider that section to be the one being read.
  *
- * Note: This must exceed the `scroll-margin-top` of every section so
+ * Note: This must exceed the `scroll-mt` of every section so
  * that following a link to a section makes that section current.
  */
-const READING_LINE_OFFSET = 160;
+const READING_LINE_OFFSET = 256;
 
 /**
  * Computes the `id`s of the specified {@link SectionHeading}s
