@@ -1,15 +1,12 @@
 import { useSyncExternalStore } from "react";
 
-/**
- * The media query that matches iff the user `prefers-reduced-motion`.
- */
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 /**
- * Registers the specified callback as a listener for changes
- * to whether {@link REDUCED_MOTION_QUERY} matches.
+ * Registers the specified callback as a listener for
+ * changes to whether the user `prefers-reduced-motion`.
  * @param onChange the callback to be invoked on each change
- * @returns a function that removes the listener
+ * @returns a cleanup function that removes the listener
  */
 const subscribeToReducedMotion = (onChange: () => void): (() => void) => {
   const mediaQueryList = matchMedia(REDUCED_MOTION_QUERY);
