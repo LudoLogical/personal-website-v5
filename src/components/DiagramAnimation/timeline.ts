@@ -80,7 +80,7 @@ const animateArrow = (
 };
 
 /**
- * The controls returned by `useDiagramAnimationTimeline()`.
+ * The controls returned by {@link useDiagramAnimationTimeline}.
  */
 export type DiagramAnimationTimelineControls = {
   /**

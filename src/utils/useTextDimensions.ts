@@ -23,7 +23,7 @@ export type TextDimensions = {
  * `HTMLElement` change (which includes when web fonts finish loading).
  * @param ref a `RefObject` for the `HTMLElement` to be measured  
  * @returns the {@link TextDimensions} of the `HTMLElement`,
- *                                     or `null` if ref is `null`
+ *                                     or `null` if `ref` is `null`
  */
 const useTextDimensions = (
   ref: RefObject<HTMLElement | null>,
