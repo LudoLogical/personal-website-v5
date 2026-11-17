@@ -10,9 +10,9 @@ import {
 import { PhotoCarousel, VideoCarousel } from "@/app/work/carousels";
 import { TableOfContents } from "@/app/work/menus";
 import {
+  CaseStudySummary,
   FindingStatement,
-  MethodItem,
-  ProjectSummary,
+  ResearchMethodItem,
   Section,
   Subsection,
 } from "@/app/work/sections";
@@ -80,7 +80,7 @@ const VibrantGrants = () => (
 
       <VideoCarousel demos={DEMOS} />
 
-      <ProjectSummary
+      <CaseStudySummary
         team={TEAM}
         client={CLIENT}
         timeline={TIMELINE}
@@ -164,7 +164,7 @@ const VibrantGrants = () => (
             />
 
             <div className="join join-vertical">
-              <MethodItem method={METHODS.systemMapping} open>
+              <ResearchMethodItem method={METHODS.systemMapping} open>
                 <div className="grid gap-6 sm:grid-cols-2">
                   <Figure
                     picture={PICTURES.systemMappingFigurines}
@@ -175,16 +175,18 @@ const VibrantGrants = () => (
                     sizes={HALF_WIDTH_SIZES}
                   />
                 </div>
-              </MethodItem>
+              </ResearchMethodItem>
 
-              <MethodItem method={METHODS.fieldWorkAndSSIs}>
+              <ResearchMethodItem method={METHODS.fieldWorkAndSSIs}>
                 <PhotoCarousel
                   photos={CLIENT_NON_PROFIT_PHOTOS}
                   className="mx-auto w-full max-w-xl"
                 />
-              </MethodItem>
+              </ResearchMethodItem>
 
-              <MethodItem method={METHODS.cardSortingAndUsabilityTesting}>
+              <ResearchMethodItem
+                method={METHODS.cardSortingAndUsabilityTesting}
+              >
                 {/* Each figure spans two shared rows (one for the images and
                     one for the captions) so that its caption lines up with
                     the other's even though the images' heights differ */}
@@ -202,7 +204,7 @@ const VibrantGrants = () => (
                     imageClassName="self-end"
                   />
                 </div>
-              </MethodItem>
+              </ResearchMethodItem>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -263,8 +265,8 @@ const VibrantGrants = () => (
             </Paragraph>
 
             <div className="flex flex-col gap-12">
-              {FEATURE_GROUPS.map(({ id, title, features }) => (
-                <Subsection key={id} heading={{ id, title }}>
+              {FEATURE_GROUPS.map(({ id, label: title, features }) => (
+                <Subsection key={id} heading={{ id, label: title }}>
                   {features.map(({ title, description, media }) => (
                     <article key={title} className="flex flex-col gap-4">
                       <div className="flex flex-col gap-3">

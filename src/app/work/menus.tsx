@@ -89,7 +89,7 @@ const useCurrentSectionID = (ids: string[]): string | null => {
  * @returns the rendered `menu` item
  */
 const renderItem = (
-  { id, title }: Heading,
+  { id, label: title }: Heading,
   currentSectionID: string | null,
   children?: ReactNode,
 ) => (

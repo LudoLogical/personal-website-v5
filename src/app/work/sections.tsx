@@ -6,17 +6,17 @@ import Logo from "@/components/Logo";
 import { ClientLogo, Paragraph } from "./atoms";
 import type {
   Client,
-  Insight,
   Heading,
+  Insight,
   ResearchMethod,
   SectionHeading,
   TeamMember,
 } from "./types";
 
 /**
- * Renders one labeled entry in a {@link ProjectSummary}.
+ * Renders a single, labeled item in a {@link CaseStudySummary}.
  */
-const Fact = ({
+const CaseStudySummaryItem = ({
   label,
   className,
   children,
@@ -33,67 +33,72 @@ const Fact = ({
   </div>
 );
 
-export type ProjectSummaryProps = {
+export type CaseStudySummaryProps = {
   /**
-   * The {@link TeamMember}s who worked on the project,
-   * in the order in which they are to be listed.
+   * The {@link TeamMember}s who worked on the project/product presented
+   * in this case study, in the order in which they are to be listed.
    *
-   * Note: The first is visually emphasized.
+   * Note: The first {@link TeamMember} should always be me!
    */
   team: TeamMember[];
 
   /**
-   * The {@link Client} for which the project was carried out.
+   * The {@link Client} for which the project/product
+   * presented in this case study was conducted/created.
    */
   client: Client;
 
   /**
-   * The span of time over which the project took place.
+   * The span of time over which the project/product
+   * presented in this case study was conducted/created.
    */
   timeline: {
     /**
-     * The month, in YYYY-MM format, in which the project began.
+     * The month, in YYYY-MM format, in which work on the
+     * project/product presented in this case study began.
      */
     start: string;
 
     /**
-     * The month, in YYYY-MM format, in which the project ended.
+     * The month, in YYYY-MM format, in which work on the
+     * project/product presented in this case study ended.
      */
     end: string;
   };
 
   /**
-   * A summary of what the project ultimately achieved.
+   * A summary of what the project/product presented
+   * in this case study ultimately achieved.
    */
   outcome: ReactNode;
 
   /**
-   * Classes for the container `<dl>` of this {@link ProjectSummary}.
+   * Classes for the container `<dl>` of this {@link CaseStudySummary}.
    */
   className?: string;
 };
 
 /**
- * Renders the key facts about the project that a case study presents: its
- * `team`, its {@link Client}, its `timeline`, and its `outcome`. On wide
- * viewports, the `team` fills a column to the left of the other facts.
+ * Renders the following basic information about a case study: its `team`,
+ * its {@link Client}, its `timeline`, and its `outcome`. On wide viewports,
+ * the `team` appears in its own column to the left of the other information;
+ * on narrow ones, all of the information appears in a single column and in
+ * the order established above.
  */
-export const ProjectSummary = ({
+export const CaseStudySummary = ({
   team,
   client,
   timeline: { start, end },
   outcome,
   className,
-}: ProjectSummaryProps) => (
-  // The last row absorbs the height left over by the team, which
-  // keeps the facts beside it packed together at the top
+}: CaseStudySummaryProps) => (
   <dl
     className={twMerge(
       "grid gap-x-10 gap-y-8 md:grid-cols-2 md:grid-rows-[auto_auto_1fr]",
       className,
     )}
   >
-    <Fact label="Team" className="md:row-span-3">
+    <CaseStudySummaryItem label="Team" className="md:row-span-3">
       <ul className="flex flex-col gap-4">
         {team.map(({ name, href, role, portrait }, i) => (
           <li
@@ -123,22 +128,22 @@ export const ProjectSummary = ({
           </li>
         ))}
       </ul>
-    </Fact>
-    <Fact label="Client">
+    </CaseStudySummaryItem>
+    <CaseStudySummaryItem label="Client">
       <div className="flex items-center gap-3">
         <ClientLogo client={client} />
         <ExternalLink kind="underline" href={client.href}>
           {client.name}
         </ExternalLink>
       </div>
-    </Fact>
-    <Fact label="Timeline">
+    </CaseStudySummaryItem>
+    <CaseStudySummaryItem label="Timeline">
       <span className="tabular-nums">
         <time dateTime={start}>{start}</time> to{" "}
         <time dateTime={end}>{end}</time>
       </span>
-    </Fact>
-    <Fact label="Outcome">{outcome}</Fact>
+    </CaseStudySummaryItem>
+    <CaseStudySummaryItem label="Outcome">{outcome}</CaseStudySummaryItem>
   </dl>
 );
 
@@ -149,7 +154,8 @@ export type SectionProps = {
   heading: SectionHeading;
 
   /**
-   * The content of this {@link Section}.
+   * The content of this {@link Section},
+   * which may include one or more {@link Subsection}s.
    */
   children: ReactNode;
 };
@@ -158,7 +164,7 @@ export type SectionProps = {
  * Renders a top-level section of a case study, labeled by
  * the specified {@link SectionHeading} in the primary color.
  */
-export const Section = ({ heading: { id, title }, children }: SectionProps) => (
+export const Section = ({ heading: { id, label }, children }: SectionProps) => (
   <section
     id={id}
     aria-labelledby={`${id}-heading`}
@@ -168,7 +174,7 @@ export const Section = ({ heading: { id, title }, children }: SectionProps) => (
       id={`${id}-heading`}
       className="mb-8 text-2xl leading-tight font-bold text-primary sm:text-3xl"
     >
-      {title}
+      {label}
     </h2>
     {children}
   </section>
@@ -181,19 +187,21 @@ export type SubsectionProps = {
   heading: Heading;
 
   /**
-   * The content of this {@link Subsection}.
+   * The content of this {@link Subsection},
+   * which should not contain any nested {@link Subsection}s.
    */
   children: ReactNode;
 };
 
 /**
- * Renders a subsection of a {@link Section}, labeled by the specified
- * {@link Heading}, whose title is marked by the arrow from the {@link Logo}
- * (in the secondary color). The arrowhead is vertically centered on the
- * first line of the title.
+ * Renders a subsection of a {@link Section}, labeled by the arrow
+ * from the {@link Logo} (displayed in the secondary color) and the
+ * specified {@link Heading}. The two elements are vertically aligned
+ * such that arrowhead is vertically centered on the first line of
+ * the {@link Heading.label}.
  */
 export const Subsection = ({
-  heading: { id, title },
+  heading: { id, label: title },
   children,
 }: SubsectionProps) => (
   <section
@@ -205,34 +213,39 @@ export const Subsection = ({
       id={`${id}-heading`}
       className="flex items-start gap-3 text-xl leading-snug font-bold"
     >
-      {/* Cropped to the bounds of the arrow, the only part left visible,
-          whose arrowhead is centered 16 of its 24 units (i.e., 0.8em) from
-          the top and is thus raised to the middle of the capitals */}
+      {/* The new `viewBox` crops the `Logo` to the bounds of the arrow;
+          the margin aligns the center of the arrowhead with the middle of
+          the (capital letter(s) in the) title */}
+      {/* Math: `text-xl` yields a `font-size` of 20px, so the new `viewBox`
+          is intrinsically 1.2em tall and the the center of the arrowhead is
+          located 16 units -> 0.8em from the top */}
       <Logo
         viewBox="4 9 18 24"
         className="mt-[calc(0.5cap-0.8em)] h-[1.2em] w-auto shrink-0 **:fill-secondary **:data-dot:hidden **:data-letter-d:hidden"
       />
-      {/* Trimmed so that its top edge lies at the top of the capitals */}
+      {/* `text-box-trim` to clamp the top of the bounding
+          box to the cap height of the first line of text */}
       <span className="text-box-trim">{title}</span>
     </h3>
     {children}
   </section>
 );
 
-export type MethodItemProps = {
+export type ResearchMethodItemProps = {
   /**
-   * The {@link ResearchMethod} to be rendered in this {@link MethodItem}.
+   * The {@link ResearchMethod} to be
+   * rendered in this {@link ResearchMethodItem}.
    */
   method: ResearchMethod;
 
   /**
-   * `true` if this {@link MethodItem} should start
-   * out open, `false` otherwise (and by default).
+   * `true` if this {@link ResearchMethodItem} should
+   * start out open, `false` otherwise (and by default).
    */
   open?: boolean;
 
   /**
-   * The content that this {@link MethodItem} reveals while it is open
+   * The content that this {@link ResearchMethodItem} reveals while it is open
    * (e.g., evidence of the {@link ResearchMethod} in use), which follows the
    * `purpose` of the {@link ResearchMethod} (if any).
    */
@@ -248,11 +261,11 @@ export type MethodItemProps = {
  * Note: This component is a daisyUI `join-item`, so its
  * parent is responsible for supplying `join join-vertical`.
  */
-export const MethodItem = ({
+export const ResearchMethodItem = ({
   method: { name: title, purpose },
   open = false,
   children,
-}: MethodItemProps) => (
+}: ResearchMethodItemProps) => (
   // Sharing a `name` is what makes the browser close the other items
   <details
     name="research-methods"

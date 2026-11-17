@@ -393,7 +393,7 @@ export const RECEIPTS: Receipt[] = [
 export const FEATURE_GROUPS: FeatureGroup[] = [
   {
     id: "find-relevant-grants",
-    title: "Find Relevant Grants",
+    label: "Find Relevant Grants",
     features: [
       {
         title: "Multi-Modal Ingestion",
@@ -426,7 +426,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
   },
   {
     id: "weave-data-into-applications",
-    title: "Weave Data into Applications",
+    label: "Weave Data into Applications",
     features: [
       {
         title: "Leverage Existing Sources",
@@ -480,7 +480,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
   },
   {
     id: "prove-impact-in-reports",
-    title: "Prove Impact in Reports",
+    label: "Prove Impact in Reports",
     features: [
       {
         title: "Conversational Data Gathering",
@@ -507,16 +507,16 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
 
 // Listed in the order in which the sections appear
 export const SECTION_HEADINGS = {
-  client: { id: "client", title: "The Client" },
-  opportunity: { id: "opportunity", title: "The Opportunity" },
-  strategy: { id: "strategy", title: "Our Strategy" },
-  learnings: { id: "learnings", title: "What We Learned" },
+  client: { id: "client", label: "The Client" },
+  opportunity: { id: "opportunity", label: "The Opportunity" },
+  strategy: { id: "strategy", label: "Our Strategy" },
+  learnings: { id: "learnings", label: "What We Learned" },
   solution: {
     id: "solution",
-    title: "Our Solution",
-    subheadings: FEATURE_GROUPS.map(({ id, title }) => ({ id, title })),
+    label: "Our Solution",
+    subheadings: FEATURE_GROUPS.map(({ id, label }) => ({ id, label })),
   },
-  impact: { id: "impact", title: "Our Impact" },
+  impact: { id: "impact", label: "Our Impact" },
 } satisfies Record<string, SectionHeading>;
 
 // Quoted from NSR staff and acceptance testing participants;

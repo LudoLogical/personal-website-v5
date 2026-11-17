@@ -1,33 +1,36 @@
 import type { ReactNode } from "react";
+import type { Section, Subsection } from "./sections";
 
 /**
- * A heading that labels a section of a case study.
+ * A heading that labels a {@link Section}
+ * or {@link Subsection} of a case study.
  */
 export type Heading = {
   /**
-   * The `id` of the `<section>` that this {@link Heading} labels.
+   * The `id` of the `<section>`{@link Section} or
+   * {@link Subsection} that this {@link Heading} labels.
    */
   id: string;
 
   /**
    * The text of this {@link Heading}.
    */
-  title: string;
+  label: string;
 };
 
 /**
- * A {@link Heading} that labels a top-level section of a case study.
+ * A {@link Heading} that labels a top-level {@link Section} of a case study.
  */
 export type SectionHeading = Heading & {
   /**
-   * The {@link Heading}s of the subsections that the table of contents
-   * lists beneath this {@link SectionHeading}. Omitted if it lists none.
+   * The {@link Heading}s of the {@link Subsection}s that fall under this
+   * {@link SectionHeading}, if any.
    */
   subheadings?: Heading[];
 };
 
 /**
- * An image, plus its associated sizing and caption information.
+ * An image and its associated sizing and caption information.
  */
 export type Picture = {
   /**
