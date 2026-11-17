@@ -201,7 +201,7 @@ export type SubsectionProps = {
  * the {@link Heading.label}.
  */
 export const Subsection = ({
-  heading: { id, label: title },
+  heading: { id, label },
   children,
 }: SubsectionProps) => (
   <section
@@ -225,55 +225,55 @@ export const Subsection = ({
       />
       {/* `text-box-trim` to clamp the top of the bounding
           box to the cap height of the first line of text */}
-      <span className="text-box-trim">{title}</span>
+      <span className="text-box-trim">{label}</span>
     </h3>
     {children}
   </section>
 );
 
-export type ResearchMethodItemProps = {
+export type ResearchMethodContainerProps = {
   /**
    * The {@link ResearchMethod} to be
-   * rendered in this {@link ResearchMethodItem}.
+   * rendered in this {@link ResearchMethodContainer}.
    */
   method: ResearchMethod;
 
   /**
-   * `true` if this {@link ResearchMethodItem} should
+   * `true` if this {@link ResearchMethodContainer} should
    * start out open, `false` otherwise (and by default).
    */
   open?: boolean;
 
   /**
-   * The content that this {@link ResearchMethodItem} reveals while it is open
-   * (e.g., evidence of the {@link ResearchMethod} in use), which follows the
-   * `purpose` of the {@link ResearchMethod} (if any).
+   * The content that should appear below the `method.purpose`
+   * of this {@link ResearchMethodContainer} while it is open.
    */
   children: ReactNode;
 };
 
 /**
- * Renders the specified {@link ResearchMethod} as an item in an accordion whose
- * content opens with the `purpose` of the {@link ResearchMethod} (if any). Opening
- * an item closes whichever other one on the page is open, but every item
- * can be closed at once.
+ * Renders the specified {@link ResearchMethod} as an item in an accordion.
+ * Opening a `ResearchMethodContainer` reveals its content, which always begins
+ * with the `purpose` of the {@link ResearchMethod}, and closes whichever other
+ * `ResearchMethodContainer` on the page was already open, if any.
  *
- * Note: This component is a daisyUI `join-item`, so its
- * parent is responsible for supplying `join join-vertical`.
+ * Note: This component is a daisyUI `join-item`, so
+ * its direct parent must supply `join join-vertical`.
  */
-export const ResearchMethodItem = ({
-  method: { name: title, purpose },
+export const ResearchMethodContainer = ({
+  method: { name, purpose },
   open = false,
   children,
-}: ResearchMethodItemProps) => (
-  // Sharing a `name` is what makes the browser close the other items
+}: ResearchMethodContainerProps) => (
+  // When two or more `<details>` have the same `name`,
+  // only one of them can be `open` at a time
   <details
     name="research-methods"
     open={open}
     className="collapse-arrow collapse join-item border border-base-content/10 bg-base-200"
   >
     <summary className="collapse-title">
-      <h3 className="text-lg leading-snug font-semibold">{title}</h3>
+      <h3 className="text-lg leading-snug font-semibold">{name}</h3>
     </summary>
     <div className="collapse-content pb-6">
       <div className="flex flex-col gap-6">
@@ -284,22 +284,23 @@ export const ResearchMethodItem = ({
   </details>
 );
 
-export type FindingStatementProps = {
+export type InsightHeroProps = {
   /**
-   * The {@link Insight} to be rendered in this {@link FindingStatement}.
+   * The {@link Insight} to be rendered in this {@link InsightHero}.
    */
-  finding: Insight;
+  insight: Insight;
 };
 
 /**
- * Renders the statement of the specified {@link Insight}
- * above the paragraph that elaborates on it.
+ * Renders the specified {@link Insight}.
  */
-export const FindingStatement = ({
-  finding: { headline: title, details: description },
-}: FindingStatementProps) => (
+export const InsightHero = ({
+  insight: { headline, details },
+}: InsightHeroProps) => (
   <div className="flex flex-col gap-3 border-s-2 border-secondary ps-5">
-    <h3 className="text-xl leading-snug font-semibold text-balance">{title}</h3>
-    <Paragraph>{description}</Paragraph>
+    <h3 className="text-xl leading-snug font-semibold text-balance">
+      {headline}
+    </h3>
+    <Paragraph>{details}</Paragraph>
   </div>
 );

@@ -11,8 +11,8 @@ import { PhotoCarousel, VideoCarousel } from "@/app/work/carousels";
 import { TableOfContents } from "@/app/work/menus";
 import {
   CaseStudySummary,
-  FindingStatement,
-  ResearchMethodItem,
+  InsightHero,
+  ResearchMethodContainer,
   Section,
   Subsection,
 } from "@/app/work/sections";
@@ -164,7 +164,7 @@ const VibrantGrants = () => (
             />
 
             <div className="join join-vertical">
-              <ResearchMethodItem method={METHODS.systemMapping} open>
+              <ResearchMethodContainer method={METHODS.systemMapping} open>
                 <div className="grid gap-6 sm:grid-cols-2">
                   <Figure
                     picture={PICTURES.systemMappingFigurines}
@@ -175,21 +175,20 @@ const VibrantGrants = () => (
                     sizes={HALF_WIDTH_SIZES}
                   />
                 </div>
-              </ResearchMethodItem>
+              </ResearchMethodContainer>
 
-              <ResearchMethodItem method={METHODS.fieldWorkAndSSIs}>
+              <ResearchMethodContainer method={METHODS.fieldWorkAndSSIs}>
                 <PhotoCarousel
                   photos={CLIENT_NON_PROFIT_PHOTOS}
                   className="mx-auto w-full max-w-xl"
                 />
-              </ResearchMethodItem>
+              </ResearchMethodContainer>
 
-              <ResearchMethodItem
+              <ResearchMethodContainer
                 method={METHODS.cardSortingAndUsabilityTesting}
               >
-                {/* Each figure spans two shared rows (one for the images and
-                    one for the captions) so that its caption lines up with
-                    the other's even though the images' heights differ */}
+                {/* `row-span-2` and `grid-rows-subgrid` so the captions line
+                    up with each other even though the image heights differ */}
                 <div className="grid gap-6 sm:grid-cols-2">
                   <Figure
                     picture={PICTURES.dendrogram}
@@ -204,7 +203,7 @@ const VibrantGrants = () => (
                     imageClassName="self-end"
                   />
                 </div>
-              </ResearchMethodItem>
+              </ResearchMethodContainer>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -227,7 +226,7 @@ const VibrantGrants = () => (
         <Section heading={SECTION_HEADINGS.learnings}>
           <div className="flex flex-col gap-10">
             <article className="flex flex-col gap-8">
-              <FindingStatement finding={FINDINGS.communityOriented} />
+              <InsightHero insight={FINDINGS.communityOriented} />
               <SplitPicture
                 left={PICTURES.communityOriented}
                 right={PICTURES.dataDriven}
@@ -235,7 +234,7 @@ const VibrantGrants = () => (
             </article>
 
             <article className="flex flex-col gap-8">
-              <FindingStatement finding={FINDINGS.grantDiscovery} />
+              <InsightHero insight={FINDINGS.grantDiscovery} />
               <figure className="flex flex-col gap-4">
                 <PageFan
                   pages={GRANT_OPPORTUNITY_PAGES}
@@ -246,7 +245,7 @@ const VibrantGrants = () => (
             </article>
 
             <article className="flex flex-col gap-8">
-              <FindingStatement finding={FINDINGS.riskAversion} />
+              <InsightHero insight={FINDINGS.riskAversion} />
               <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center">
                 {RECEIPTS.map((receipt) => (
                   <ReceiptCard key={receipt.title} receipt={receipt} />
