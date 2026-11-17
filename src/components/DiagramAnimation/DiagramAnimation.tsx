@@ -2,8 +2,8 @@
 
 import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
-import useTapOutside from "@/utils/useTapOutside";
-import useTextDimensions from "@/utils/useTextDimensions";
+import useTapOutside from "@/hooks/useTapOutside";
+import useTextDimensions from "@/hooks/useTextDimensions";
 import { getArrowheadPath, getMarkerPaths, rasterizeArrow } from "./paths";
 import { useDiagramAnimationTimeline } from "./timeline";
 import {

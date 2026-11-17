@@ -1,6 +1,6 @@
 import { useState, type RefObject } from "react";
-import useInView from "@/utils/useInView";
-import usePrefersReducedMotion from "@/utils/usePrefersReducedMotion";
+import useInView from "@/hooks/useInView";
+import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 import type { ProgressTrack } from "./controls";
 
 /**

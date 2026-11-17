@@ -7,7 +7,7 @@ import {
   type PointerEvent,
   type ReactNode,
 } from "react";
-import useTapOutside from "@/utils/useTapOutside";
+import useTapOutside from "@/hooks/useTapOutside";
 
 /**
  * An SVG path used as a replacement for daisyUI's native `chat-bubble` tail so

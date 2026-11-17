@@ -1,7 +1,7 @@
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { orthogonalPathFinding } from "orthogonal-path-finding";
 import { roundCorners } from "svg-round-corners";
-import type { TextDimensions } from "@/utils/useTextDimensions";
+import type { TextDimensions } from "@/hooks/useTextDimensions";
 import type {
   default as DiagramAnimation,
   DiagramAnimationOptions,

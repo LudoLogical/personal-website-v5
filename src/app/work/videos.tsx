@@ -3,7 +3,7 @@
 import { Pause, Play, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import useFrameLoop from "@/utils/useFrameLoop";
+import useFrameLoop from "@/hooks/useFrameLoop";
 import {
   ControlButton,
   ExpandButton,

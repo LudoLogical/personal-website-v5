@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { twMerge } from "tailwind-merge";
-import useTapOutside from "@/utils/useTapOutside";
+import useTapOutside from "@/hooks/useTapOutside";
 import LevelPanels from "./LevelPanels";
 import { NUM_LEVELS, type Level, type Levels } from "./levels";
 

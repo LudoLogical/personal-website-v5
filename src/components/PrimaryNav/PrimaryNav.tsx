@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import AnimatedLogo from "@/components/AnimatedLogo";
-import useHideOnScrollDown from "@/utils/useHideOnScrollDown";
+import useHideOnScrollDown from "@/hooks/useHideOnScrollDown";
 import { NAV_ITEMS } from "./content";
 import styles from "./PrimaryNav.module.css";
 

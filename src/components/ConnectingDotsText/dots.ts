@@ -7,7 +7,7 @@ import {
 } from "react";
 import useTextDimensions, {
   type TextDimensions,
-} from "@/utils/useTextDimensions";
+} from "@/hooks/useTextDimensions";
 import type ConnectingDotsText from "./ConnectingDotsText";
 
 /**

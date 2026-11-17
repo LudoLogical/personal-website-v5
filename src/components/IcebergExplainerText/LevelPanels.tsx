@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import useGapMidpoint from "@/utils/useGapMidpoint";
+import useGapMidpoint from "@/hooks/useGapMidpoint";
 import Iceberg from "./Iceberg";
 import type { IcebergExplainerTextProps } from "./IcebergExplainerText";
 import { NUM_LEVELS, type Level, type Levels } from "./levels";

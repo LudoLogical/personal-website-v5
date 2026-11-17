@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { twMerge } from "tailwind-merge";
-import useTapOutside from "@/utils/useTapOutside";
+import useTapOutside from "@/hooks/useTapOutside";
 
 /**
  * The minimum duration, in milliseconds, for which a single hover

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import ExternalLink from "@/components/ExternalLink";
-import useFrameLoop from "@/utils/useFrameLoop";
+import useFrameLoop from "@/hooks/useFrameLoop";
 import { Caption } from "./atoms";
 import {
   ControlButton,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, type PointerEvent } from "react";
-import useTapOutside from "@/utils/useTapOutside";
+import useTapOutside from "@/hooks/useTapOutside";
 import { useDots } from "./dots";
 import { getTransitions } from "./timing";
 

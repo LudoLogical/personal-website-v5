@@ -23,12 +23,12 @@ Follow these in new and edited code, even where an older line still deviates fro
 - Components, types, and helper modules shared by sibling routes live in their parent route folder (`src/app/work/` for the case studies beneath it), in the same plural-noun component files plus lowercase-noun helper modules (`work/sections.tsx`, `work/types.ts`, `work/playback.ts`). Routes import them through `@/app/…` (`@/app/work/atoms`), and each route folder keeps only what is specific to it (`vibrant-grants/illustrations.tsx`).
 - `src/components/` holds shared components. A single-file component is `src/components/Name.tsx`. A component with a CSS module, its own content, helper modules, or subcomponents is a folder `Name/` containing `Name.tsx` and an `index.ts` barrel.
 - In a component folder, other modules are lowercase nouns named for their concern (`dots.ts`, `timing.ts`, `paths.ts`, `timeline.ts`, `types.ts`, `levels.ts`, `content.ts`), and extracted subcomponents are PascalCase siblings (`LevelPanels.tsx`, `Iceberg.tsx`).
-- `src/utils/` holds shared hooks, one per file named after the hook (`useTapOutside.ts`). `src/lib/` holds `.d.ts` shims named after packages whose own types can't be imported (`orthogonal-path-finding.d.ts`), each opening with a doc comment that says why it exists.
+- `src/hooks/` holds shared hooks, one per file named after the hook (`useTapOutside.ts`). `src/lib/` holds `.d.ts` shims named after packages whose own types can't be imported (`orthogonal-path-finding.d.ts`), each opening with a doc comment that says why it exists.
 - Files in `public/` are kebab-case (`resume-daniel-ludo-deanda.pdf`, `logos/nebula-labs.png`).
 
 ## Colocation
 
-- Keep each constant, type, helper, and style in the file of its only consumer (`LEVEL_CLASS_NAMES` lives in `LevelPanels.tsx`, not `levels.ts`). Move it to `src/components/`, `src/utils/`, or `globals.css` only once something else needs it.
+- Keep each constant, type, helper, and style in the file of its only consumer (`LEVEL_CLASS_NAMES` lives in `LevelPanels.tsx`, not `levels.ts`). Move it to `src/components/`, `src/hooks/`, or `globals.css` only once something else needs it.
 - Keep authored content (copy, URLs, lists, tuning data) out of markup. A route's content goes in its `content.tsx`, and a self-contained component's goes in a `content.ts` beside it (`PrimaryNav/content.ts`). Content that belongs to a page reaches components as props (`TIPS` lives in `app/content.tsx`, not in `SpokenTips/`).
 - When a component grows unwieldy, extract coherent pieces into subcomponents in its folder and pass them slices of its props (`LevelPanels` receives `childClassNames.panel` as `panelClassName`).
 
@@ -51,7 +51,7 @@ Follow these in new and edited code, even where an older line still deviates fro
 ## Imports
 
 - Order imports in three groups with no blank lines between them: packages, then `@/` aliases, then same-folder `./` paths. Sort each group case-insensitively by path, and put global CSS and CSS modules last.
-- Reach other folders through `@/` (`@/components/Expandable`, `@/utils/useTapOutside`), never `../`, and import components through their barrels.
+- Reach other folders through `@/` (`@/components/Expandable`, `@/hooks/useTapOutside`), never `../`, and import components through their barrels.
 - Sort the names inside braces case-insensitively, values first and then inline `type` specifiers: `{ along, anchor, free, MarkerShape, Side, type Arrow }`.
 - Use `import type { … }` when every name is a type, inline `type` when mixing, `import Logo, { type LogoProps } from "@/components/Logo";` for a default plus types, and `import type { default as Name, NameOptions } from "./Name";` when the default is needed only as a type. `default` sorts as the word "default" (`{ ConnectingDotsTextOptions, default as ConnectingDotsText }`).
 - `pnpm lint` enforces these rules (except for side-effect imports like `import "./globals.css";`). `import/order` checks the ordering, and `pnpm exec eslint --fix <paths>` applies it. `no-restricted-syntax` flags `import { type … }` and `export { type … }` statements whose names are all types, but it can't fix them since it is a custom rule.
