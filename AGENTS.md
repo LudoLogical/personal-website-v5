@@ -126,7 +126,7 @@ Follow these in new and edited code, even where an older line still deviates fro
   - "The animation triggers on hover, except on touch screens, for which it toggles on tap and can be dismissed by tapping anywhere."
   - "While active, the root element carries a `data-active` attribute so that surrounding content can react."
   - "Animated using CSS alone and thus valid as a server component."
-  - "Note: This component is hidden from ATs, so its parent is responsible for supplying a label if one is necessary."
+  - "Note: This component is hidden from ATs, so its parent is responsible for supplying an `aria-label` label if one is necessary."
 - Hooks and functions open with a third-person verb ("Tracks …", "Computes …", "Creates …", "While enabled, invokes …"), and a hook that tracks a changing value says when it updates ("Updates whenever …"). Types open with a noun phrase ("A link in the {@link SiteFooter}.", "One end of an {@link Arrow}."). Members and constants are noun phrases that give units between commas ("The duration, in seconds, over which …", "The month, in YYYY-MM format, in which …"), except callable members, which open with a verb ("Registers …").
 - Boolean members read "`true` if …, `false` otherwise (and by default)." When the default is `true`, they end "… `false` otherwise. Defaults to `true`." Other defaults read "Defaults to `"underline"`." or "Defaults to "Present" if omitted.", and omission is spelled out ("Omitted if said role is ongoing.", "omit if the toggle button should be omitted").
 - Give a reason with "Exists to …", a secondary role with "Also used as …", and a caveat with "Note:" or "Note that". Put longer asides under `@remarks` with a blank line on each side, and point to related settings with `@see`.

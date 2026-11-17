@@ -9,9 +9,9 @@ import useEveryAnimationFrame from "@/hooks/useEveryAnimationFrame";
 import { Caption } from "./atoms";
 import {
   ControlButton,
-  ExpandButton,
-  PlaybackBadge,
-  ProgressSegments,
+  FloatingExpandButton,
+  FloatingPlaybackButton,
+  ProgressTracks,
 } from "./controls";
 import { play, showProgress, usePlayback } from "./playback";
 import type { Demo, LinkCaptionedPicture } from "./types";
@@ -157,9 +157,9 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
                 onEnded={() => showDemo((i + 1) % demos.length)}
               />
             ))}
-            <PlaybackBadge paused={paused} />
+            <FloatingPlaybackButton paused={paused} />
           </button>
-          <ExpandButton
+          <FloatingExpandButton
             label={`Expand video: ${currentCaption}`}
             paused={paused}
             onClick={() =>
@@ -178,7 +178,7 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
             </p>
           }
           segments={
-            <ProgressSegments
+            <ProgressTracks
               labels={demos.map(
                 ({ caption }, i) =>
                   `Video ${i + 1} of ${demos.length}: ${caption}`,
@@ -215,7 +215,7 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
               {caption}
             </p>
           ))}
-          // As tall as the `ProgressSegments`, whose
+          // As tall as the `ProgressTracks`, whose
           // buttons are 1.5rem taller than their tracks
           segments={<div className="h-7 lg:w-60" />}
         />
@@ -307,7 +307,7 @@ export const PhotoCarousel = ({ photos, className }: PhotoCarouselProps) => {
         >
           <ChevronLeft aria-hidden className="size-4" />
         </ControlButton>
-        <ProgressSegments
+        <ProgressTracks
           labels={photos.map((_, i) => `Photo ${i + 1} of ${photos.length}`)}
           currentIndex={photoIndex}
           className="flex-1"

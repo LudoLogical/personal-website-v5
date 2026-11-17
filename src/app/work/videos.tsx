@@ -6,8 +6,8 @@ import { twMerge } from "tailwind-merge";
 import useEveryAnimationFrame from "@/hooks/useEveryAnimationFrame";
 import {
   ControlButton,
-  ExpandButton,
-  PlaybackBadge,
+  FloatingExpandButton,
+  FloatingPlaybackButton,
   ProgressTrack,
 } from "./controls";
 import { play, showProgress, usePlayback } from "./playback";
@@ -293,9 +293,9 @@ export const LoopingVideo = ({ src, label }: LoopingVideoProps) => {
             preload="metadata"
             className="block h-auto w-full"
           />
-          <PlaybackBadge paused={paused} />
+          <FloatingPlaybackButton paused={paused} />
         </button>
-        <ExpandButton
+        <FloatingExpandButton
           label={`Expand video: ${label}`}
           paused={paused}
           onClick={() => setExpansionTime(videoRef.current?.currentTime ?? 0)}

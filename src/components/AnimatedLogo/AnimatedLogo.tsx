@@ -14,7 +14,7 @@ export type AnimatedLogoProps = Omit<LogoProps, "ref">;
  * Motionless if the user `prefers-reduced-motion`.
  *
  * Note: Like {@link Logo}, this component is hidden from ATs, so its
- * parent is responsible for supplying a label if one is necessary.
+ * parent is responsible for supplying an `aria-label` if one is necessary.
  */
 const AnimatedLogo = ({ className, ...props }: AnimatedLogoProps) => {
   const svgRef = useRef<SVGSVGElement>(null);

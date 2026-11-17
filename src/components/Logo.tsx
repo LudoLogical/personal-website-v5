@@ -7,8 +7,8 @@ export type LogoProps = ComponentProps<"svg">;
  * Renders the `public/logo.svg` inline so that its individual parts remain
  * addressable for styling and animation via the data attributes on each path.
  *
- * Note: This component is hidden from ATs, so its parent is responsible for
- * supplying a label if one is necessary.
+ * Note: This component is hidden from ATs, so its parent is
+ * responsible for supplying an `aria-label` if one is necessary.
  */
 const Logo = ({ className, ...props }: LogoProps) => (
   <svg
