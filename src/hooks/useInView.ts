@@ -1,9 +1,9 @@
 import { useEffect, useState, type RefObject } from "react";
 
 /**
- * Tracks whether a meaningful portion of the `Element` assigned to the
+ * Tracks whether at least 25% of the `Element` assigned to the
  * specified `ref` is visible in the viewport. Updates whenever that
- * `Element` scrolls (or is otherwise brought) into or out of view.
+ * threshold starts or stops being met.
  * @param ref a `RefObject` for the `Element` to be observed
  * @returns `true` if the `Element` is in view, `false` otherwise
  */
@@ -14,6 +14,7 @@ const useInView = (ref: RefObject<Element | null>): boolean => {
     const element = ref.current;
     if (!element) return;
 
+    // Observations are conducted against the viewport by default
     const observer = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
       { threshold: 0.25 },
