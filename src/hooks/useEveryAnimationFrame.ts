@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent } from "react";
 
 /**
- * The longest duration, in milliseconds, that {@link useFrameLoop} will ever
+ * The longest duration, in milliseconds, that {@link useEveryAnimationFrame} will ever
  * report as having elapsed between two animation frames. This cap exists to
  * prevent unexpected leaps forward in time after long gaps between animation
  * frames (caused by, e.g., the user switching to another tab for a while).
@@ -16,7 +16,7 @@ const MAX_FRAME_DURATION = 100;
  *                receives the duration, in milliseconds, of the frame
  *                that just ended (capped by {@link MAX_FRAME_DURATION})
  */
-const useFrameLoop = (
+const useEveryAnimationFrame = (
   enabled: boolean,
   onFrame: (frameDuration: number) => void,
 ) => {
@@ -43,4 +43,4 @@ const useFrameLoop = (
   }, [enabled]);
 };
 
-export default useFrameLoop;
+export default useEveryAnimationFrame;

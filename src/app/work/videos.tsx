@@ -3,7 +3,7 @@
 import { Pause, Play, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import useFrameLoop from "@/hooks/useFrameLoop";
+import useEveryAnimationFrame from "@/hooks/useEveryAnimationFrame";
 import {
   ControlButton,
   ExpandButton,
@@ -97,7 +97,7 @@ export const ExpandedVideo = ({
   }, [playing]);
 
   // Runs even while the video stands still so that seeking is depicted too
-  useFrameLoop(true, () => {
+  useEveryAnimationFrame(true, () => {
     const video = videoRef.current;
     const scrubber = scrubberRef.current;
 
@@ -262,7 +262,7 @@ export const LoopingVideo = ({ src, label }: LoopingVideoProps) => {
     return () => video.pause();
   }, [playing]);
 
-  useFrameLoop(playing, () => {
+  useEveryAnimationFrame(playing, () => {
     const video = videoRef.current;
 
     // Wait until the video's duration is known

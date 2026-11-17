@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import ExternalLink from "@/components/ExternalLink";
-import useFrameLoop from "@/hooks/useFrameLoop";
+import useEveryAnimationFrame from "@/hooks/useEveryAnimationFrame";
 import { Caption } from "./atoms";
 import {
   ControlButton,
@@ -96,7 +96,7 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
     return () => video.pause();
   }, [demoIndex, playing]);
 
-  useFrameLoop(playing, () => {
+  useEveryAnimationFrame(playing, () => {
     const video = videoRefs.current[demoIndex];
 
     // Wait until the video's duration is known
@@ -265,7 +265,7 @@ export const PhotoCarousel = ({ photos, className }: PhotoCarouselProps) => {
     setPhotoIndex((nextPhotoIndex + photos.length) % photos.length);
   };
 
-  useFrameLoop(playing, (frameDuration) => {
+  useEveryAnimationFrame(playing, (frameDuration) => {
     elapsedDuration.current += frameDuration;
     if (elapsedDuration.current >= PHOTO_DWELL_DURATION) {
       showPhoto(photoIndex + 1);
