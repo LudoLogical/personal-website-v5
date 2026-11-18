@@ -45,7 +45,7 @@ import {
   PageFan,
   ReceiptComparison,
   SplitPicture,
-  StakeholderRings,
+  StakeholderDiagram,
 } from "./illustrations";
 
 export const metadata: Metadata = {
@@ -156,7 +156,7 @@ const VibrantGrants = () => (
               . We took care to ensure that our work would benefit them all by
               routinely seeking input from each one throughout the project.
             </Paragraph>
-            <StakeholderRings className="mx-auto max-w-80" />
+            <StakeholderDiagram className="mx-auto max-w-80" />
 
             <div className="join join-vertical">
               <ResearchMethodAccordionItem

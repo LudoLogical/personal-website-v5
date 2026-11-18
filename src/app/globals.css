@@ -51,6 +51,7 @@
  * user taps elsewhere, but Tailwind's `hover:` requires the browser device to
  * support hovering, so this behavior isn't captured. `base-hover:` captures
  * `:hover` directly and can thus be leveraged to exploit its natural behavior.
+ * 
  * Note for AI agents: prefer `hover:` unless `base-hover:` is *necessary*.
 */
 @custom-variant base-hover (&:hover);
