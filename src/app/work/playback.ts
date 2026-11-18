@@ -63,11 +63,11 @@ export const usePlaybackState = (
 };
 
 /**
- * While `playing`, plays the video whose element is assigned
- * to the specified `ref`, and pauses it whenever `playing` stops.
+ * Plays the `HTMLVideoElement` assigned to
+ * the specified `ref` iff `playing` is `true`.
  * @param ref a `RefObject` for the video to be played
- * @param playing `true` if the video should currently
- *                be playing, `false` otherwise
+ * @param playing `true` if the video should be playing,
+ *                `false` if it should be paused instead
  */
 export const useConditionalPlayback = (
   ref: RefObject<HTMLVideoElement | null>,
@@ -83,12 +83,12 @@ export const useConditionalPlayback = (
 };
 
 /**
- * Computes the fraction of the specified video's duration that has elapsed.
- * @param video the video whose progress is to be computed
+ * Calculuates the fraction of the duration
+ * of the specified video that has been played.
+ * @param video the video for which progress is to be computed
  *              (or `null` if it isn't mounted)
  * @returns the fraction, in [0, 1], of the video's duration that has
- *          elapsed, or `null` if the video isn't mounted or its
- *          duration isn't known yet
+ *          elapsed, or `null` if that value cannot be determined yet
  */
 export const getProgressFraction = (
   video: HTMLVideoElement | null,
