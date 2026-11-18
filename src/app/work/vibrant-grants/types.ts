@@ -22,12 +22,6 @@ export type Service = {
 };
 
 /**
- * The groups of people implicated in the design of Vibrant
- * Grants, in order from the broadest group to the narrowest one.
- */
-export type Stakeholders = [string, string, string, string];
-
-/**
  * A research method with a publicly available explainer.
  */
 export type ResearchActivity = {
@@ -40,32 +34,6 @@ export type ResearchActivity = {
    * A webpage that explains this {@link ResearchActivity}.
    */
   href: string;
-};
-
-/**
- * An itemized bill whose currency is hours of time instead of money.
- */
-export type Receipt = {
-  /**
-   * The name of the tool that issued this {@link Receipt}.
-   */
-  title: string;
-
-  /**
-   * The line items on this {@link Receipt},
-   * in the order in which they are to be displayed.
-   */
-  items: {
-    /**
-     * The task that this line item bills for.
-     */
-    label: string;
-
-    /**
-     * The duration, in hours, of the task that this line item bills for.
-     */
-    hours: number;
-  }[];
 };
 
 /**

@@ -10,13 +10,7 @@ import type {
   TeamMember,
 } from "@/app/work/types";
 import ExternalLink from "@/components/ExternalLink";
-import type {
-  FeatureGroup,
-  Receipt,
-  ResearchActivity,
-  Service,
-  Stakeholders,
-} from "./types";
+import type { FeatureGroup, ResearchActivity, Service } from "./types";
 
 export const TITLE = "Vibrant Grants";
 
@@ -126,15 +120,7 @@ export const SERVICES: Service[] = [
   },
 ];
 
-// General order: outermost -> innermost
-export const STAKEHOLDERS: Stakeholders = [
-  "Community members",
-  "All non-profits",
-  "Client non-profits",
-  "NSR",
-];
-
-export const METHODS = {
+export const RESEARCH_METHODS = {
   systemMapping: {
     name: "Participatory System Mapping",
     purpose: (
@@ -319,14 +305,14 @@ export const OTHER_RESEARCH_ACTIVITIES: ResearchActivity[] = [
   },
 ];
 
-export const FINDINGS = {
+export const INSIGHTS = {
   communityOriented: {
     headline:
       "Non-profit leaders are community-oriented, not business-minded or data-driven.",
     details:
       "They excel at qualitative thinking and delivering impact, but struggle with the admin work that keeps their orgs up and running. In their eyes, that extra work gets in the way of doing good.",
   },
-  grantDiscovery: {
+  grantFinding: {
     headline:
       "Finding relevant grant opportunities can be overwhelming and time-consuming.",
     details:
@@ -369,25 +355,6 @@ export const GRANT_OPPORTUNITY_CAPTION = (
     ).
   </>
 );
-
-// The amount due on each receipt is the sum of its line items
-export const RECEIPTS: Receipt[] = [
-  {
-    title: "Shiny New Tool",
-    items: [
-      { label: "Read comparison articles", hours: 0.75 },
-      { label: "Compare pricing options", hours: 0.25 },
-      { label: "Watch tutorial videos", hours: 1 },
-      { label: "Import and organize data", hours: 1.5 },
-      { label: "Migrate workflows", hours: 2 },
-      { label: "Re-train volunteers", hours: 2 },
-    ],
-  },
-  {
-    title: "Old Reliable",
-    items: [{ label: "Just pull it up", hours: 0 }],
-  },
-];
 
 // Listed in the order in which the stages of the grant lifecycle occur
 export const FEATURE_GROUPS: FeatureGroup[] = [
@@ -519,9 +486,7 @@ export const SECTION_HEADINGS = {
   impact: { id: "impact", label: "Our Impact" },
 } satisfies Record<string, SectionHeading>;
 
-// Quoted from NSR staff and acceptance testing participants;
-// bracketed text marks editorial changes
-export const TESTIMONIALS = [
+export const ACCEPTANCE_TESTING_TESTIMONIALS = [
   "[The interface is] not too much for my brain and not overwhelming.",
   "The plain[-]language [analysis] is great! This is where we see a lot of people struggle.",
   "This is all amazing! Who would've thought grants could be exciting[?]",

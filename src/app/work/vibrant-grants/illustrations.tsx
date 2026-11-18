@@ -2,13 +2,23 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { twMerge } from "tailwind-merge";
 import type { Picture } from "@/app/work/types";
-import type { Receipt, Stakeholders } from "./types";
+
+/**
+ * The groups of people implicated in the design of Vibrant Grants,
+ * in order from the broadest group to the narrowest one.
+ */
+const STAKEHOLDERS = [
+  "Community members",
+  "All non-profits",
+  "Client non-profits",
+  "NSR",
+];
 
 /**
  * The classes that size, position, and color each ring in a
- * {@link StakeholderRings} (and position its label), in order from the
- * outermost ring to the innermost one. Sizes and offsets are percentages
- * of the outermost ring's diameter.
+ * {@link StakeholderRings} (and position its label), in the same order as
+ * {@link STAKEHOLDERS}. Sizes and offsets are percentages of the outermost
+ * ring's diameter.
  */
 const RING_CLASS_NAMES: { ring: string; label: string }[] = [
   { ring: "bottom-0 size-full bg-yellow-200", label: "mt-[9%]" },
@@ -32,13 +42,73 @@ const RING_CLASS_NAMES: { ring: string; label: string }[] = [
  */
 const PAGE_FAN_SPREAD = 60;
 
-export type StakeholderRingsProps = {
-  /**
-   * The {@link Stakeholders} that label the rings in this
-   * {@link StakeholderRings}, from the outermost ring to the innermost one.
-   */
-  stakeholders: Stakeholders;
+/**
+ * The itemized bills, whose currency is hours of time instead of money,
+ * rendered by a {@link ReceiptComparison}, in order from left to right.
+ */
+const RECEIPTS = [
+  {
+    title: "Shiny New Tool",
+    items: [
+      { label: "Read comparison articles", hours: 0.75 },
+      { label: "Compare pricing options", hours: 0.25 },
+      { label: "Watch tutorial videos", hours: 1 },
+      { label: "Import and organize data", hours: 1.5 },
+      { label: "Migrate workflows", hours: 2 },
+      { label: "Re-train volunteers", hours: 2 },
+    ],
+  },
+  {
+    title: "Old Reliable",
+    items: [{ label: "Just pull it up", hours: 0 }],
+  },
+];
 
+/**
+ * Renders an itemized bill with the specified `title` and line `items`
+ * whose amount due is the sum of its line items. Every amount is expressed
+ * in hours, to two decimal places.
+ */
+const ReceiptCard = ({
+  title,
+  items,
+}: {
+  title: string;
+  items: { label: string; hours: number }[];
+}) => {
+  const formatHours = (hours: number) => `${hours.toFixed(2)} hrs`;
+  const hoursDue = items.reduce((sum, { hours }) => sum + hours, 0);
+
+  return (
+    <div className="card w-full max-w-72 border border-base-content/10 bg-base-200 text-sm">
+      <div className="card-body gap-4 p-5">
+        <p className="text-center font-bold tracking-widest uppercase">
+          {title}
+        </p>
+        <hr className="border-dashed border-base-content/20" />
+        <dl className="flex flex-col gap-1.5">
+          {items.map(({ label, hours }) => (
+            <div key={label} className="flex justify-between gap-4">
+              <dt className="text-base-content/75">{label}</dt>
+              <dd className="whitespace-nowrap tabular-nums">
+                {formatHours(hours)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <hr className="border-dashed border-base-content/20" />
+        <dl className="flex justify-between gap-4 font-bold">
+          <dt className="tracking-wide uppercase">Amount due</dt>
+          <dd className="whitespace-nowrap text-primary tabular-nums">
+            {formatHours(hoursDue)}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  );
+};
+
+export type StakeholderRingsProps = {
   /**
    * Classes for the container `<div>` of this {@link StakeholderRings}.
    * Used to set its width (its height always matches its width).
@@ -47,23 +117,20 @@ export type StakeholderRingsProps = {
 };
 
 /**
- * Renders the specified {@link Stakeholders} as labeled circles, each of
- * which sits inside (and near the bottom of) the circle for the next
+ * Renders the {@link STAKEHOLDERS} as labeled circles, each of which
+ * sits inside (and near the bottom of) the circle for the next
  * broadest group.
  *
  * Exposed to ATs as a single image whose label lists the
- * {@link Stakeholders} in order.
+ * {@link STAKEHOLDERS} in order.
  */
-export const StakeholderRings = ({
-  stakeholders,
-  className,
-}: StakeholderRingsProps) => (
+export const StakeholderRings = ({ className }: StakeholderRingsProps) => (
   <div
     role="img"
-    aria-label={`Nested circles depicting groups of stakeholders. From the broadest group to the narrowest one: ${stakeholders.join(", ")}.`}
+    aria-label={`Nested circles depicting groups of stakeholders. From the broadest group to the narrowest one: ${STAKEHOLDERS.join(", ")}.`}
     className={twMerge("relative aspect-square w-full", className)}
   >
-    {stakeholders.map((stakeholder, i) => (
+    {STAKEHOLDERS.map((stakeholder, i) => (
       <div
         key={stakeholder}
         className={twMerge(
@@ -172,49 +239,14 @@ export const PageFan = ({ pages, label }: PageFanProps) => (
   </div>
 );
 
-export type ReceiptCardProps = {
-  /**
-   * The {@link Receipt} to be rendered by this {@link ReceiptCard}.
-   */
-  receipt: Receipt;
-};
-
 /**
- * Renders the specified {@link Receipt} as an itemized bill whose amount
- * due is the sum of its line items. Every amount is expressed in hours,
- * to two decimal places.
+ * Renders the {@link RECEIPTS} as itemized bills side by side,
+ * or stacked vertically on narrow viewports.
  */
-export const ReceiptCard = ({
-  receipt: { title, items },
-}: ReceiptCardProps) => {
-  const formatHours = (hours: number) => `${hours.toFixed(2)} hrs`;
-  const hoursDue = items.reduce((sum, { hours }) => sum + hours, 0);
-
-  return (
-    <div className="card w-full max-w-72 border border-base-content/10 bg-base-200 text-sm">
-      <div className="card-body gap-4 p-5">
-        <p className="text-center font-bold tracking-widest uppercase">
-          {title}
-        </p>
-        <hr className="border-dashed border-base-content/20" />
-        <dl className="flex flex-col gap-1.5">
-          {items.map(({ label, hours }) => (
-            <div key={label} className="flex justify-between gap-4">
-              <dt className="text-base-content/75">{label}</dt>
-              <dd className="whitespace-nowrap tabular-nums">
-                {formatHours(hours)}
-              </dd>
-            </div>
-          ))}
-        </dl>
-        <hr className="border-dashed border-base-content/20" />
-        <dl className="flex justify-between gap-4 font-bold">
-          <dt className="tracking-wide uppercase">Amount due</dt>
-          <dd className="whitespace-nowrap text-primary tabular-nums">
-            {formatHours(hoursDue)}
-          </dd>
-        </dl>
-      </div>
-    </div>
-  );
-};
+export const ReceiptComparison = () => (
+  <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center">
+    {RECEIPTS.map(({ title, items }) => (
+      <ReceiptCard key={title} title={title} items={items} />
+    ))}
+  </div>
+);

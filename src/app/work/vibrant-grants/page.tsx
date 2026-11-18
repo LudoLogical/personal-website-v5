@@ -19,33 +19,31 @@ import {
 import { LoopingVideo } from "@/app/work/videos";
 import ExternalLink from "@/components/ExternalLink";
 import {
+  ACCEPTANCE_TESTING_TESTIMONIALS,
   CLIENT,
   CLIENT_EXECUTIVE_DIRECTOR,
   CLIENT_NON_PROFIT_PHOTOS,
   DEMOS,
   EXECUTIVE_DIRECTOR_TESTIMONIAL,
   FEATURE_GROUPS,
-  FINDINGS,
   GRANT_OPPORTUNITY_CAPTION,
   GRANT_OPPORTUNITY_LABEL,
   GRANT_OPPORTUNITY_PAGES,
-  METHODS,
+  INSIGHTS,
   OTHER_RESEARCH_ACTIVITIES,
   OUTCOME,
   PICTURES,
-  RECEIPTS,
+  RESEARCH_METHODS,
   SECTION_HEADINGS,
   SERVICES,
-  STAKEHOLDERS,
   SUBTITLE,
   TEAM,
-  TESTIMONIALS,
   TIMELINE,
   TITLE,
 } from "./content";
 import {
   PageFan,
-  ReceiptCard,
+  ReceiptComparison,
   SplitPicture,
   StakeholderRings,
 } from "./illustrations";
@@ -158,13 +156,13 @@ const VibrantGrants = () => (
               . We took care to ensure that our work would benefit them all by
               routinely seeking input from each one throughout the project.
             </Paragraph>
-            <StakeholderRings
-              stakeholders={STAKEHOLDERS}
-              className="mx-auto max-w-80"
-            />
+            <StakeholderRings className="mx-auto max-w-80" />
 
             <div className="join join-vertical">
-              <ResearchMethodContainer method={METHODS.systemMapping} open>
+              <ResearchMethodContainer
+                method={RESEARCH_METHODS.systemMapping}
+                open
+              >
                 <div className="grid gap-6 sm:grid-cols-2">
                   <Figure
                     picture={PICTURES.systemMappingFigurines}
@@ -177,7 +175,9 @@ const VibrantGrants = () => (
                 </div>
               </ResearchMethodContainer>
 
-              <ResearchMethodContainer method={METHODS.fieldWorkAndSSIs}>
+              <ResearchMethodContainer
+                method={RESEARCH_METHODS.fieldWorkAndSSIs}
+              >
                 <PhotoCarousel
                   photos={CLIENT_NON_PROFIT_PHOTOS}
                   className="mx-auto w-full max-w-xl"
@@ -185,7 +185,7 @@ const VibrantGrants = () => (
               </ResearchMethodContainer>
 
               <ResearchMethodContainer
-                method={METHODS.cardSortingAndUsabilityTesting}
+                method={RESEARCH_METHODS.cardSortingAndUsabilityTesting}
               >
                 {/* `row-span-2` and `grid-rows-subgrid` so the captions line
                     up with each other even though the image heights differ */}
@@ -226,7 +226,7 @@ const VibrantGrants = () => (
         <Section heading={SECTION_HEADINGS.learnings}>
           <div className="flex flex-col gap-10">
             <article className="flex flex-col gap-8">
-              <InsightHero insight={FINDINGS.communityOriented} />
+              <InsightHero insight={INSIGHTS.communityOriented} />
               <SplitPicture
                 left={PICTURES.communityOriented}
                 right={PICTURES.dataDriven}
@@ -234,7 +234,7 @@ const VibrantGrants = () => (
             </article>
 
             <article className="flex flex-col gap-8">
-              <InsightHero insight={FINDINGS.grantDiscovery} />
+              <InsightHero insight={INSIGHTS.grantFinding} />
               <figure className="flex flex-col gap-4">
                 <PageFan
                   pages={GRANT_OPPORTUNITY_PAGES}
@@ -245,12 +245,8 @@ const VibrantGrants = () => (
             </article>
 
             <article className="flex flex-col gap-8">
-              <InsightHero insight={FINDINGS.riskAversion} />
-              <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center">
-                {RECEIPTS.map((receipt) => (
-                  <ReceiptCard key={receipt.title} receipt={receipt} />
-                ))}
-              </div>
+              <InsightHero insight={INSIGHTS.riskAversion} />
+              <ReceiptComparison />
             </article>
           </div>
         </Section>
@@ -300,7 +296,7 @@ const VibrantGrants = () => (
               </Paragraph>
               {/* Margins (not `gap-y-*`) b/c columns can't space their rows */}
               <ul className="columns-1 gap-4 sm:columns-2">
-                {TESTIMONIALS.map((quote) => (
+                {ACCEPTANCE_TESTING_TESTIMONIALS.map((quote) => (
                   <li key={quote} className="mb-4 break-inside-avoid last:mb-0">
                     <Testimonial quote={quote} />
                   </li>
