@@ -168,3 +168,41 @@ export type Insight = {
    */
   details: ReactNode;
 };
+
+/**
+ * A single capability of a product presented in a case study.
+ */
+export type Feature = {
+  /**
+   * A sentence fragment summarizing this {@link Feature}.
+   */
+  headline: string;
+
+  /**
+   * An explanation of what this {@link Feature} does and why it matters.
+   */
+  description: ReactNode;
+
+  /**
+   * A visual related to this {@link Feature}.
+   */
+  media:
+    | {
+        /**
+         * The type of visual supplied for this {@link Feature}.
+         */
+        kind: "video";
+        /**
+         * A path (in `public/`) to a screen recording
+         * that demonstrates this {@link Feature}.
+         */
+        src: string;
+      }
+    | {
+        kind: "picture"; // inherits doc comment from other `kind`
+        /**
+         * An image that shows or explains this {@link Feature}.
+         */
+        picture: Picture;
+      };
+};

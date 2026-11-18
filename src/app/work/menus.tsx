@@ -89,7 +89,7 @@ const useCurrentSectionID = (ids: string[]): string | null => {
  * @returns the rendered `menu` item
  */
 const renderItem = (
-  { id, label: title }: Heading,
+  { id, label }: Heading,
   currentSectionID: string | null,
   children?: ReactNode,
 ) => (
@@ -99,7 +99,7 @@ const renderItem = (
       href={`#${id}`}
       aria-current={id === currentSectionID ? "location" : undefined}
     >
-      {title}
+      {label}
     </a>
     {children}
   </li>

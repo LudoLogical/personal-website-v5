@@ -39,7 +39,7 @@ export type ExternalLinkProps = Omit<
         children: string;
       }
     | {
-        kind: "highlight" | "button";
+        kind: "highlight" | "button"; // inherits doc comment from other `kind`
         children: ReactNode;
       }
   );

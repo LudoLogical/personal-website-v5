@@ -1,4 +1,5 @@
 import { ChartColumn, HandCoins, Sprout } from "lucide-react";
+import type { FeatureGroupProps } from "@/app/work/sections";
 import type {
   Client,
   Demo,
@@ -10,7 +11,7 @@ import type {
   TeamMember,
 } from "@/app/work/types";
 import ExternalLink from "@/components/ExternalLink";
-import type { FeatureGroup, ResearchActivity, Service } from "./types";
+import type { ResearchActivity, Service } from "./types";
 
 export const TITLE = "Vibrant Grants";
 
@@ -357,13 +358,12 @@ export const GRANT_OPPORTUNITY_CAPTION = (
 );
 
 // Listed in the order in which the stages of the grant lifecycle occur
-export const FEATURE_GROUPS: FeatureGroup[] = [
+export const FEATURE_GROUPS: FeatureGroupProps[] = [
   {
-    id: "find-relevant-grants",
-    label: "Find Relevant Grants",
+    heading: { id: "find-relevant-grants", label: "Find Relevant Grants" },
     features: [
       {
-        title: "Multi-Modal Ingestion",
+        headline: "Multi-Modal Ingestion",
         description: (
           <>
             Despite how unstructured the grant ecosystem often is, Vibrant
@@ -376,7 +376,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         media: { kind: "picture", picture: PICTURES.ingestionMechanism },
       },
       {
-        title: "Holistic Relevance Assessments",
+        headline: "Holistic Relevance Assessments",
         description: (
           <>
             Vibrant Grants <strong>ranks search results by relevance</strong>{" "}
@@ -392,11 +392,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
     ],
   },
   {
-    id: "weave-data-into-applications",
-    label: "Weave Data into Applications",
+    heading: {
+      id: "weave-data-into-applications",
+      label: "Weave Data into Applications",
+    },
     features: [
       {
-        title: "Leverage Existing Sources",
+        headline: "Leverage Existing Sources",
         description: (
           <>
             Vibrant Grants <strong>intelligently surfaces relevant data</strong>{" "}
@@ -410,7 +412,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         },
       },
       {
-        title: "Generate Step-by-Step Guidance",
+        headline: "Generate Step-by-Step Guidance",
         description: (
           <>
             Vibrant Grants leverages AI to{" "}
@@ -428,7 +430,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         },
       },
       {
-        title: "Leave the Writing to the Experts",
+        headline: "Leave the Writing to the Experts",
         description: (
           <>
             People who are as community-driven as non-profit leaders are
@@ -446,11 +448,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
     ],
   },
   {
-    id: "prove-impact-in-reports",
-    label: "Prove Impact in Reports",
+    heading: {
+      id: "prove-impact-in-reports",
+      label: "Prove Impact in Reports",
+    },
     features: [
       {
-        title: "Conversational Data Gathering",
+        headline: "Conversational Data Gathering",
         description: (
           <>
             As qualitative thinkers, non-profit leaders may not always recognize
@@ -481,7 +485,7 @@ export const SECTION_HEADINGS = {
   solution: {
     id: "solution",
     label: "Our Solution",
-    subheadings: FEATURE_GROUPS.map(({ id, label }) => ({ id, label })),
+    subheadings: FEATURE_GROUPS.map(({ heading }) => heading),
   },
   impact: { id: "impact", label: "Our Impact" },
 } satisfies Record<string, SectionHeading>;

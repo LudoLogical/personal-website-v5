@@ -11,12 +11,11 @@ import { PhotoCarousel, VideoCarousel } from "@/app/work/carousels";
 import { TableOfContents } from "@/app/work/menus";
 import {
   CaseStudySummary,
+  FeatureGroup,
   InsightHero,
   ResearchMethodContainer,
   Section,
-  Subsection,
 } from "@/app/work/sections";
-import { LoopingVideo } from "@/app/work/videos";
 import ExternalLink from "@/components/ExternalLink";
 import {
   ACCEPTANCE_TESTING_TESTIMONIALS,
@@ -260,28 +259,12 @@ const VibrantGrants = () => (
             </Paragraph>
 
             <div className="flex flex-col gap-12">
-              {FEATURE_GROUPS.map(({ id, label: title, features }) => (
-                <Subsection key={id} heading={{ id, label: title }}>
-                  {features.map(({ title, description, media }) => (
-                    <article key={title} className="flex flex-col gap-4">
-                      <div className="flex flex-col gap-3">
-                        <h4 className="text-lg leading-snug font-semibold">
-                          {title}
-                        </h4>
-                        <Paragraph>{description}</Paragraph>
-                      </div>
-                      {media.kind === "video" ? (
-                        <LoopingVideo src={media.src} label={title} />
-                      ) : (
-                        <Figure
-                          picture={media.picture}
-                          sizes="(min-width: 400px) 320px, 100vw"
-                          className="mx-auto max-w-xs"
-                        />
-                      )}
-                    </article>
-                  ))}
-                </Subsection>
+              {FEATURE_GROUPS.map(({ heading, features }) => (
+                <FeatureGroup
+                  key={heading.id}
+                  heading={heading}
+                  features={features}
+                />
               ))}
             </div>
           </div>

@@ -36,78 +36,6 @@ const RING_CLASS_NAMES: { ring: string; label: string }[] = [
   },
 ];
 
-/**
- * The angle, in degrees, between the first
- * and last pages in a {@link PageFan}.
- */
-const PAGE_FAN_SPREAD = 60;
-
-/**
- * The itemized bills, whose currency is hours of time instead of money,
- * rendered by a {@link ReceiptComparison}, in order from left to right.
- */
-const RECEIPTS = [
-  {
-    title: "Shiny New Tool",
-    items: [
-      { label: "Read comparison articles", hours: 0.75 },
-      { label: "Compare pricing options", hours: 0.25 },
-      { label: "Watch tutorial videos", hours: 1 },
-      { label: "Import and organize data", hours: 1.5 },
-      { label: "Migrate workflows", hours: 2 },
-      { label: "Re-train volunteers", hours: 2 },
-    ],
-  },
-  {
-    title: "Old Reliable",
-    items: [{ label: "Just pull it up", hours: 0 }],
-  },
-];
-
-/**
- * Renders an itemized bill with the specified `title` and line `items`
- * whose amount due is the sum of its line items. Every amount is expressed
- * in hours, to two decimal places.
- */
-const ReceiptCard = ({
-  title,
-  items,
-}: {
-  title: string;
-  items: { label: string; hours: number }[];
-}) => {
-  const formatHours = (hours: number) => `${hours.toFixed(2)} hrs`;
-  const hoursDue = items.reduce((sum, { hours }) => sum + hours, 0);
-
-  return (
-    <div className="card w-full max-w-72 border border-base-content/10 bg-base-200 text-sm">
-      <div className="card-body gap-4 p-5">
-        <p className="text-center font-bold tracking-widest uppercase">
-          {title}
-        </p>
-        <hr className="border-dashed border-base-content/20" />
-        <dl className="flex flex-col gap-1.5">
-          {items.map(({ label, hours }) => (
-            <div key={label} className="flex justify-between gap-4">
-              <dt className="text-base-content/75">{label}</dt>
-              <dd className="whitespace-nowrap tabular-nums">
-                {formatHours(hours)}
-              </dd>
-            </div>
-          ))}
-        </dl>
-        <hr className="border-dashed border-base-content/20" />
-        <dl className="flex justify-between gap-4 font-bold">
-          <dt className="tracking-wide uppercase">Amount due</dt>
-          <dd className="whitespace-nowrap text-primary tabular-nums">
-            {formatHours(hoursDue)}
-          </dd>
-        </dl>
-      </div>
-    </div>
-  );
-};
-
 export type StakeholderRingsProps = {
   /**
    * Classes for the container `<div>` of this {@link StakeholderRings}.
@@ -192,6 +120,12 @@ export const SplitPicture = ({ left, right }: SplitPictureProps) => (
   </div>
 );
 
+/**
+ * The angle, in degrees, between the first
+ * and last pages in a {@link PageFan}.
+ */
+const PAGE_FAN_SPREAD = 60;
+
 export type PageFanProps = {
   /**
    * The paths (in `public/`) to images of the pages of a US Letter
@@ -240,13 +174,79 @@ export const PageFan = ({ pages, label }: PageFanProps) => (
 );
 
 /**
+ * The itemized bills, whose currency is hours of time instead of money,
+ * rendered by a {@link ReceiptComparison}, in order from left to right.
+ */
+const RECEIPTS = [
+  {
+    headline: "Shiny New Tool",
+    items: [
+      { label: "Read comparison articles", hours: 0.75 },
+      { label: "Compare pricing options", hours: 0.25 },
+      { label: "Watch tutorial videos", hours: 1 },
+      { label: "Import and organize data", hours: 1.5 },
+      { label: "Migrate workflows", hours: 2 },
+      { label: "Re-train volunteers", hours: 2 },
+    ],
+  },
+  {
+    headline: "Old Reliable",
+    items: [{ label: "Just pull it up", hours: 0 }],
+  },
+];
+
+/**
+ * Renders an itemized bill with the specified `headline` and line `items`
+ * whose amount due is the sum of its line items. Every amount is expressed
+ * in hours, to two decimal places.
+ */
+const ReceiptCard = ({
+  headline,
+  items,
+}: {
+  headline: string;
+  items: { label: string; hours: number }[];
+}) => {
+  const formatHours = (hours: number) => `${hours.toFixed(2)} hrs`;
+  const hoursDue = items.reduce((sum, { hours }) => sum + hours, 0);
+
+  return (
+    <div className="card w-full max-w-72 border border-base-content/10 bg-base-200 text-sm">
+      <div className="card-body gap-4 p-5">
+        <p className="text-center font-bold tracking-widest uppercase">
+          {headline}
+        </p>
+        <hr className="border-dashed border-base-content/20" />
+        <dl className="flex flex-col gap-1.5">
+          {items.map(({ label, hours }) => (
+            <div key={label} className="flex justify-between gap-4">
+              <dt className="text-base-content/75">{label}</dt>
+              <dd className="whitespace-nowrap tabular-nums">
+                {formatHours(hours)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <hr className="border-dashed border-base-content/20" />
+        <dl className="flex justify-between gap-4 font-bold">
+          <dt className="tracking-wide uppercase">Amount due</dt>
+          <dd className="whitespace-nowrap text-primary tabular-nums">
+            {formatHours(hoursDue)}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  );
+};
+
+/**
  * Renders the {@link RECEIPTS} as itemized bills side by side,
  * or stacked vertically on narrow viewports.
  */
 export const ReceiptComparison = () => (
   <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-center">
-    {RECEIPTS.map(({ title, items }) => (
-      <ReceiptCard key={title} title={title} items={items} />
+    {RECEIPTS.map(({ headline, items }) => (
+      <ReceiptCard key={headline} headline={headline} items={items} />
     ))}
   </div>
 );

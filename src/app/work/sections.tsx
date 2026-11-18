@@ -3,15 +3,17 @@ import type { ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import ExternalLink from "@/components/ExternalLink";
 import Logo from "@/components/Logo";
-import { ClientLogo, Paragraph } from "./atoms";
+import { ClientLogo, Figure, Paragraph } from "./atoms";
 import type {
   Client,
+  Feature,
   Heading,
   Insight,
   ResearchMethod,
   SectionHeading,
   TeamMember,
 } from "./types";
+import { LoopingVideo } from "./videos";
 
 /**
  * Renders a single, labeled item in a {@link CaseStudySummary}.
@@ -303,4 +305,63 @@ export const InsightHero = ({
     </h3>
     <Paragraph>{details}</Paragraph>
   </div>
+);
+
+export type FeatureShowcaseProps = {
+  /**
+   * The {@link Feature} to be rendered in this {@link FeatureShowcase}.
+   */
+  feature: Feature;
+};
+
+/**
+ * Renders the specified {@link Feature}.
+ *
+ * Note: This component renders the {@link Feature.headline} as an
+ * `<h4>` and as such should be placed within a {@link Subsection}.
+ */
+export const FeatureShowcase = ({
+  feature: { headline, description, media },
+}: FeatureShowcaseProps) => (
+  <article className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
+      <h4 className="text-lg leading-snug font-semibold">{headline}</h4>
+      <Paragraph>{description}</Paragraph>
+    </div>
+    {media.kind === "video" ? (
+      <LoopingVideo src={media.src} label={headline} />
+    ) : (
+      <Figure
+        picture={media.picture}
+        sizes="(min-width: 400px) 320px, 100vw"
+        className="mx-auto max-w-xs"
+      />
+    )}
+  </article>
+);
+
+export type FeatureGroupProps = {
+  /**
+   * The {@link Heading} that labels this {@link FeatureGroup}.
+   */
+  heading: Heading;
+
+  /**
+   * The {@link Feature}s in this {@link FeatureGroup},
+   * in the order in which they are to be displayed.
+   */
+  features: Feature[];
+};
+
+/**
+ * Renders the specified set of related {@link Feature}s as
+ * {@link FeatureShowcase}s in a {@link Subsection} labeled
+ * by the specified {@link Heading}.
+ */
+export const FeatureGroup = ({ heading, features }: FeatureGroupProps) => (
+  <Subsection heading={heading}>
+    {features.map((feature) => (
+      <FeatureShowcase key={feature.headline} feature={feature} />
+    ))}
+  </Subsection>
 );
