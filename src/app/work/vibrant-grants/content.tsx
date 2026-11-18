@@ -12,7 +12,6 @@ import type {
   TeamMember,
 } from "@/app/work/types";
 import ExternalLink from "@/components/ExternalLink";
-import type { Service } from "./types";
 
 export const TITLE = "Vibrant Grants";
 
@@ -103,7 +102,7 @@ export const TEAM: TeamMember[] = [
   },
 ];
 
-export const SERVICES: Service[] = [
+export const SERVICES = [
   {
     name: "Capacity Building",
     description: "Getting from an idea to a fully developed organization",
