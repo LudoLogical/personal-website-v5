@@ -26,25 +26,20 @@ import { ExpandedVideo, WINDOW_CLASS_NAMES } from "./videos";
  * The duration, in milliseconds, for which a {@link PhotoCarousel}
  * shows each of its photos before moving on to the next one.
  */
-const PHOTO_DWELL_DURATION = 5000;
+const PHOTO_PLAYBACK_DURATION = 5000;
 
 /**
- * Renders the bar along the bottom of the window frame of a
- * {@link VideoCarousel}, which holds the specified `caption` and `segments`.
- * On wide viewports, the `caption` sits to the left of the `segments`.
- * Otherwise, it sits beneath them, and the gaps that separate the top of the
- * bar, the tracks of the `segments`, the text of the `caption`, and the
- * bottom of the bar are all equal.
+ * Renders the specified `caption` and `segments` in a bar at the bottom
+ * of a {@link VideoCarousel}. On wide viewports, the `caption` sits to
+ * the left of the `segments`; on narrow ones, it sits beneath them.
  */
-const Taskbar = ({
+const StatusBar = ({
   caption,
   segments,
 }: {
   caption: ReactNode;
   segments: ReactNode;
 }) => (
-  // Each gap is 1rem, i.e., this padding (or `gap-1`) plus the
-  // padding that makes the segments' buttons taller than their tracks
   <div className="flex flex-col-reverse gap-1 px-4 pt-1 pb-4 lg:flex-row lg:items-center lg:gap-8 lg:py-2.5 lg:ps-5">
     <div className="grid flex-1 text-center text-sm font-semibold text-balance lg:text-start">
       {caption}
@@ -62,68 +57,71 @@ export type VideoCarouselProps = {
 };
 
 /**
- * Renders the specified {@link Demo}s as a carousel that shows one video at
- * a time in a window frame. A bar along the bottom of the frame holds the
- * caption of the current video and a row of segments (one per video).
+ * Renders the specified {@link Demo}s in a carousel that shows one video at
+ * a time in a `mockup-window`. The caption of the current video and a row of
+ * line segments each represent and track the progress of one of the videos
+ * are also displayed at the bottom of the `mockup-window`.
  *
- * Each video plays automatically (and silently) from its beginning while it
- * is in view, and the carousel moves on to the next video (or back to the
- * first one) when the current one ends. Selecting a segment switches to its
- * video, and clicking on the current video pauses or resumes it. A paused
- * video never ends, so the carousel only moves on from one if the user
- * selects a segment (which also resumes playback). The current video's
- * segment fills to depict how much of that video has played.
+ * The current video plays automatically whenever it is in view and can be
+ * paused or resumed by clicking on it. The carousel moves on to the next video
+ * (or back to the first one) when the current one ends. Clicking (or tapping)
+ * on a line segment makes the corresponding video the current one (and resumes
+ * playback if it was paused). The line segment corresponding to the current
+ * video fills to show how much of that video has played. Playback is paused
+ * by default if the user `prefers-reduced-motion`.
  *
- * A button in the top right corner of the current video opens an
- * {@link ExpandedVideo} that picks up where said video left off.
- * The carousel stands still until said dialog is closed.
- *
- * Paused by default if the user `prefers-reduced-motion`.
+ * Hovering over the current video reveals a button in its top-right corner
+ * that, when clicked, opens an {@link ExpandedVideo} version of the current
+ * video that pauses its progenitor until it is closed and immeditely begins
+ * playback where the original left off.
  */
 export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  // The time, in seconds, that the current video had reached when
-  // it was expanded (`null` unless it is currently expanded)
-  const [expansionTime, setExpansionTime] = useState<number | null>(null);
+  // `null` iff the `ExpandedVideo` is not visible
+  const [timeWhenExpanded, setTimeWhenExpanded] = useState<number | null>(null);
   const { paused, playing, setPaused } = usePlaybackState(
     rootRef,
-    expansionTime !== null,
+    timeWhenExpanded !== null,
   );
-  const [demoIndex, setDemoIndex] = useState(0);
+  const [currentDemoIndex, setCurrentDemoIndex] = useState(0);
 
   useEffect(() => {
-    const video = videoRefs.current[demoIndex];
+    const video = videoRefs.current[currentDemoIndex];
     if (!video || !playing) return;
 
     play(video);
     return () => video.pause();
-  }, [demoIndex, playing]);
+  }, [currentDemoIndex, playing]);
 
   useEveryAnimationFrame(playing, () => {
-    const progressFraction = getProgressFraction(videoRefs.current[demoIndex]);
+    const progressFraction = getProgressFraction(
+      videoRefs.current[currentDemoIndex],
+    );
     if (progressFraction === null) return; // wait until the video has loaded
     showProgress(rootRef.current, progressFraction);
   });
 
   const showDemo = (nextDemoIndex: number) => {
-    // Rewound here (not in an effect) so that every appearance of a video
-    // starts from its beginning, even if it is already the current one
+    // The rewind happens here (and not in the effect) so that
+    // it applies even when `nextDemoIndex === currentDemoIndex`
     const video = videoRefs.current[nextDemoIndex];
     if (video) video.currentTime = 0;
-
     showProgress(rootRef.current, 0);
-    setDemoIndex(nextDemoIndex);
+    setCurrentDemoIndex(nextDemoIndex);
   };
 
-  const { src: currentSrc, caption: currentCaption } = demos[demoIndex];
+  const { src: currentSrc, caption: currentCaption } = demos[currentDemoIndex];
 
   return (
-    // The window shrinks to fit the current caption, so it's stacked atop an
-    // invisible copy that fits the longest one, which reserves enough room
-    // for any caption and thus keeps the page below from shifting
+    // The `StatusBar` (and, by extension, the entire `mockup-window`) shrinks
+    // to fit the height of the `currentCaption`, which would ordinarily affect
+    // the height of the entire page. To prevent this from happening, the real
+    // `mockup-window` is stacked on top of an invisible copy that always fits
+    // the longest caption in `demos`.
     <div className="grid">
+      {/* Real `mockup-window` (see earlier comment) */}
       <div
         ref={rootRef}
         className={twMerge(WINDOW_CLASS_NAMES, "self-start [grid-area:1/1]")}
@@ -148,13 +146,14 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
                 disableRemotePlayback
                 // Only the current video and its successor are fetched eagerly
                 preload={
-                  i === demoIndex || i === (demoIndex + 1) % demos.length
+                  i === currentDemoIndex ||
+                  i === (currentDemoIndex + 1) % demos.length
                     ? "auto"
                     : "none"
                 }
                 className={twMerge(
                   "absolute inset-0 size-full transition-opacity duration-300 motion-reduce:transition-none",
-                  i !== demoIndex && "opacity-0",
+                  i !== currentDemoIndex && "opacity-0",
                 )}
                 onEnded={() => showDemo((i + 1) % demos.length)}
               />
@@ -165,11 +164,13 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
             label={`Expand video: ${currentCaption}`}
             paused={paused}
             onClick={() =>
-              setExpansionTime(videoRefs.current[demoIndex]?.currentTime ?? 0)
+              setTimeWhenExpanded(
+                videoRefs.current[currentDemoIndex]?.currentTime ?? 0,
+              )
             }
           />
         </div>
-        <Taskbar
+        <StatusBar
           caption={
             // Keyed by video so that each new caption fades in
             <p
@@ -185,7 +186,7 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
                 ({ caption }, i) =>
                   `Video ${i + 1} of ${demos.length}: ${caption}`,
               )}
-              currentIndex={demoIndex}
+              currentIndex={currentDemoIndex}
               className="lg:w-60"
               onSelect={(nextDemoIndex) => {
                 showDemo(nextDemoIndex);
@@ -195,31 +196,33 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
           }
         />
 
-        {expansionTime !== null && (
+        {timeWhenExpanded !== null && (
           <ExpandedVideo
             src={currentSrc}
             label={currentCaption}
-            initialTime={expansionTime}
+            initialTime={timeWhenExpanded}
             initiallyPaused={paused}
-            onClose={() => setExpansionTime(null)}
+            onClose={() => setTimeWhenExpanded(null)}
           />
         )}
       </div>
 
+      {/* Dummy `mockup-window` (see earlier comment) */}
       <div
         aria-hidden
         className={twMerge(WINDOW_CLASS_NAMES, "invisible [grid-area:1/1]")}
       >
         <div className="aspect-16/10" />
-        <Taskbar
+        <StatusBar
           caption={demos.map(({ src, caption }) => (
+            // `[grid-area:1/1]` makes the container
+            // `<div>` as tall as the longest caption
             <p key={src} className="[grid-area:1/1] text-box-trim">
               {caption}
             </p>
           ))}
-          // As tall as the `ProgressTracks`, whose
-          // buttons are 1.5rem taller than their tracks
-          segments={<div className="h-7 lg:w-60" />}
+          // `h-7` matches the height of a real `ProgressTracks`
+          segments={<div className="h-7" />}
         />
       </div>
     </div>
@@ -240,16 +243,17 @@ export type PhotoCarouselProps = {
 };
 
 /**
- * Renders the specified {@link LinkCaptionedPicture}s as a carousel that
+ * Renders the specified {@link LinkCaptionedPicture}s in a carousel that
  * shows one photo at a time above its caption and a row of controls.
  *
  * While it is in view, the carousel shows each photo for the same fixed
  * duration before moving on to the next one (or back to the first one).
  * The controls let the user switch photos at will and pause or resume the
- * carousel, and the bar that corresponds to the current photo depicts the
- * fraction of said duration that has elapsed.
+ * carousel. They include a row of line segments that each represent one of
+ * the photos; the one that corresponds to the current photo fills to show
+ * how much of the fixed display duration has elapsed.
  *
- * Paused by default if the user `prefers-reduced-motion`.
+ * The carousel is paused by default if the user `prefers-reduced-motion`.
  */
 export const PhotoCarousel = ({ photos, className }: PhotoCarouselProps) => {
   const rootRef = useRef<HTMLElement>(null);
@@ -263,20 +267,20 @@ export const PhotoCarousel = ({ photos, className }: PhotoCarouselProps) => {
   const showPhoto = (nextPhotoIndex: number) => {
     elapsedDuration.current = 0;
     showProgress(rootRef.current, 0);
-    // Wraps around in both directions
+    // Adding `photos.length` accounts for the case where `nextPhotoIndex` is -1
     setPhotoIndex((nextPhotoIndex + photos.length) % photos.length);
   };
 
   useEveryAnimationFrame(playing, (frameDuration) => {
     elapsedDuration.current += frameDuration;
-    if (elapsedDuration.current >= PHOTO_DWELL_DURATION) {
+    if (elapsedDuration.current >= PHOTO_PLAYBACK_DURATION) {
       showPhoto(photoIndex + 1);
       return;
     }
 
     showProgress(
       rootRef.current,
-      elapsedDuration.current / PHOTO_DWELL_DURATION,
+      elapsedDuration.current / PHOTO_PLAYBACK_DURATION,
     );
   });
 

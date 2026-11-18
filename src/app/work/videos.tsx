@@ -228,11 +228,12 @@ export type LoopingVideoProps = {
 };
 
 /**
- * Renders the specified video in a `mockup-window`. The video plays
- * automatically whenever it is in view and can be paused or resumed
- * by clicking on it. Playback loops when the video ends.
- * A bar beneath the video shows how much of it has played.
- * The video is paused by default if the user `prefers-reduced-motion`.
+ * Renders the specified video in a `mockup-window`.
+ *
+ * The video plays automatically whenever it is in view and can be paused or
+ * resumed by clicking on it. Playback loops when the video ends. A bar beneath
+ * the video shows how much of it has played. The video is paused by default if
+ * the user `prefers-reduced-motion`.
  *
  * Hovering over the video reveals a button in its top-right corner that,
  * when clicked, opens an {@link ExpandedVideo} version of the video that
