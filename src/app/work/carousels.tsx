@@ -171,15 +171,7 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
           />
         </div>
         <StatusBar
-          caption={
-            // Keyed by video so that each new caption fades in
-            <p
-              key={currentSrc}
-              className="transition-opacity duration-300 text-box-trim motion-reduce:transition-none starting:opacity-0"
-            >
-              {currentCaption}
-            </p>
-          }
+          caption={<p className="text-box-trim">{currentCaption}</p>}
           segments={
             <ProgressTracks
               labels={demos.map(
