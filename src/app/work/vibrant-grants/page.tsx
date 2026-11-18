@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * The `sizes` attribute of every {@link Figure} that fills
+ * The `sizes` prop/attribute of every {@link Figure} that fills
  * one of two equally wide columns (except on narrow viewports).
  */
 const HALF_WIDTH_SIZES =
@@ -88,8 +88,6 @@ const VibrantGrants = () => (
     </header>
 
     <div className="border-t border-base-content/10 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-x-10">
-      {/* Stretched to the full height of the sections beside it, within
-          which the table of contents can thus stick to the viewport */}
       <div className="hidden pt-12 lg:block">
         <TableOfContents
           headings={Object.values(SECTION_HEADINGS)}
@@ -189,9 +187,10 @@ const VibrantGrants = () => (
                   FEATURED_RESEARCH_METHODS.cardSortingAndUsabilityTesting
                 }
               >
-                {/* `row-span-2` and `grid-rows-subgrid` so the captions line
-                    up with each other even though the image heights differ */}
                 <div className="grid gap-6 sm:grid-cols-2">
+                  {/* `row-span-2` and `grid-rows-subgrid` so that the
+                      captions line up with each other even though the
+                      image heights differ */}
                   <Figure
                     picture={PICTURES.dendrogram}
                     sizes={HALF_WIDTH_SIZES}
@@ -280,9 +279,10 @@ const VibrantGrants = () => (
                 NSR and its clients <strong>overwhelmingly endorsed</strong>{" "}
                 Vibrant Grants as useful, usable, and a powerful time saver.
               </Paragraph>
-              {/* Margins (not `gap-y-*`) b/c columns can't space their rows */}
               <ul className="columns-1 gap-4 sm:columns-2">
                 {ACCEPTANCE_TESTING_TESTIMONIALS.map((quote) => (
+                  // `mb-* last:mb-0` instead of `gap-y-*` on the
+                  // parent `<ul>` b/c `columns` can't space their rows
                   <li key={quote} className="mb-4 break-inside-avoid last:mb-0">
                     <Testimonial quote={quote} />
                   </li>
