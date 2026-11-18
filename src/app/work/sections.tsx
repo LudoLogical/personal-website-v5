@@ -339,29 +339,3 @@ export const FeatureShowcase = ({
     )}
   </article>
 );
-
-export type FeatureGroupProps = {
-  /**
-   * The {@link Heading} that labels this {@link FeatureGroup}.
-   */
-  heading: Heading;
-
-  /**
-   * The {@link Feature}s in this {@link FeatureGroup},
-   * in the order in which they are to be displayed.
-   */
-  features: Feature[];
-};
-
-/**
- * Renders the specified set of related {@link Feature}s as
- * {@link FeatureShowcase}s in a {@link Subsection} labeled
- * by the specified {@link Heading}.
- */
-export const FeatureGroup = ({ heading, features }: FeatureGroupProps) => (
-  <Subsection heading={heading}>
-    {features.map((feature) => (
-      <FeatureShowcase key={feature.headline} feature={feature} />
-    ))}
-  </Subsection>
-);

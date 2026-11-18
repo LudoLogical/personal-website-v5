@@ -1,8 +1,8 @@
 import { ChartColumn, HandCoins, Sprout } from "lucide-react";
-import type { FeatureGroupProps } from "@/app/work/sections";
 import type {
   Client,
   Demo,
+  FeatureGroup,
   Insight,
   LinkCaptionedPicture,
   Picture,
@@ -358,7 +358,7 @@ export const GRANT_OPPORTUNITY_CAPTION = (
 );
 
 // Listed in the order in which the stages of the grant lifecycle occur
-export const FEATURE_GROUPS: FeatureGroupProps[] = [
+export const FEATURE_GROUPS: FeatureGroup[] = [
   {
     heading: { id: "find-relevant-grants", label: "Find Relevant Grants" },
     features: [
@@ -481,7 +481,7 @@ export const SECTION_HEADINGS = {
   client: { id: "client", label: "The Client" },
   opportunity: { id: "opportunity", label: "The Opportunity" },
   strategy: { id: "strategy", label: "Our Strategy" },
-  learnings: { id: "learnings", label: "What We Learned" },
+  insights: { id: "insights", label: "What We Learned" },
   solution: {
     id: "solution",
     label: "Our Solution",

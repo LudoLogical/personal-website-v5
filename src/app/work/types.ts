@@ -206,3 +206,19 @@ export type Feature = {
         picture: Picture;
       };
 };
+
+/**
+ * A collection of related {@link Feature}s.
+ */
+export type FeatureGroup = {
+  /**
+   * The {@link Heading} that labels this {@link FeatureGroup}.
+   */
+  heading: Heading;
+
+  /**
+   * The {@link Feature}s in this {@link FeatureGroup},
+   * in the order in which they are to be displayed.
+   */
+  features: Feature[];
+};

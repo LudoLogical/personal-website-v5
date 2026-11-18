@@ -11,10 +11,11 @@ import { PhotoCarousel, VideoCarousel } from "@/app/work/carousels";
 import { TableOfContents } from "@/app/work/menus";
 import {
   CaseStudySummary,
-  FeatureGroup,
+  FeatureShowcase,
   InsightHero,
   ResearchMethodContainer,
   Section,
+  Subsection,
 } from "@/app/work/sections";
 import ExternalLink from "@/components/ExternalLink";
 import {
@@ -222,7 +223,7 @@ const VibrantGrants = () => (
           </div>
         </Section>
 
-        <Section heading={SECTION_HEADINGS.learnings}>
+        <Section heading={SECTION_HEADINGS.insights}>
           <div className="flex flex-col gap-10">
             <article className="flex flex-col gap-8">
               <InsightHero insight={INSIGHTS.communityOriented} />
@@ -260,11 +261,11 @@ const VibrantGrants = () => (
 
             <div className="flex flex-col gap-12">
               {FEATURE_GROUPS.map(({ heading, features }) => (
-                <FeatureGroup
-                  key={heading.id}
-                  heading={heading}
-                  features={features}
-                />
+                <Subsection key={heading.id} heading={heading}>
+                  {features.map((feature) => (
+                    <FeatureShowcase key={feature.headline} feature={feature} />
+                  ))}
+                </Subsection>
               ))}
             </div>
           </div>
