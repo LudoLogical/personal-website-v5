@@ -25,20 +25,18 @@ export const WINDOW_CLASS_NAMES =
 
 export type ExpandedVideoProps = {
   /**
-   * The path (in `public/`) to the video
-   * file played by this {@link ExpandedVideo}.
+   * The path (in `public/`) to the video file for this {@link ExpandedVideo}.
    */
   src: string;
 
   /**
-   * A short name for the video in this
-   * {@link ExpandedVideo}. Only exposed to ATs.
+   * A short description of this {@link ExpandedVideo}. Only exposed to ATs.
    */
   label: string;
 
   /**
-   * The time, in seconds, from which the video
-   * in this {@link ExpandedVideo} starts.
+   * The time, in seconds, from which the video in
+   * this {@link ExpandedVideo} should begin playback.
    */
   initialTime: number;
 
@@ -49,22 +47,22 @@ export type ExpandedVideoProps = {
   initiallyPaused: boolean;
 
   /**
-   * The callback to be invoked once this {@link ExpandedVideo} has closed.
+   * The callback to be invoked when this {@link ExpandedVideo} is closed.
    */
   onClose: () => void;
 };
 
 /**
- * Renders the specified video in a modal dialog whose window frame fills most
- * of the viewport and beneath which the rest of the page appears darkened.
- * The video starts (silently) from the specified `initialTime`, restarts from
- * the beginning each time it ends, and can be paused or resumed by clicking
- * on it or on the button below it. A scrubber beside said button depicts how
- * much of the video has played and lets the user seek through it, during
- * which the video stands still.
+ * Renders the specified video in a modal dialog that fills most of the width
+ * of the viewport and darkens everything beneath it. Playback begins from the
+ * specified `initialTime`, loops when the video ends, and can be paused or
+ * resumed by clicking on either the video itself or a dedicated button.
+ * The modal dialog also features a scrubber that both depicts the progress
+ * of the playback and lets the user seek through the video.
  *
- * The dialog closes, invoking `onClose`, when the user selects its close
- * button, presses Escape, or clicks or taps anywhere outside of its frame.
+ * The dialog closes (and invokes the specified `onClose` callback) when
+ * the user clicks (or taps) on its "X" button, presses Escape, or clicks
+ * (or taps) anywhere outside of its frame.
  */
 export const ExpandedVideo = ({
   src,
@@ -88,13 +86,13 @@ export const ExpandedVideo = ({
 
     video.currentTime = initialTime;
 
-    // Already open when Strict Mode runs this effect a second time
+    // Guarded b/c this effect gets run twice when in strict mode
     if (!dialog.open) dialog.showModal();
   }, [initialTime]);
 
   useConditionalPlayback(videoRef, playing);
 
-  // Runs even while the video stands still so that seeking is depicted too
+  // Runs even while `!playing` to support visual feedback when seeking
   useEveryAnimationFrame(true, () => {
     const progressFraction = getProgressFraction(videoRef.current);
 
@@ -122,17 +120,21 @@ export const ExpandedVideo = ({
       className="modal motion-reduce:transition-none"
       onClose={onClose}
     >
-      {/* As wide as the dialog's margins (whose combined size per axis grows
-          w/ the viewport's shorter side) allow, unless that would make it
-          too tall to fit between them: the video is 1.6 times as wide as
-          it is tall, and the rest of the frame adds 6.125rem to its height */}
+      {/* The `mockup-window` is as wide as the `--expanded-video-margins`
+          (which are sized based on the viewport's smaller dimension) allow,
+          capped to prevent the sum of its height and those margins from
+          exceeding the height of the viewport */}
+      {/* Math: the videos are 1920/1200 = 1.6 times as wide as they are tall,
+          and the rest of the frame adds 3rem (title bar) + 3rem (control bar)
+          + 0.125rem (border) = 6.125rem to its height */}
       <div
         className={twMerge(
           WINDOW_CLASS_NAMES,
           "w-[min(100%-var(--expanded-video-margins),(100dvh-var(--expanded-video-margins)-6.125rem)*1.6)] [--expanded-video-margins:clamp(1rem,5vmin,4rem)] [grid-area:1/1]",
         )}
       >
-        {/* Centered vertically in the title bar of the window frame */}
+        {/* Positioned such that it appears vertically
+            centered in the title bar of the `mockup-window` */}
         <button
           type="button"
           aria-label="Close expanded video"
@@ -142,8 +144,9 @@ export const ExpandedVideo = ({
           <X aria-hidden className="size-4" />
         </button>
 
-        {/* Not a `<button>` (unlike in the other players)
-            b/c the controls below already hold one for ATs */}
+        {/* Not wrapped in a `<button>` like the other players are
+            b/c the `ControlButton` below already makes the playback
+            toggle functionality accessible */}
         <video
           ref={videoRef}
           src={src}
@@ -157,7 +160,6 @@ export const ExpandedVideo = ({
           onClick={() => setPaused(!paused)}
         />
 
-        {/* Controls */}
         <div className="flex items-center gap-4 py-2 pr-4 pl-4">
           <ControlButton
             label={paused ? "Play video" : "Pause video"}
@@ -166,7 +168,6 @@ export const ExpandedVideo = ({
             <PlaybackIcon aria-hidden className="size-3.5 fill-current" />
           </ControlButton>
 
-          {/* Scrubber */}
           <div className="group/scrubber relative flex h-8 flex-1 items-center">
             <ProgressTrack
               active
@@ -176,20 +177,25 @@ export const ExpandedVideo = ({
               aria-hidden
               className="absolute left-[calc(var(--playback-progress,0)*100%)] size-3 -translate-x-1/2 rounded-full bg-primary shadow-md group-has-focus-visible/scrubber:outline-2 group-has-focus-visible/scrubber:outline-offset-2 group-has-focus-visible/scrubber:outline-primary"
             />
-            {/* Invisible, but handles all of the scrubber's interactions.
-                Overhangs the track by half the width of a native thumb on
-                each side b/c that is how far said thumb's center stays from
-                each end, which lets the dot above travel the entire track */}
+            {/* Invisibly handles all of the scrubber's interactions;
+                overhangs the `<ProgressTrack>` by half the width of a
+                typical native thumb (i.e., drag handle) on each side to
+                ensure that the custom thumb (above) can traverse the full
+                width of the `<input>`'s track. */}
             <input
               ref={scrubberRef}
               type="range"
               min={0}
               max={100}
-              // Arrow keys move the value by 1 in Firefox when the
-              // step is "any", hence the range of [0, 100] above
+              // In Firefox, the arrow keys move the `value` by 1 when
+              // `step` is "any", hence the range of [0, 100] above
               step="any"
               defaultValue={0}
               aria-label="Seek"
+              // Overhangs the `<ProgressTrack>` by half the width of a
+              // typical native thumb (i.e., drag handle) on each side to
+              // ensure that the custom thumb (above) can traverse the full
+              // width of the `<input>`'s track.
               className="absolute -left-2 h-full w-[calc(100%+(--spacing(4)))] cursor-pointer opacity-0"
               onChange={(e) => scrubTo(e.target.valueAsNumber)}
               onPointerDown={(e) => {
@@ -211,40 +217,37 @@ export const ExpandedVideo = ({
 
 export type LoopingVideoProps = {
   /**
-   * The path (in `public/`) to the video
-   * file played by this {@link LoopingVideo}.
+   * The path (in `public/`) to the video file for this {@link LoopingVideo}.
    */
   src: string;
 
   /**
-   * A short name for the video in this
-   * {@link LoopingVideo}. Only exposed to ATs.
+   * A short description of this {@link LoopingVideo}. Only exposed to ATs.
    */
   label: string;
 };
 
 /**
- * Renders the specified video in a window frame. The video plays
- * automatically (and silently) while it is in view, restarts from the
- * beginning each time it ends, and can be paused or resumed by clicking on
- * it. A bar beneath the video depicts how much of it has played.
+ * Renders the specified video in a `mockup-window`. The video plays
+ * automatically whenever it is in view and can be paused or resumed
+ * by clicking on it. Playback loops when the video ends.
+ * A bar beneath the video shows how much of it has played.
+ * The video is paused by default if the user `prefers-reduced-motion`.
  *
- * A button in the top right corner of the video opens an
- * {@link ExpandedVideo} that picks up where the video left off.
- * The video itself stands still until said dialog is closed.
- *
- * Paused by default if the user `prefers-reduced-motion`.
+ * Hovering over the video reveals a button in its top-right corner that,
+ * when clicked, opens an {@link ExpandedVideo} version of the video that
+ * pauses its progenitor until it is closed and immediately begins playback
+ * where the original video left off.
  */
 export const LoopingVideo = ({ src, label }: LoopingVideoProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // The time, in seconds, that the video had reached when
-  // it was expanded (`null` unless it is currently expanded)
-  const [expansionTime, setExpansionTime] = useState<number | null>(null);
+  // `null` iff the `ExpandedVideo` is not visible
+  const [timeWhenExpanded, setTimeWhenExpanded] = useState<number | null>(null);
   const { paused, playing, setPaused } = usePlaybackState(
     rootRef,
-    expansionTime !== null,
+    timeWhenExpanded !== null,
   );
 
   useConditionalPlayback(videoRef, playing);
@@ -282,18 +285,20 @@ export const LoopingVideo = ({ src, label }: LoopingVideoProps) => {
         <FloatingExpandButton
           label={`Expand video: ${label}`}
           paused={paused}
-          onClick={() => setExpansionTime(videoRef.current?.currentTime ?? 0)}
+          onClick={() =>
+            setTimeWhenExpanded(videoRef.current?.currentTime ?? 0)
+          }
         />
       </div>
       <ProgressTrack active className="rounded-none" />
 
-      {expansionTime !== null && (
+      {timeWhenExpanded !== null && (
         <ExpandedVideo
           src={src}
           label={label}
-          initialTime={expansionTime}
+          initialTime={timeWhenExpanded}
           initiallyPaused={paused}
-          onClose={() => setExpansionTime(null)}
+          onClose={() => setTimeWhenExpanded(null)}
         />
       )}
     </div>
