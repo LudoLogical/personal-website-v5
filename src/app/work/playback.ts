@@ -1,12 +1,21 @@
-import { useState, type RefObject } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import useInView from "@/hooks/useInView";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 import type { ProgressTrack } from "./controls";
 
 /**
- * The media player state tracked and returned by {@link usePlayback}.
+ * Plays the specified video.
+ * @param video the video to be played
  */
-type Playback = {
+export const play = (video: HTMLVideoElement) =>
+  // If playback is interrupted (e.g., by a pause)
+  // before it starts, simply ignore the rejection
+  void video.play().catch(() => {});
+
+/**
+ * The media player state tracked and returned by {@link usePlaybackState}.
+ */
+type PlaybackState = {
   /**
    * `true` if the media player is paused, `false` otherwise.
    */
@@ -33,12 +42,12 @@ type Playback = {
  * @param suspended `true` if the media player's playback must be interrupted
  *                  (e.g., because it is covered by a dialog that plays the
  *                  same video), `false` otherwise (and by default)
- * @returns the {@link Playback} state of the media player
+ * @returns the {@link PlaybackState} state of the media player
  */
-export const usePlayback = (
+export const usePlaybackState = (
   ref: RefObject<Element | null>,
   suspended = false,
-): Playback => {
+): PlaybackState => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const inView = useInView(ref);
 
@@ -54,6 +63,40 @@ export const usePlayback = (
 };
 
 /**
+ * While `playing`, plays the video whose element is assigned
+ * to the specified `ref`, and pauses it whenever `playing` stops.
+ * @param ref a `RefObject` for the video to be played
+ * @param playing `true` if the video should currently
+ *                be playing, `false` otherwise
+ */
+export const useConditionalPlayback = (
+  ref: RefObject<HTMLVideoElement | null>,
+  playing: boolean,
+) => {
+  useEffect(() => {
+    const video = ref.current;
+    if (!video || !playing) return;
+
+    play(video);
+    return () => video.pause();
+  }, [ref, playing]);
+};
+
+/**
+ * Computes the fraction of the specified video's duration that has elapsed.
+ * @param video the video whose progress is to be computed
+ *              (or `null` if it isn't mounted)
+ * @returns the fraction, in [0, 1], of the video's duration that has
+ *          elapsed, or `null` if the video isn't mounted or its
+ *          duration isn't known yet
+ */
+export const getProgressFraction = (
+  video: HTMLVideoElement | null,
+): number | null =>
+  // `duration` is `NaN` until the video's metadata has loaded
+  video?.duration ? video.currentTime / video.duration : null;
+
+/**
  * Exposes the specified `fraction` as the CSS variable
  * `--playback-progress` on the specified media player root element so that
  * a child {@link ProgressTrack} can depict it without having to re-render
@@ -65,12 +108,3 @@ export const usePlayback = (
  */
 export const showProgress = (root: HTMLElement | null, fraction: number) =>
   root?.style.setProperty("--playback-progress", `${fraction}`);
-
-/**
- * Plays the specified video.
- * @param video the video to be played
- */
-export const play = (video: HTMLVideoElement) =>
-  // If playback is interrupted (e.g., by a pause)
-  // before it starts, simply ignore the rejection
-  void video.play().catch(() => {});

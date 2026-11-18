@@ -13,7 +13,12 @@ import {
   FloatingPlaybackButton,
   ProgressTracks,
 } from "./controls";
-import { play, showProgress, usePlayback } from "./playback";
+import {
+  getProgressFraction,
+  play,
+  showProgress,
+  usePlaybackState,
+} from "./playback";
 import type { Demo, LinkCaptionedPicture } from "./types";
 import { ExpandedVideo, WINDOW_CLASS_NAMES } from "./videos";
 
@@ -82,7 +87,7 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
   // The time, in seconds, that the current video had reached when
   // it was expanded (`null` unless it is currently expanded)
   const [expansionTime, setExpansionTime] = useState<number | null>(null);
-  const { paused, playing, setPaused } = usePlayback(
+  const { paused, playing, setPaused } = usePlaybackState(
     rootRef,
     expansionTime !== null,
   );
@@ -97,12 +102,9 @@ export const VideoCarousel = ({ demos }: VideoCarouselProps) => {
   }, [demoIndex, playing]);
 
   useEveryAnimationFrame(playing, () => {
-    const video = videoRefs.current[demoIndex];
-
-    // Wait until the video's duration is known
-    if (!video || !video.duration) return;
-
-    showProgress(rootRef.current, video.currentTime / video.duration);
+    const progressFraction = getProgressFraction(videoRefs.current[demoIndex]);
+    if (progressFraction === null) return; // wait until the video has loaded
+    showProgress(rootRef.current, progressFraction);
   });
 
   const showDemo = (nextDemoIndex: number) => {
@@ -255,7 +257,7 @@ export const PhotoCarousel = ({ photos, className }: PhotoCarouselProps) => {
   // The duration, in milliseconds, for which the current photo has been shown
   const elapsedDuration = useRef(0);
 
-  const { paused, playing, setPaused } = usePlayback(rootRef);
+  const { paused, playing, setPaused } = usePlaybackState(rootRef);
   const [photoIndex, setPhotoIndex] = useState(0);
 
   const showPhoto = (nextPhotoIndex: number) => {

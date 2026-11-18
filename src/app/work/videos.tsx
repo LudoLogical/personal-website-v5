@@ -10,11 +10,15 @@ import {
   FloatingPlaybackButton,
   ProgressTrack,
 } from "./controls";
-import { play, showProgress, usePlayback } from "./playback";
+import {
+  getProgressFraction,
+  showProgress,
+  useConditionalPlayback,
+  usePlaybackState,
+} from "./playback";
 
 /**
- * The classes shared by every window frame in which a player places
- * its video(s). Also used as the frame of an {@link ExpandedVideo}.
+ * The classes shared by every `mockup-window` in which videos are framed.
  */
 export const WINDOW_CLASS_NAMES =
   "mockup-window border border-base-content/10 bg-base-200 shadow-lg";
@@ -88,35 +92,24 @@ export const ExpandedVideo = ({
     if (!dialog.open) dialog.showModal();
   }, [initialTime]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !playing) return;
-
-    play(video);
-    return () => video.pause();
-  }, [playing]);
+  useConditionalPlayback(videoRef, playing);
 
   // Runs even while the video stands still so that seeking is depicted too
   useEveryAnimationFrame(true, () => {
-    const video = videoRef.current;
-    const scrubber = scrubberRef.current;
+    const progressFraction = getProgressFraction(videoRef.current);
 
-    // Wait until the video's duration is known
-    if (!video || !scrubber || !video.duration) return;
+    // Wait until the scrubber exists and the video has loaded
+    if (!scrubberRef.current || progressFraction === null) return;
 
-    const progressFraction = video.currentTime / video.duration;
     showProgress(dialogRef.current, progressFraction);
-    scrubber.value = `${progressFraction * 100}`;
+    scrubberRef.current.value = `${progressFraction * 100}`;
   });
 
   const close = () => dialogRef.current?.close();
 
   const scrubTo = (progressPercent: number) => {
     const video = videoRef.current;
-
-    // Wait until the video's duration is known
-    if (!video || !video.duration) return;
-
+    if (!video || !video.duration) return; // wait until the video has loaded
     video.currentTime = (progressPercent / 100) * video.duration;
   };
 
@@ -249,26 +242,17 @@ export const LoopingVideo = ({ src, label }: LoopingVideoProps) => {
   // The time, in seconds, that the video had reached when
   // it was expanded (`null` unless it is currently expanded)
   const [expansionTime, setExpansionTime] = useState<number | null>(null);
-  const { paused, playing, setPaused } = usePlayback(
+  const { paused, playing, setPaused } = usePlaybackState(
     rootRef,
     expansionTime !== null,
   );
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !playing) return;
-
-    play(video);
-    return () => video.pause();
-  }, [playing]);
+  useConditionalPlayback(videoRef, playing);
 
   useEveryAnimationFrame(playing, () => {
-    const video = videoRef.current;
-
-    // Wait until the video's duration is known
-    if (!video || !video.duration) return;
-
-    showProgress(rootRef.current, video.currentTime / video.duration);
+    const progressFraction = getProgressFraction(videoRef.current);
+    if (progressFraction === null) return; // wait until the video has loaded
+    showProgress(rootRef.current, progressFraction);
   });
 
   return (
