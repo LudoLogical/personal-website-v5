@@ -19,18 +19,3 @@ export type Service = {
    */
   icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
 };
-
-/**
- * A research method with a publicly available explainer.
- */
-export type ResearchActivity = {
-  /**
-   * The name of this {@link ResearchActivity}.
-   */
-  label: string;
-
-  /**
-   * A webpage that explains this {@link ResearchActivity}.
-   */
-  href: string;
-};

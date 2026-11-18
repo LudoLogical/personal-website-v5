@@ -7,9 +7,9 @@ import { ClientLogo, Figure, Paragraph } from "./atoms";
 import type {
   Client,
   Feature,
+  FeaturedResearchMethod,
   Heading,
   Insight,
-  ResearchMethod,
   SectionHeading,
   TeamMember,
 } from "./types";
@@ -233,40 +233,41 @@ export const Subsection = ({
   </section>
 );
 
-export type ResearchMethodContainerProps = {
+export type ResearchMethodAccordionItemProps = {
   /**
-   * The {@link ResearchMethod} to be
-   * rendered in this {@link ResearchMethodContainer}.
+   * The {@link FeaturedResearchMethod} to be rendered
+   * in this {@link ResearchMethodAccordionItem}.
    */
-  method: ResearchMethod;
+  method: FeaturedResearchMethod;
 
   /**
-   * `true` if this {@link ResearchMethodContainer} should
+   * `true` if this {@link ResearchMethodAccordionItem} should
    * start out open, `false` otherwise (and by default).
    */
   open?: boolean;
 
   /**
    * The content that should appear below the `method.purpose`
-   * of this {@link ResearchMethodContainer} while it is open.
+   * of this {@link ResearchMethodAccordionItem} while it is open.
    */
   children: ReactNode;
 };
 
 /**
- * Renders the specified {@link ResearchMethod} as an item in an accordion.
- * Opening a `ResearchMethodContainer` reveals its content, which always begins
- * with the `purpose` of the {@link ResearchMethod}, and closes whichever other
- * `ResearchMethodContainer` on the page was already open, if any.
+ * Renders the specified {@link FeaturedResearchMethod} as an item in an
+ * accordion. Opening a `ResearchMethodAccordionItem` reveals its content,
+ * which always begins with the `purpose` of the {@link FeaturedResearchMethod},
+ * and closes whichever other `ResearchMethodAccordionItem` on the page was
+ * already open, if any.
  *
  * Note: This component is a daisyUI `join-item`, so
  * its direct parent must supply `join join-vertical`.
  */
-export const ResearchMethodContainer = ({
+export const ResearchMethodAccordionItem = ({
   method: { name, purpose },
   open = false,
   children,
-}: ResearchMethodContainerProps) => (
+}: ResearchMethodAccordionItemProps) => (
   // When two or more `<details>` have the same `name`,
   // only one of them can be `open` at a time
   <details

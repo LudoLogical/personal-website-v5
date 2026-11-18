@@ -13,7 +13,7 @@ import {
   CaseStudySummary,
   FeatureShowcase,
   InsightHero,
-  ResearchMethodContainer,
+  ResearchMethodAccordionItem,
   Section,
   Subsection,
 } from "@/app/work/sections";
@@ -30,10 +30,10 @@ import {
   GRANT_OPPORTUNITY_LABEL,
   GRANT_OPPORTUNITY_PAGES,
   INSIGHTS,
-  OTHER_RESEARCH_ACTIVITIES,
+  ADDITIONAL_RESEARCH_METHODS,
   OUTCOME,
   PICTURES,
-  RESEARCH_METHODS,
+  FEATURED_RESEARCH_METHODS,
   SECTION_HEADINGS,
   SERVICES,
   SUBTITLE,
@@ -159,8 +159,8 @@ const VibrantGrants = () => (
             <StakeholderRings className="mx-auto max-w-80" />
 
             <div className="join join-vertical">
-              <ResearchMethodContainer
-                method={RESEARCH_METHODS.systemMapping}
+              <ResearchMethodAccordionItem
+                method={FEATURED_RESEARCH_METHODS.systemMapping}
                 open
               >
                 <div className="grid gap-6 sm:grid-cols-2">
@@ -173,19 +173,21 @@ const VibrantGrants = () => (
                     sizes={HALF_WIDTH_SIZES}
                   />
                 </div>
-              </ResearchMethodContainer>
+              </ResearchMethodAccordionItem>
 
-              <ResearchMethodContainer
-                method={RESEARCH_METHODS.fieldWorkAndSSIs}
+              <ResearchMethodAccordionItem
+                method={FEATURED_RESEARCH_METHODS.fieldWorkAndSSIs}
               >
                 <PhotoCarousel
                   photos={CLIENT_NON_PROFIT_PHOTOS}
                   className="mx-auto w-full max-w-xl"
                 />
-              </ResearchMethodContainer>
+              </ResearchMethodAccordionItem>
 
-              <ResearchMethodContainer
-                method={RESEARCH_METHODS.cardSortingAndUsabilityTesting}
+              <ResearchMethodAccordionItem
+                method={
+                  FEATURED_RESEARCH_METHODS.cardSortingAndUsabilityTesting
+                }
               >
                 {/* `row-span-2` and `grid-rows-subgrid` so the captions line
                     up with each other even though the image heights differ */}
@@ -203,7 +205,7 @@ const VibrantGrants = () => (
                     imageClassName="self-end"
                   />
                 </div>
-              </ResearchMethodContainer>
+              </ResearchMethodAccordionItem>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -211,10 +213,10 @@ const VibrantGrants = () => (
                 Other Research Activities
               </h3>
               <ul className="flex flex-wrap gap-2">
-                {OTHER_RESEARCH_ACTIVITIES.map(({ label, href }) => (
+                {ADDITIONAL_RESEARCH_METHODS.map(({ name, href }) => (
                   <li key={href}>
                     <ExternalLink kind="button" href={href}>
-                      {label}
+                      {name}
                     </ExternalLink>
                   </li>
                 ))}

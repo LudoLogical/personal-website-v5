@@ -1,17 +1,18 @@
 import { ChartColumn, HandCoins, Sprout } from "lucide-react";
 import type {
+  AdditionalResearchMethod,
   Client,
   Demo,
+  FeaturedResearchMethod,
   FeatureGroup,
   Insight,
   LinkCaptionedPicture,
   Picture,
-  ResearchMethod,
   SectionHeading,
   TeamMember,
 } from "@/app/work/types";
 import ExternalLink from "@/components/ExternalLink";
-import type { ResearchActivity, Service } from "./types";
+import type { Service } from "./types";
 
 export const TITLE = "Vibrant Grants";
 
@@ -121,7 +122,7 @@ export const SERVICES: Service[] = [
   },
 ];
 
-export const RESEARCH_METHODS = {
+export const FEATURED_RESEARCH_METHODS = {
   systemMapping: {
     name: "Participatory System Mapping",
     purpose: (
@@ -149,7 +150,7 @@ export const RESEARCH_METHODS = {
       </>
     ),
   },
-} satisfies Record<string, ResearchMethod>;
+} satisfies Record<string, FeaturedResearchMethod>;
 
 export const PICTURES = {
   nsrTeam: {
@@ -282,26 +283,26 @@ export const CLIENT_NON_PROFIT_PHOTOS: LinkCaptionedPicture[] = [
   },
 ];
 
-export const OTHER_RESEARCH_ACTIVITIES: ResearchActivity[] = [
+export const ADDITIONAL_RESEARCH_METHODS: AdditionalResearchMethod[] = [
   {
-    label: "Directed storytelling",
+    name: "Directed storytelling",
     href: "https://www.youtube.com/watch?v=x8OJd4tpMoM",
   },
   {
-    label: "MoSCoW analysis",
+    name: "MoSCoW analysis",
     href: "https://en.wikipedia.org/wiki/MoSCoW_method",
   },
   {
-    label: "Mixed-methods survey",
+    name: "Mixed-methods survey",
     href: "https://www.nngroup.com/articles/mixed-methods-research/",
   },
   {
-    label: "Speed dating",
+    name: "Speed dating",
     href: "https://www.designreference.xyz/ux-methods/ideation/speed-dating",
   },
-  { label: "Co-design", href: "https://ixdf.org/literature/topics/codesign" },
+  { name: "Co-design", href: "https://ixdf.org/literature/topics/codesign" },
   {
-    label: "Concept testing",
+    name: "Concept testing",
     href: "https://maze.co/guides/concept-testing/",
   },
 ];

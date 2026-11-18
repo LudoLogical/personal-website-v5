@@ -141,16 +141,32 @@ export type Client = {
 /**
  * A research method employed during a project presented in a case study.
  */
-export type ResearchMethod = {
+export type FeaturedResearchMethod = {
   /**
-   * The name of this {@link ResearchMethod}.
+   * The name of this {@link FeaturedResearchMethod}.
    */
   name: string;
 
   /**
-   * A summary of what this {@link ResearchMethod} was meant to accomplish.
+   * A summary of what this {@link FeaturedResearchMethod}
+   * was meant to accomplish.
    */
   purpose: ReactNode;
+};
+
+/**
+ * A research method with a publicly available explainer.
+ */
+export type AdditionalResearchMethod = {
+  /**
+   * The name of this {@link AdditionalResearchMethod}.
+   */
+  name: string;
+
+  /**
+   * A webpage that explains this {@link AdditionalResearchMethod}.
+   */
+  href: string;
 };
 
 /**
