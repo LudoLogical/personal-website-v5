@@ -154,13 +154,13 @@ export const FEATURED_RESEARCH_METHODS = {
 export const PICTURES = {
   nsrTeam: {
     src: "/case-studies/vibrant-grants/photos/new-sun-rising-team.jpg",
-    alt: "The New Sun Rising team cheering with their arms raised in front of an ivy-covered wall.",
+    alt: "The New Sun Rising staff cheering with their arms raised in front of an ivy-covered wall.",
     width: 2560,
     height: 1472,
   },
   dataFlowModel: {
     src: "/case-studies/vibrant-grants/diagrams/data-flow-model-simplified.png",
-    alt: "A diagram in which 18 unlabeled data stores and processes are joined by a tangle of crisscrossing solid and dashed arrows.",
+    alt: "A diagram in which more than a dozen generic data stores and processes are joined by a tangle of criss-crossing solid and dashed arrows.",
     width: 2936,
     height: 1988,
     caption:
@@ -168,7 +168,7 @@ export const PICTURES = {
   },
   systemMappingFigurines: {
     src: "/case-studies/vibrant-grants/photos/system-mapping-figurines.jpg",
-    alt: "Clay figurines on a wooden table. Their handwritten labels include “Hunter,” “Scott,” “Non Profit,” “Social Enterprise,” and “Vibrancy Portal.”",
+    alt: 'Clay figurines with handwritten labels like "Non Profit," "Social Enterprise," and "Vibrancy Portal" sitting on a wooden table.',
     width: 4032,
     height: 3024,
     caption:
@@ -176,7 +176,7 @@ export const PICTURES = {
   },
   systemMappingInProgress: {
     src: "/case-studies/vibrant-grants/photos/system-mapping-in-progress.jpg",
-    alt: "A workshop participant placing a clay figurine on a paper-covered table among hand-drawn arrows, sticky notes, and markers.",
+    alt: "An NSR staff member gesturing at an arrangement of clay figurines, sticky notes, and hand-drawn arrows on a paper-covered table.",
     width: 5712,
     height: 4284,
     caption:
@@ -184,7 +184,7 @@ export const PICTURES = {
   },
   dendrogram: {
     src: "/case-studies/vibrant-grants/diagrams/dendrogram-mini.png",
-    alt: "A dendrogram in which six color-coded clusters of concepts merge at levels of consensus that range from 100% down to 50%.",
+    alt: "A diagram in which twenty concepts merge into six color-coded clusters merge at levels of concensus that range from 100% to 50%.",
     width: 1352,
     height: 1212,
     caption: (
@@ -211,29 +211,29 @@ export const PICTURES = {
   },
   usabilityTesting: {
     src: "/case-studies/vibrant-grants/diagrams/usability-testing.png",
-    alt: "A screenshot of NSR’s Vibrancy Portal on which parts of the interface are annotated with the questions “Noticeable?”, “Known to users?”, “Meaningful?”, “Helpful?”, and “Important?”",
+    alt: 'A screenshot of NSR\'s Vibrancy Portal in which specific interface elements are annotated with the design questions "Noticeable?", "Known to users?", "Meaningful?", "Helpful?", and "Important?"',
     width: 1703,
     height: 1471,
     caption:
       "We were particularly interested in NSR's Vibrancy Index because our initial research suggested that it was underutilized. Our testing revealed that few people knew when, why, or even how to use it.",
   },
-  // Two versions of one scene, shown as the halves of a single picture. Alt
-  // text adapted from each SVG's own `aria-label`, which `<img>` ignores.
+  // Alt text adapted from the SVG's own `aria-label`, which `<img>` ignores
   communityOriented: {
     src: "/case-studies/vibrant-grants/diagrams/community-oriented.svg",
-    alt: "A community supper photo, warm and in color, with handwritten circles and notes about the people in it.",
+    alt: "A photo of a community supper annotated with handwritten circles and notes about the people in it.",
     width: 540,
     height: 380,
   },
+  // Alt text adapted from the SVG's own `aria-label`, which `<img>` ignores
   dataDriven: {
     src: "/case-studies/vibrant-grants/diagrams/data-driven.svg",
-    alt: "The same community supper photo seen as a computer would: greyscale, with every person and plate boxed and labeled with a confidence score.",
+    alt: "A photo of a community supper annotated with object labels and confidence scores that evoke computer vision interfaces.",
     width: 540,
     height: 380,
   },
   ingestionMechanism: {
     src: "/case-studies/vibrant-grants/diagrams/ingestion-mechanism.png",
-    alt: "A flowchart in which a list of grant hub URLs feeds an algorithmic web scraper, whose output passes through an AI-powered grant parser and into the Vibrant Grants database.",
+    alt: "A flowchart that shows a list of grant hub URLs being supplied to an algorithmic web scraper, the output of which is fed through an AI-powered grant parser before ending up in the Vibrant Grants database.",
     width: 936,
     height: 840,
   },
@@ -242,7 +242,7 @@ export const PICTURES = {
 export const CLIENT_NON_PROFIT_PHOTOS: LinkCaptionedPicture[] = [
   {
     src: "/case-studies/vibrant-grants/photos/client-non-profits-001.png",
-    alt: "Four children crouching around a tree stump that holds a pile of colorful beads.",
+    alt: "Four children crouching to examine a tree stump.",
     width: 1458,
     height: 1084,
     caption: "Art in the Garden",
@@ -250,7 +250,7 @@ export const CLIENT_NON_PROFIT_PHOTOS: LinkCaptionedPicture[] = [
   },
   {
     src: "/case-studies/vibrant-grants/photos/client-non-profits-002.jpg",
-    alt: "A packed room of people seated at round tables beneath screens that read “Who is in the room?”",
+    alt: 'A room full of people seated at round tables and listening to a presenter. A slide projected on the walls reads "Who is in the room?"',
     width: 2560,
     height: 1920,
     caption: "Millvale Food + Energy Hub",
@@ -258,7 +258,7 @@ export const CLIENT_NON_PROFIT_PHOTOS: LinkCaptionedPicture[] = [
   },
   {
     src: "/case-studies/vibrant-grants/photos/client-non-profits-003.jpg",
-    alt: "A large room whose floor is covered in rows of packed brown paper bags.",
+    alt: "A large room in which many neat rows of packed brown paper bags cover the floor.",
     width: 2016,
     height: 1512,
     caption: "Millvale Food + Energy Hub",
@@ -266,7 +266,7 @@ export const CLIENT_NON_PROFIT_PHOTOS: LinkCaptionedPicture[] = [
   },
   {
     src: "/case-studies/vibrant-grants/photos/client-non-profits-004.jpg",
-    alt: "Three people posing with a painting of raised fists in many skin tones above a yellow bridge.",
+    alt: "Three people posing with a painting of raised fists in many skin tones and symbols from various religions above a single yellow bridge.",
     width: 1169,
     height: 894,
     caption: "Building Bridges Day",
@@ -274,7 +274,7 @@ export const CLIENT_NON_PROFIT_PHOTOS: LinkCaptionedPicture[] = [
   },
   {
     src: "/case-studies/vibrant-grants/photos/client-non-profits-005.jpg",
-    alt: "Neighbors sharing coffee and doughnuts around a table in a colorful café.",
+    alt: "A handful of people sharing coffee and doughnuts around a table in a colorful café.",
     width: 2048,
     height: 1536,
     caption: "Arts Excursions Unlimited",
@@ -333,8 +333,6 @@ export const INSIGHTS = {
   },
 } satisfies Record<string, Insight>;
 
-// One image per page of the PDF linked from `GRANT_OPPORTUNITY_CAPTION`,
-// in order from first to last
 export const GRANT_OPPORTUNITY_PAGES = Array.from(
   { length: 16 },
   (_, i) =>
@@ -357,7 +355,6 @@ export const GRANT_OPPORTUNITY_CAPTION = (
   </>
 );
 
-// Listed in the order in which the stages of the grant lifecycle occur
 export const FEATURE_GROUPS: FeatureGroup[] = [
   {
     heading: { id: "find-relevant-grants", label: "Find Relevant Grants" },
@@ -476,7 +473,6 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
   },
 ];
 
-// Listed in the order in which the sections appear
 export const SECTION_HEADINGS = {
   client: { id: "client", label: "The Client" },
   opportunity: { id: "opportunity", label: "The Opportunity" },
