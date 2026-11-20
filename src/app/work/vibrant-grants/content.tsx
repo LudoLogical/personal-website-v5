@@ -105,7 +105,7 @@ export const TEAM: TeamMember[] = [
 export const SERVICES = [
   {
     name: "Capacity Building",
-    description: "Getting from an idea to a fully developed organization",
+    description: "Growing from an idea to a fully developed organization",
     icon: Sprout,
   },
   {
@@ -317,7 +317,7 @@ export const INSIGHTS = {
     headline:
       "Finding relevant grant opportunities can be overwhelming and time-consuming.",
     details:
-      "The world of grants has no central database and no standardization. Plus, many listings take ages to read. Helping non-profit leaders surface relevant grants can save them a lot of time.",
+      "The world of grants has no central database and no standardization. Plus, many listings are lengthy and exhausting to read. Helping non-profit leaders locate relevant grants would save them a lot of valuable time and energy.",
   },
   riskAversion: {
     headline: "Non-profits avoid experimenting with new tools to manage risk.",
@@ -430,11 +430,11 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         headline: "Leave the Writing to the Experts",
         description: (
           <>
-            People who are as community-driven as non-profit leaders are
-            exceptional storytellers. Generating grant applications for them
-            would worsen the quality of the writing, make mistakes more likely,
-            and increase operating costs, so{" "}
-            <strong>we deliberately chose not to</strong>.
+            Non-profit leaders are deeply committed to their communities, which
+            makes them exceptional storytellers. Generating grant applications
+            for them would mean trading their powerful prose for relatively
+            forgettable writing and much higher operating costs, so we
+            deliberately chose not to.
           </>
         ),
         media: {

@@ -19,19 +19,25 @@ export type ExternalLinkProps = Omit<
     | {
         /**
          * The manner in which this {@link ExternalLink} should be rendered.
-         * - `"underline"`: underlined on hover; the content (which must be
-         *                  plain text) is permitted to wrap with the sole
-         *                  constraint that the `ArrowUpRight` icon will
-         *                  never wrap separately from the last word
+         * - `"underline"`: underlined only on hover
          * - `"inline"`: like `"underline"`, but faintly underlined even
          *               when not hovered so that it stands out from the
-         *               running text around it
+         *               text around it
          * - `"highlight"`: brightened on hover; the content is placed
          *                  within a single `inline-flex` box
          * - `"button"`: the content is placed within a
          *               `btn-soft btn-sm` daisyUI button
          */
         kind: "underline" | "inline";
+
+        /**
+         * `true` if `content` is a string and should be prevented from
+         * wrapping entirely, `false` if `content` is a `ReactNode` or
+         * should be permitted to wrap (with the sole constraint that the
+         * `ArrowUpRight` icon will never wrap separately from the last word)
+         */
+        nowrap?: boolean;
+
         /**
          * The content of the link. Must be plain text
          * iff using the `"underline"` or `"inline"` `kind`.
@@ -39,7 +45,9 @@ export type ExternalLinkProps = Omit<
         children: string;
       }
     | {
-        kind: "highlight" | "button"; // inherits doc comment from other `kind`
+        // All props inherit doc comments from other `kind`s
+        kind: "highlight" | "button";
+        nowrap?: false;
         children: ReactNode;
       }
   );
@@ -51,6 +59,7 @@ export type ExternalLinkProps = Omit<
  */
 const ExternalLink = ({
   kind,
+  nowrap = false,
   className,
   children,
   ...props
@@ -65,12 +74,16 @@ const ExternalLink = ({
       className={twMerge(KIND_CLASS_NAMES[kind], className)}
     >
       {isText ? (
-        <>
-          <span className="whitespace-normal">
-            {children.slice(0, lastWordStart)}
-          </span>
-          {children.slice(lastWordStart)}
-        </>
+        nowrap ? (
+          <span className="whitespace-nowrap">{children}</span>
+        ) : (
+          <>
+            <span className="whitespace-normal">
+              {children.slice(0, lastWordStart)}
+            </span>
+            {children.slice(lastWordStart)}
+          </>
+        )
       ) : (
         children
       )}

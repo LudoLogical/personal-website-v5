@@ -16,6 +16,37 @@ import type {
 import { LoopingVideo } from "./videos";
 
 /**
+ * A pattern matching any contiguous group of alphanumeric characters joined
+ * by hyphens (e.g., "step-by-step"), excluding any adjacent punctuation.
+ *
+ * @remarks
+ *
+ * Trailing punctuation must be excluded b/c `text-wrap: balance` won't
+ * break after a `<span>` with `whitespace-nowrap` that ends in punctuation
+ * (e.g., a comma) in (at least) Chrome
+ */
+const HYPHENATED_TOKEN = /([\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)+)/u;
+
+/**
+ * Renders the specified `text` such that every hyphenated
+ * word sequence (e.g., "step-by-step") stays on a single line.
+ * @param text the text to be rendered
+ * @returns a `<span>` containing the `text` in which each hyphenated word
+ *          sequence is wrapped in an inner `<span>` with `whitespace-nowrap`
+ */
+const renderWithoutHyphenBreaks = (text: string): ReactNode =>
+  text.split(HYPHENATED_TOKEN).map((part, i) =>
+    // Splitting on a capturing group puts the matches at odd indices
+    i % 2 ? (
+      <span key={i} className="whitespace-nowrap">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+
+/**
  * Renders a single, labeled item in a {@link CaseStudySummary}.
  */
 const CaseStudySummaryItem = ({
@@ -31,7 +62,7 @@ const CaseStudySummaryItem = ({
     <dt className="mb-3 text-xs font-bold tracking-widest text-base-content/50 uppercase">
       {label}
     </dt>
-    <dd>{children}</dd>
+    <dd className="max-w-sm text-balance">{children}</dd>
   </div>
 );
 
@@ -296,13 +327,16 @@ export type InsightHeroProps = {
 
 /**
  * Renders the specified {@link Insight}.
+ *
+ * Note: Hyphenated word pairs in the {@link Insight.headline}
+ * never break across lines.
  */
 export const InsightHero = ({
   insight: { headline, details },
 }: InsightHeroProps) => (
   <div className="flex flex-col gap-3 border-s-2 border-secondary ps-5">
     <h3 className="text-xl leading-snug font-semibold text-balance">
-      {headline}
+      {renderWithoutHyphenBreaks(headline)}
     </h3>
     <Paragraph>{details}</Paragraph>
   </div>

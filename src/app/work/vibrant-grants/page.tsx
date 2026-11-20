@@ -71,7 +71,7 @@ const VibrantGrants = () => (
         <h1 className="text-3xl leading-tight font-bold xs:text-4xl sm:text-5xl">
           {TITLE}
         </h1>
-        <p className="mt-3 text-lg text-base-content/70 sm:text-xl">
+        <p className="mt-3 text-lg text-balance text-base-content/70 sm:text-xl">
           {SUBTITLE}
         </p>
       </div>
@@ -99,14 +99,22 @@ const VibrantGrants = () => (
         <Section heading={SECTION_HEADINGS.client}>
           <div className="flex flex-col gap-8">
             <Paragraph>
-              Meet <strong>New Sun Rising, a non-profit incubator</strong>{" "}
-              serving Greater Pittsburgh. Think of it as a Y-Combinator for
-              public benefit initiatives.
+              Meet <strong>New Sun Rising (NSR), a non-profit incubator</strong>{" "}
+              serving Greater Pittsburgh. Think of it as a{" "}
+              <ExternalLink
+                kind="inline"
+                href="https://www.ycombinator.com"
+                nowrap
+              >
+                Y Combinator
+              </ExternalLink>{" "}
+              for public benefit initiatives.
             </Paragraph>
             <Figure picture={PICTURES.nsrTeam} />
             <div className="flex flex-col gap-4">
               <Paragraph>
-                NSR delivers on this mission in three key ways:
+                NSR delivers on its mission of inspiring community-driven
+                development in three key ways:
               </Paragraph>
               <ul className="grid gap-4 sm:grid-cols-3">
                 {SERVICES.map(({ name, description, icon: Icon }) => (
@@ -134,8 +142,9 @@ const VibrantGrants = () => (
               NSR and its clients were{" "}
               <strong>struggling to secure grant funding</strong>. Its digital
               service ecosystem had the potential to help with that, but it had
-              grown into a bit of a mess. We were challenged to tackle this
-              problem.
+              grown into a fragmented and unwieldy set of tools that were each
+              built to address a specific, emergent need. We were challenged to
+              tackle this problem.
             </Paragraph>
             <Figure
               picture={PICTURES.dataFlowModel}
@@ -149,7 +158,7 @@ const VibrantGrants = () => (
           <div className="flex flex-col gap-10">
             <Paragraph>
               <strong>
-                This design challenge implicated many different stakeholders
+                This design challenge involved many different stakeholders
               </strong>
               . We took care to ensure that our work would benefit them all by
               routinely seeking input from each one throughout the project.
@@ -209,7 +218,7 @@ const VibrantGrants = () => (
 
             <div className="flex flex-col gap-3">
               <h3 className="text-xs font-bold tracking-widest text-base-content/50 uppercase">
-                Other Research Activities
+                Additional Research Activities
               </h3>
               <ul className="flex flex-wrap gap-2">
                 {ADDITIONAL_RESEARCH_METHODS.map(({ name, href }) => (
@@ -256,8 +265,8 @@ const VibrantGrants = () => (
           <div className="flex flex-col gap-10">
             <Paragraph>
               <strong>Vibrant Grants</strong> empowers non-profit leaders at
-              every step of the way through every grant lifecycle that they
-              encounter.
+              every step of the grant lifecycle, from finding and applying for
+              grants to reporting on their outcomes.
             </Paragraph>
 
             <div className="flex flex-col gap-12">
