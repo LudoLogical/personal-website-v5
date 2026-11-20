@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import type { Picture } from "@/app/work/types";
 
@@ -83,44 +83,59 @@ export const StakeholderDiagram = ({ className }: StakeholderDiagramProps) => (
 export type SplitPictureProps = {
   /**
    * The {@link Picture} whose left half is rendered in this
-   * {@link SplitPicture}. Its intrinsic dimensions must match
-   * those of its partner.
+   * {@link SplitPicture}. Its intrinsic dimensions must match those
+   * of its partner, and it must have a `caption` iff its partner does.
    */
   left: Picture;
 
   /**
    * The {@link Picture} whose right half is rendered in this
-   * {@link SplitPicture}. Its intrinsic dimensions must match
-   * those of its partner.
+   * {@link SplitPicture}. Its intrinsic dimensions must match those
+   * of its partner, and it must have a `caption` iff its partner does.
    */
   right: Picture;
-};
+} & (
+  | { left: { caption: ReactNode }; right: { caption: ReactNode } }
+  | { left: { caption?: never }; right: { caption?: never } }
+);
 
 /**
  * Renders the left half of the specified `left` {@link Picture} and the right
  * half of the specified `right` {@link Picture} as a single image with rounded
- * corners and no visible boundary between the halves.
+ * corners and no visible boundary between the halves. If the {@link Picture}s
+ * have `caption`s, they are rendered as eyebrows and appear centered under
+ * the halves to which they correspond.
  *
- * Exposed to ATs as two images, each with its own `alt` text.
+ * Exposed to ATs as two images, each with its own `alt` text,
+ * inside a `<figure>` whose `<figcaption>` contains both captions.
  */
 export const SplitPicture = ({ left, right }: SplitPictureProps) => (
-  // Both pictures share the one and only grid cell, so they overlap exactly
-  <div className="grid overflow-hidden rounded-xl *:col-start-1 *:row-start-1">
-    <Image
-      src={left.src}
-      alt={left.alt}
-      width={left.width}
-      height={left.height}
-      className="h-auto w-full"
-    />
-    <Image
-      src={right.src}
-      alt={right.alt}
-      width={right.width}
-      height={right.height}
-      className="h-auto w-full [clip-path:inset(0_0_0_50%)]"
-    />
-  </div>
+  <figure className="flex flex-col gap-4">
+    {/* Both pictures share the one and only grid cell,
+        so they overlap exactly */}
+    <div className="grid overflow-hidden rounded-box *:col-start-1 *:row-start-1">
+      <Image
+        src={left.src}
+        alt={left.alt}
+        width={left.width}
+        height={left.height}
+        className="h-auto w-full"
+      />
+      <Image
+        src={right.src}
+        alt={right.alt}
+        width={right.width}
+        height={right.height}
+        className="h-auto w-full [clip-path:inset(0_0_0_50%)]"
+      />
+    </div>
+    {left.caption && (
+      <figcaption className="grid grid-cols-2 text-center text-xs font-bold tracking-widest text-base-content/50 uppercase text-box-trim *:px-2">
+        <span>{left.caption}</span>
+        <span>{right.caption}</span>
+      </figcaption>
+    )}
+  </figure>
 );
 
 export type PageFanProps = {
@@ -215,10 +230,10 @@ const ReceiptCard = ({
           {headline}
         </p>
         <hr className="border-dashed border-base-content/20" />
-        <dl className="flex flex-col gap-1.5">
+        <dl className="flex flex-col gap-1.5 text-base-content/50">
           {items.map(({ label, hours }) => (
             <div key={label} className="flex justify-between gap-4">
-              <dt className="text-base-content/75">{label}</dt>
+              <dt>{label}</dt>
               <dd className="whitespace-nowrap tabular-nums">
                 {formatHours(hours)}
               </dd>

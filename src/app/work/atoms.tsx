@@ -83,7 +83,7 @@ export const Figure = ({
       width={width}
       height={height}
       sizes={sizes}
-      className={twMerge("h-auto w-full rounded-xl", imageClassName)}
+      className={twMerge("h-auto w-full rounded-box", imageClassName)}
     />
     {caption && <Caption>{caption}</Caption>}
   </figure>
@@ -109,8 +109,8 @@ export type TestimonialProps = {
 };
 
 /**
- * Renders the specified `quote` as a callout, wrapped in quotation
- * marks and followed by the specified attribution (if any).
+ * Renders the specified `quote` as a callout,
+ * followed by the specified attribution (if any).
  */
 export const Testimonial = ({
   quote,
@@ -127,11 +127,11 @@ export const Testimonial = ({
       <Quote aria-hidden className="size-5 fill-current text-primary" />
       <blockquote
         className={twMerge(
-          "text-lg leading-snug font-semibold",
-          featured && "sm:text-2xl",
+          "text-base font-semibold",
+          featured && "text-lg leading-snug sm:text-2xl",
         )}
       >
-        &ldquo;{quote}&rdquo;
+        {quote}
       </blockquote>
       {children && <figcaption>{children}</figcaption>}
     </div>

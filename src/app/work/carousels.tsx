@@ -281,7 +281,7 @@ export const PhotoCarousel = ({ photos, className }: PhotoCarouselProps) => {
 
   return (
     <figure ref={rootRef} className={twMerge("flex flex-col gap-4", className)}>
-      <div className="relative aspect-4/3 overflow-hidden rounded-xl bg-base-300">
+      <div className="relative aspect-4/3 overflow-hidden rounded-box bg-base-300">
         {photos.map(({ src, alt }, i) => (
           <Image
             key={src}

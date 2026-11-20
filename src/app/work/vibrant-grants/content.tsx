@@ -223,6 +223,7 @@ export const PICTURES = {
     alt: "A photo of a community supper annotated with handwritten circles and notes about the people in it.",
     width: 540,
     height: 380,
+    caption: "Community-oriented",
   },
   // Alt text adapted from the SVG's own `aria-label`, which `<img>` ignores
   dataDriven: {
@@ -230,6 +231,7 @@ export const PICTURES = {
     alt: "A photo of a community supper annotated with object labels and confidence scores that evoke computer vision interfaces.",
     width: 540,
     height: 380,
+    caption: "Data-driven",
   },
   ingestionMechanism: {
     src: "/case-studies/vibrant-grants/diagrams/ingestion-mechanism.png",
@@ -494,4 +496,4 @@ export const ACCEPTANCE_TESTING_TESTIMONIALS = [
 ];
 
 export const EXECUTIVE_DIRECTOR_TESTIMONIAL =
-  "The UI here can help us set more modern, more accessible, cleaner ways for the information to be presented on the portal.";
+  "The UI [of Vibrant Grants] can help us set more modern, more accessible, cleaner ways for the information to be presented on [NSR's Vibrancy Portal].";

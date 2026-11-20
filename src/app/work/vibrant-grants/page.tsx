@@ -165,7 +165,7 @@ const VibrantGrants = () => (
             </Paragraph>
             <StakeholderDiagram className="mx-auto max-w-80" />
 
-            <div className="join join-vertical">
+            <div className="join join-vertical [--radius-field:var(--radius-box)]">
               <ResearchMethodAccordionItem
                 method={FEATURED_RESEARCH_METHODS.systemMapping}
                 open
